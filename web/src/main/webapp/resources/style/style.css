@@ -1,0 +1,7 @@
+.ui-panelgrid td {
+    border-width: 1px;
+    border-style: solid;
+    border-color: inherit;
+    padding: 4px 10px;
+    vertical-align: top;
+}
