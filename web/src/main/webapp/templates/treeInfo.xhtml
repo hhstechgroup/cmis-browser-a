@@ -11,7 +11,7 @@
 <h:body>
     <ui:composition>
         <h:form id="formLeftTree">
-            <p:panelGrid columns="3">
+            <p:panelGrid columns="3" style="width: 100%;">
                 <p:tree value="#{treeBean.root}" var="node" dynamic="true" cache="false"
                         selectionMode="single" selection="#{treeBean.selectedNode}" id="tree">
                     <p:ajax event="select" update=":formLeftTree:fsTable"/>
@@ -23,9 +23,8 @@
 
                 <p:dataTable id="fsTable" var="fsObject" value="#{treeBean.fsList}">
                     <f:facet name="header">
-                        #{fsObject.path }
+                        #{treeBean.selectedFSObject.path}
                     </f:facet>
-
                     <p:column headerText="Name" sortBy="#{fsObject.name}">
                         <p:graphicImage value="/resources/images/#{fsObject.icon}" width="16" height="16"/>
                         <h:outputText value=" #{fsObject.name}"/>

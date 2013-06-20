@@ -23,17 +23,21 @@ import java.util.List;
 @ManagedBean(name = "treeBean")
 @ApplicationScoped
 public class TreeBean implements Serializable {
-    private TreeNode root;
+    private TreeNode main;
     private List<FSObject> fsList;
+    private FSObject selectedFSObject;
     private TreeNode selectedNodes;
     private FSFolder parent = new FSFolder();
     private CMISService service = new CMISServiceImpl();
 
     public TreeBean() {
-        root = new DefaultTreeNode("Root", null);
+        FSFolder root = new FSFolder();
+        root.setName("Root");
         parent.setPath("/");
         fsList = service.getChildren(parent);
-        SubObjects(parent, root);
+        main = new DefaultTreeNode("Main", null);
+        TreeNode node0 = new DefaultTreeNode(root, main);
+        SubObjects(parent, node0);
     }
 
     private void SubObjects(FSFolder parent, TreeNode treenodeparent) {
@@ -47,7 +51,7 @@ public class TreeBean implements Serializable {
     }
 
     public TreeNode getRoot() {
-        return root;
+        return main;
     }
 
     public TreeNode getSelectedNode() {
@@ -56,8 +60,8 @@ public class TreeBean implements Serializable {
 
     public void setSelectedNode(TreeNode selectedNodes) {
         this.selectedNodes = selectedNodes;
-        FSObject fsObject = (FSObject) getSelectedNode().getData();
-        parent.setPath(fsObject.getPath());
+        selectedFSObject = (FSObject) getSelectedNode().getData();
+        parent.setPath(selectedFSObject.getPath());
         fsList = service.getChildren(parent);
     }
 
@@ -69,4 +73,11 @@ public class TreeBean implements Serializable {
         this.fsList = fsList;
     }
 
+    public FSObject getSelectedFSObject() {
+        return selectedFSObject;
+    }
+
+    public void setSelectedFSObject(FSObject sn) {
+        this.selectedFSObject = sn;
+    }
 }

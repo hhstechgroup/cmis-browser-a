@@ -25,7 +25,6 @@ public class LoginBean implements Serializable {
 
     public LoginBean(){
         anonymous=true;
-        System.out.println(anonymous+"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbba");
     }
     public String getLogin() {
         return login;
@@ -52,9 +51,7 @@ public class LoginBean implements Serializable {
     }
 
     public void changeAnonumous() {
-
         this.anonymous = !anonymous;
-        System.out.println(anonymous+"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
     }
 
     public String getRepository() {
