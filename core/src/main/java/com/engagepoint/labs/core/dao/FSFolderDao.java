@@ -56,6 +56,10 @@ public interface FSFolderDao {
      */
     public FSFolder getRoot();
 
+    /**
+     *
+     * @return reference to FSFileDao
+     */
     public FSFileDao getFsFileDao();
 
 }
