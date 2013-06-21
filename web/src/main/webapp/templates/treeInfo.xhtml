@@ -11,9 +11,11 @@
 <h:body>
     <ui:composition>
         <h:form id="formLeftTree">
-            <p:panelGrid columns="3" style="width: 100%;">
+            <!--<h:outputStylesheet library="style" name="table.css" />-->
+            <p:panelGrid columns="3" style="width: 100%;" styleClass="table">
+                <h:outputStylesheet library="style" name="style.css" />
                 <p:tree value="#{treeBean.root}" var="node" dynamic="true" cache="false"
-                        selectionMode="single" selection="#{treeBean.selectedNode}" id="tree">
+                        selectionMode="single" selection="#{treeBean.selectedNode}" id="tree" style="width: 300px;">
                     <p:ajax event="select" update=":formLeftTree:fsTable"/>
                     <p:treeNode expandedIcon="ui-icon-folder-open"
                                 collapsedIcon="ui-icon-folder-collapsed">
@@ -21,9 +23,10 @@
                     </p:treeNode>
                 </p:tree>
 
-                <p:dataTable id="fsTable" var="fsObject" value="#{treeBean.fsList}">
+                <p:dataTable id="fsTable" var="fsObject" value="#{treeBean.fsList}" style="width: 670px;">
                     <f:facet name="header">
-                        #{treeBean.selectedFSObject.path}
+                        <!--#{treeBean.selectedFSObject.path}-->
+                        <p:inputText value="#{treeBean.selectedFSObject.path}" size="68"/>
                     </f:facet>
                     <p:column headerText="Name" sortBy="#{fsObject.name}">
                         <p:graphicImage value="/resources/images/#{fsObject.icon}" width="16" height="16"/>
@@ -34,7 +37,7 @@
                     </p:column>
                 </p:dataTable>
 
-                <p:panel id="managedButtons" header="Actions">
+                <p:panel id="managedButtons" header="Actions" style="width:200px;">
                     <p><p:commandButton value="Create" ajax="false" action="index"/></p>
 
                     <p><p:commandButton value="Read" ajax="false" disabled="true"/></p>
