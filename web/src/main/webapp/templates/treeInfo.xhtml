@@ -13,7 +13,7 @@
         <h:form id="formLeftTree">
             <!--<h:outputStylesheet library="style" name="table.css" />-->
             <p:panelGrid columns="3" style="width: 100%;" styleClass="table">
-                <h:outputStylesheet library="style" name="style.css" />
+                <h:outputStylesheet library="style" name="style.css"/>
                 <p:tree value="#{treeBean.root}" var="node" dynamic="true" cache="false"
                         selectionMode="single" selection="#{treeBean.selectedNode}" id="tree" style="width: 300px;">
                     <p:ajax event="select" update=":formLeftTree:fsTable"/>
@@ -23,7 +23,8 @@
                     </p:treeNode>
                 </p:tree>
 
-                <p:dataTable id="fsTable" var="fsObject" value="#{treeBean.fsList}" style="width: 670px;">
+                <p:dataTable id="fsTable" var="fsObject" value="#{treeBean.fsList}" style="width: 670px;"
+                             emptyMessage="This folder is empty">
                     <f:facet name="header">
                         <!--#{treeBean.selectedFSObject.path}-->
                         <p:inputText value="#{treeBean.selectedFSObject.path}" size="68"/>
