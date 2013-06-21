@@ -61,7 +61,13 @@ public class TreeBean implements Serializable {
     public void setSelectedNode(TreeNode selectedNodes) {
         this.selectedNodes = selectedNodes;
         selectedFSObject = (FSObject) getSelectedNode().getData();
-        parent.setPath(selectedFSObject.getPath());
+        if (selectedFSObject.getPath() == null) {
+            parent.setPath("/");
+            selectedFSObject.setPath("/");
+        } else {
+            parent.setPath(selectedFSObject.getPath());
+        }
+
         fsList = service.getChildren(parent);
     }
 
