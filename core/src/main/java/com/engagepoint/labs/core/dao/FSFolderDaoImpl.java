@@ -26,7 +26,6 @@ public class FSFolderDaoImpl implements FSFolderDao {
         fsFileDao = new FSFileDaoImpl();
     }
 
-    @Override
     public FSFileDao getFsFileDao() {
         return fsFileDao;
     }
@@ -48,8 +47,10 @@ public class FSFolderDaoImpl implements FSFolderDao {
         FSFolder folder = new FSFolder();
         folder.setPath(newFolder.getPath());
         folder.setName(newFolder.getName());
+        folder.setType("cmis:folder");
         folder.setParent(parent);
         folder.setId(newFolder.getId());
+        folder.setChildren(null);
         return folder;
     }
 
@@ -74,15 +75,20 @@ public class FSFolderDaoImpl implements FSFolderDao {
             FSObject fsObject;
             if(o instanceof Folder){
                 fsObject = new FSFolder();
+                fsObject.setName(o.getName());
                 fsObject.setPath(((Folder) o).getPath());
+                fsObject.setType(o.getType().getDisplayName());
+                fsObject.setId(o.getId());
+                fsObject.setParent(parent);
             } else {
                 fsObject = new FSFile();
+                fsObject.setName(o.getName());
+                fsObject.setId(o.getId());
+                fsObject.setType(o.getType().getDisplayName());
                 fsObject.setPath(notRootFolder);
                 fsObject.setAbsolutePath(notRootFolder + "/" + o.getName());
+                fsObject.setParent(parent);
             }
-            fsObject.setName(o.getName());
-            fsObject.setId(o.getId());
-            fsObject.setParent(parent);
             children.add(fsObject);
         }
         return children;
@@ -102,6 +108,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
         root.setName(cmisRoot.getName());
         root.setPath(cmisRoot.getPath());
         root.setId(cmisRoot.getId());
+        root.setType(cmisRoot.getType().getDisplayName());
         return root;
     }
 }

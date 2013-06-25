@@ -50,14 +50,6 @@ public class TreeBean implements Serializable {
         }
     }
 
-    public TreeNode getRoot() {
-        return main;
-    }
-
-    public TreeNode getSelectedNode() {
-        return selectedNodes;
-    }
-
     public void setSelectedNode(TreeNode selectedNodes) {
         this.selectedNodes = selectedNodes;
         selectedFSObject = (FSObject) getSelectedNode().getData();
@@ -69,6 +61,14 @@ public class TreeBean implements Serializable {
         }
 
         fsList = service.getChildren(parent);
+    }
+
+    public TreeNode getRoot() {
+        return main;
+    }
+
+    public TreeNode getSelectedNode() {
+        return selectedNodes;
     }
 
     public List<FSObject> getFsList() {

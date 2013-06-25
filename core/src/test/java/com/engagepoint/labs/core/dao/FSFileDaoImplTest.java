@@ -1,5 +1,13 @@
 package com.engagepoint.labs.core.dao;
 
+/**
+ * Created with IntelliJ IDEA.
+ * User: r.reznichenko
+ * Date: 6/18/13
+ * Time: 11:46 AM
+ * To change this template use File | Settings | File Templates.
+ */
+
 import com.engagepoint.labs.core.models.FSFile;
 import com.engagepoint.labs.core.models.FSFolder;
 import org.apache.chemistry.opencmis.client.api.Document;
@@ -7,9 +15,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Created with IntelliJ IDEA.
