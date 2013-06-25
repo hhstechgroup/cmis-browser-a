@@ -11,7 +11,6 @@ import java.util.List;
 /**
  * @author volodymyr.kozubal
  */
-
 public class CMISServiceImpl implements CMISService {
     private FSFolderDao fsFolderDao;
     private ConnectionFactory connect;
@@ -39,42 +38,29 @@ public class CMISServiceImpl implements CMISService {
     }
 
     /**
-     * {@inheritDoc}
+     * @param file FsFile
+     * @return
      */
-    @Override
     public String getContent(FSFile file) {
         return fsFolderDao.getFsFileDao().getContent(file);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public List<FSObject> getSubTreeObjects(FSFolder parent) {
-
         list = new ArrayList<FSObject>();
         SubObjects(parent);
         return list;
     }
 
-    /**
-     * additional method for getSubTreeObjects method
-     * is invoked recusively for all subnodes
-     *
-     * @param parent FSFolder
-     * @method getSubTreeObjects
-     */
     private void SubObjects(FSFolder parent) {
-
         List<FSObject> children = getChildren(parent);
         list.addAll(children);
         for (FSObject i : children) {
             if (i instanceof FSFolder)
-
                 SubObjects((FSFolder) i);
         }
 
     }
-
 
 }

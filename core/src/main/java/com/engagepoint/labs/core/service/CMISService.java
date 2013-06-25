@@ -1,6 +1,5 @@
 package com.engagepoint.labs.core.service;
 
-import com.engagepoint.labs.core.models.FSFile;
 import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
 
@@ -27,17 +26,5 @@ public interface CMISService {
      */
     public FSObject getRootFolder();
 
-    /**
-     * Get all nodes from parent object subtree
-     * @param parent parent object
-     * @return List of all file and folder
-     */
-    public List<FSObject> getSubTreeObjects (FSFolder parent);
-
-    /**
-     * get content of the file
-     * @param file FSFile object which it is supposed to get content
-     * @return content of the file
-     */
-    public String getContent(FSFile file);
+    public List<FSObject> getSubTreeObjects(FSFolder parent);
 }

@@ -23,9 +23,10 @@ public class LoginBean implements Serializable {
     private boolean anonymous;
     private List<SelectItem> repositories = new ArrayList<SelectItem>();
 
-    public LoginBean(){
-        anonymous=true;
+    public LoginBean() {
+        anonymous = true;
     }
+
     public String getLogin() {
         return login;
     }

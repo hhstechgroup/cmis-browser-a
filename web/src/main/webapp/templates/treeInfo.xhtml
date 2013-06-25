@@ -12,22 +12,30 @@
     <ui:composition>
         <h:form id="formLeftTree">
             <!--<h:outputStylesheet library="style" name="table.css" />-->
-            <p:panelGrid columns="3" style="width: 100%;" styleClass="table">
+            <p:panelGrid columns="2" style="width: 100%; height: 400px;" styleClass="table">
+
                 <h:outputStylesheet library="style" name="style.css"/>
                 <p:tree value="#{treeBean.root}" var="node" dynamic="true" cache="false"
-                        selectionMode="single" selection="#{treeBean.selectedNode}" id="tree" style="width: 300px;">
+                        selectionMode="single" selection="#{treeBean.selectedNode}" id="tree" style="width: 420px;">
                     <p:ajax event="select" update=":formLeftTree:fsTable"/>
+
                     <p:treeNode expandedIcon="ui-icon-folder-open"
                                 collapsedIcon="ui-icon-folder-collapsed">
                         <h:outputText value="#{node.name}"/>
                     </p:treeNode>
                 </p:tree>
-
-                <p:dataTable id="fsTable" var="fsObject" value="#{treeBean.fsList}" style="width: 670px;"
-                             emptyMessage="This folder is empty">
+                <p:dataTable id="fsTable" var="fsObject" value="#{treeBean.fsList}" scrollable="true" scrollWidth="790"
+                             scrollHeight="400" style="width: 770px;"
+                             emptyMessage="This folder is Empty">
                     <f:facet name="header">
-                        <!--#{treeBean.selectedFSObject.path}-->
-                        <p:inputText value="#{treeBean.selectedFSObject.path}" size="68"/>
+                        <p:inputText value="#{treeBean.selectedFSObject.path}"
+                                     style="font-size: 13px; margin-bottom: 5px" size="100"/>
+                        <p:tabMenu activeIndex="4">
+                            <p:menuitem value="Create" url="index.xhtml" icon="ui-icon-document"/>
+                            <p:menuitem value="Read" url="index.xhtml" icon="ui-icon-contact"/>
+                            <p:menuitem value="Update" url="index.xhtml" icon="ui-icon-arrowrefresh-1-w"/>
+                            <p:menuitem value="Delete" url="index.xhtml" icon="ui-icon-close"/>
+                        </p:tabMenu>
                     </f:facet>
                     <p:column headerText="Name" sortBy="#{fsObject.name}">
                         <p:graphicImage value="/resources/images/#{fsObject.icon}" width="16" height="16"/>
@@ -37,17 +45,6 @@
                         <h:outputText value="#{fsObject.type}"/>
                     </p:column>
                 </p:dataTable>
-
-                <p:panel id="managedButtons" header="Actions" style="width:200px;">
-                    <p><p:commandButton value="Create" ajax="false" action="index"/></p>
-
-                    <p><p:commandButton value="Read" ajax="false" disabled="true"/></p>
-
-                    <p><p:commandButton value="Update" ajax="false" disabled="true"/></p>
-
-                    <p><p:commandButton value="Delete" ajax="false" disabled="true"/></p>
-                </p:panel>
-
             </p:panelGrid>
         </h:form>
     </ui:composition>
