@@ -15,10 +15,15 @@ import com.engagepoint.labs.core.service.CMISServiceImpl;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
+import javax.faces.context.FacesContext;
+import javax.faces.event.ActionEvent;
 import java.io.Serializable;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @ManagedBean(name = "treeBean")
 @ApplicationScoped
@@ -28,20 +33,24 @@ public class TreeBean implements Serializable {
     private FSObject selectedFSObject;
     private TreeNode selectedNodes;
     private FSFolder parent = new FSFolder();
-    private CMISService service = new CMISServiceImpl();
+    private CMISService CMISService = new CMISServiceImpl();
+    private static Logger logger = Logger.getLogger(TreeBean.class.getName());
+    private String name;
+    private String type;
+
 
     public TreeBean() {
         FSFolder root = new FSFolder();
         root.setName("Root");
         parent.setPath("/");
-        fsList = service.getChildren(parent);
+        fsList = CMISService.getChildren(parent);
         main = new DefaultTreeNode("Main", null);
         TreeNode node0 = new DefaultTreeNode(root, main);
         SubObjects(parent, node0);
     }
 
     private void SubObjects(FSFolder parent, TreeNode treenodeparent) {
-        List<FSObject> children = service.getChildren(parent);
+        List<FSObject> children = CMISService.getChildren(parent);
         for (FSObject i : children) {
             if (i instanceof FSFolder) {
                 TreeNode treeNode = new DefaultTreeNode(i, treenodeparent);
@@ -60,7 +69,31 @@ public class TreeBean implements Serializable {
             parent.setPath(selectedFSObject.getPath());
         }
 
-        fsList = service.getChildren(parent);
+        fsList = CMISService.getChildren(parent);
+    }
+
+ //   public void deleteNode() {
+//        selectedNodes.getChildren().clear();
+//        selectedNodes.getParent().getChildren().remove(selectedNodes);
+//        selectedNodes.setParent(null);
+//
+//        selectedNodes = null;
+//    }
+
+    /**
+     * Create new folder with name {@link this#name} and type {@link this#type}
+     * in {@link this#selectedFSObject} parent directory
+     */
+    public void createFolder(ActionEvent event) {
+        try {
+            CMISService.createFolder((FSFolder) selectedFSObject, name);
+        } catch (Exception ex) {
+            logger.log(Level.SEVERE, "Exception: ", ex);
+           //FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Connection Fail", event.toString());
+
+            //FacesContext.getCurrentInstance().addMessage(null, message);
+        }
+
     }
 
     public TreeNode getRoot() {
@@ -85,5 +118,21 @@ public class TreeBean implements Serializable {
 
     public void setSelectedFSObject(FSObject sn) {
         this.selectedFSObject = sn;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getType() {
+        return type;
     }
 }
