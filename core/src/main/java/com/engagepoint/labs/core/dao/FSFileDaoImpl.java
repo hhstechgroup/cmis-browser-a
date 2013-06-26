@@ -21,10 +21,10 @@ import java.util.Map;
 public class FSFileDaoImpl implements FSFileDao {
 
     private Session session;
+
     @Override
     public void setSession(Session session) {
         this.session = session;
-
     }
 
     @Override
@@ -34,6 +34,10 @@ public class FSFileDaoImpl implements FSFileDao {
         String mimetype = "text/plain; charset=UTF-8";
 
         byte[] buf = new byte[0];
+        //TODO check that content not null
+        if(content == null) {
+            content = "";
+        }
         try {
             buf = content.getBytes("UTF-8");
         } catch (UnsupportedEncodingException e) {
@@ -57,7 +61,6 @@ public class FSFileDaoImpl implements FSFileDao {
         file.setAbsolutePath(notRootFolder + "/" + fileName);
         file.setContent(content);
         file.setParent(parent);
-        file.setType(doc.getType().getDisplayName());
         return file;
     }
 
