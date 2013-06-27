@@ -50,6 +50,8 @@ public interface FSFolderDao {
      */
     public boolean delete(FSFolder folder);
 
+    public boolean deleteAllTree(FSFolder folder);
+
     /**
      *
      * @return root folder

@@ -1,13 +1,5 @@
 package com.engagepoint.labs.web.controllers;
 
-/**
- * Created with IntelliJ IDEA.
- * User: bogdan.ezapenkin
- * Date: 6/17/13
- * Time: 4:37 PM
- * To change this template use File | Settings | File Templates.
- */
-
 import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
 import com.engagepoint.labs.core.service.CMISService;
@@ -17,32 +9,50 @@ import org.primefaces.model.TreeNode;
 
 import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
-import java.awt.event.ActionEvent;
+import javax.faces.event.ActionEvent;
 import java.io.Serializable;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+/**
+ * User: bogdan.ezapenkin
+ * Date: 6/17/13
+ * Time: 4:37 PM
+ */
 
 @ManagedBean(name = "treeBean")
 @ApplicationScoped
 public class TreeBean implements Serializable {
-    private TreeNode main;
-    private List<FSObject> fsList;
-    private FSObject selectedFSObject;
+
+    private boolean backButtonDisabled = true;
+    private boolean forwardButtonDisabled = true;
+    final TreeNode main;
     private TreeNode selectedNodes;
+    private FSObject selectedFSObject;
     private FSFolder parent = new FSFolder();
-    private CMISService service = new CMISServiceImpl();
+    private CMISService CMISService = CMISServiceImpl.getService();
+    private static Logger logger = Logger.getLogger(TreeBean.class.getName());
+    private List<FSObject> fsList;
+    private List<FSObject> navigationList;
+
+    private static int number = 2;
+
 
     public TreeBean() {
+        navigationList = new LinkedList<FSObject>();
         FSFolder root = new FSFolder();
         root.setName("Root");
         parent.setPath("/");
-        fsList = service.getChildren(parent);
+        fsList = CMISService.getChildren(parent);
         main = new DefaultTreeNode("Main", null);
         TreeNode node0 = new DefaultTreeNode(root, main);
         SubObjects(parent, node0);
     }
 
     private void SubObjects(FSFolder parent, TreeNode treenodeparent) {
-        List<FSObject> children = service.getChildren(parent);
+        List<FSObject> children = CMISService.getChildren(parent);
         for (FSObject i : children) {
             if (i instanceof FSFolder) {
                 TreeNode treeNode = new DefaultTreeNode(i, treenodeparent);
@@ -52,24 +62,82 @@ public class TreeBean implements Serializable {
     }
 
     public void setSelectedNode(TreeNode selectedNodes) {
+        if (navigationList.size() == 1 && isBackButtonDisabled()) {
+            setBackButtonDisabled(false);
+        }
         this.selectedNodes = selectedNodes;
-        selectedFSObject = (FSObject) getSelectedNode().getData();
+        setSelectedFSObject((FSObject) getSelectedNode().getData());
+
+        if (selectedFSObject.getPath() == null) {
+            parent.setPath("/");
+            selectedFSObject.setPath("/");
+            navigationList.add(selectedFSObject);
+        } else {
+            parent.setPath(selectedFSObject.getPath());
+            System.out.println("FSObjec added to list = " + navigationList.add(selectedFSObject));
+            System.out.println("Size is " + navigationList.size());
+        }
+        fsList = CMISService.getChildren(parent);
+    }
+
+    public void backButton() {
+        navigationList.remove(navigationList.size()-1);
+        System.out.println(navigationList.size() + " size111111111111111111111111111111111111111111111111");
+        FSObject currentObject = navigationList.get(navigationList.size() - getNumber());
+        System.out.println(navigationList.size() + " size222222222222222222222222222222222222222222222222");
+        System.out.println(currentObject.getPath() + " baaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+        setNumber(getNumber() + 1);
+        if ((navigationList.size() - getNumber()) < 0) {
+            setBackButtonDisabled(true);
+            System.out.println("baaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+        }
+        System.out.println(navigationList.size() + " size3333333333333333333333333333333333333333333333333333");
+        setForwardButtonDisabled(false);
+
+        System.out.println("BACK BUTTON___________________________________________" + currentObject.getName());
+        System.out.println(navigationList.size() + " size44444444444444444444444444444444444444444");
         if (selectedFSObject.getPath() == null) {
             parent.setPath("/");
             selectedFSObject.setPath("/");
         } else {
-            parent.setPath(selectedFSObject.getPath());
+            parent.setPath(currentObject.getPath());
         }
-
-        fsList = service.getChildren(parent);
+        System.out.println(navigationList.size() + " size5555555555555555555555555555555555555555555555555");
+        fsList = CMISService.getChildren(parent);
+        System.out.println(navigationList.size() + " size666666666666666666666666666666666666666666666666");
+        System.out.println(getNumber() + " number11111111111111111111111111111111111111111111111111111111");
     }
 
-    public FSFolder getParent() {
-        return parent;
+    public void forwardButton() {
+        navigationList.remove(navigationList.size()-1);
+        FSObject currentObject = navigationList.get(navigationList.size() - getNumber() + 2);
+        setNumber(getNumber() - 1);
+        if (getNumber() <= 2) {
+            setForwardButtonDisabled(true);
+            System.out.println("fffffffffaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+        }
+        setBackButtonDisabled(false);
+
+
+        System.out.println("FORWARD BUTTON________________________________________" + currentObject.getName());
+
+        if (selectedFSObject.getPath() == null) {
+            parent.setPath("/");
+            selectedFSObject.setPath("/");
+        } else {
+            parent.setPath(currentObject.getPath());
+        }
+        fsList = CMISService.getChildren(parent);
+        System.out.println(navigationList.size() + "size111111111111111111111111111111111111111111111111");
+        System.out.println(getNumber() + "number11111111111111111111111111111111111111111111111111111111");
     }
 
-    public void setParent(FSFolder parent) {
-        this.parent = parent;
+    public static int getNumber() {
+        return number;
+    }
+
+    public static void setNumber(int number) {
+        TreeBean.number = number;
     }
 
     public TreeNode getRoot() {
@@ -94,5 +162,29 @@ public class TreeBean implements Serializable {
 
     public void setSelectedFSObject(FSObject sn) {
         this.selectedFSObject = sn;
+    }
+
+    public FSFolder getParent() {
+        return parent;
+    }
+
+    public void setParent(FSFolder parent) {
+        this.parent = parent;
+    }
+
+    public boolean isForwardButtonDisabled() {
+        return forwardButtonDisabled;
+    }
+
+    public void setForwardButtonDisabled(boolean forwardButtonDisabled) {
+        this.forwardButtonDisabled = forwardButtonDisabled;
+    }
+
+    public boolean isBackButtonDisabled() {
+        return backButtonDisabled;
+    }
+
+    public void setBackButtonDisabled(boolean backButtonDisabled) {
+        this.backButtonDisabled = backButtonDisabled;
     }
 }

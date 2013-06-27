@@ -1,12 +1,15 @@
 package com.engagepoint.labs.web.controllers;
 
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import java.io.Serializable;
 
 @ManagedBean
 @SessionScoped
 public class ConfigBean implements Serializable {
+    @ManagedProperty(value="#{treeBean}")
+    private TreeBean treeBean;
     private String name;
     private String currentFolderName;
     private String configTitle = "Test";
@@ -30,8 +33,17 @@ public class ConfigBean implements Serializable {
         return currentFolderName;
     }
 
+    public TreeBean getTreeBean() {
+        return treeBean;
+    }
+
+    public void setTreeBean(TreeBean treeBean) {
+        this.treeBean = treeBean;
+    }
+
     public String getConfigTitle() {
         return configTitle;
+        //+""+getTreeBean().getSelectedFSObject().getName()
     }
 
     public void setConfigTitle(String configTitle) {

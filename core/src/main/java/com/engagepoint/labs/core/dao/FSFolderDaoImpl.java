@@ -11,6 +11,7 @@ import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
+import org.apache.chemistry.opencmis.commons.enums.UnfileObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -94,6 +95,14 @@ public class FSFolderDaoImpl implements FSFolderDao {
         cmisFolder.delete(true);
         return true;
     }
+
+    @Override
+    public boolean deleteAllTree(FSFolder folder) {
+        Folder cmisFolder = (Folder) session.getObjectByPath(folder.getPath());
+        cmisFolder.deleteTree(true, UnfileObject.DELETE, true);
+        return true;
+    }
+
 
     @Override
     public FSFolder getRoot() {
