@@ -4,9 +4,11 @@ import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
 import com.engagepoint.labs.core.service.CMISService;
 import com.engagepoint.labs.core.service.CMISServiceImpl;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 
+import javax.annotation.PostConstruct;
 import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
 import javax.faces.event.ActionEvent;
@@ -28,7 +30,7 @@ public class TreeBean implements Serializable {
 
     private boolean backButtonDisabled = true;
     private boolean forwardButtonDisabled = true;
-    final TreeNode main;
+    private TreeNode main;
     private TreeNode selectedNodes;
     private FSObject selectedFSObject;
     private FSFolder parent = new FSFolder();
@@ -42,9 +44,13 @@ public class TreeBean implements Serializable {
 
     public TreeBean() {
         navigationList = new LinkedList<FSObject>();
-        FSFolder root = new FSFolder();
-        root.setName("Root");
-        parent.setPath("/");
+        updateTree();
+    }
+
+    public void updateTree() {
+        logger.log(Level.INFO, "UPDATING... TREEEE...");
+        FSFolder root = CMISService.getRootFolder();
+        parent = root;
         fsList = CMISService.getChildren(parent);
         main = new DefaultTreeNode("Main", null);
         TreeNode node0 = new DefaultTreeNode(root, main);
@@ -66,16 +72,15 @@ public class TreeBean implements Serializable {
             setBackButtonDisabled(false);
         }
         this.selectedNodes = selectedNodes;
-        setSelectedFSObject((FSObject) getSelectedNode().getData());
-
+        FSObject tmp = (FSObject) selectedNodes.getData();
+        if(tmp != null)
+            this.selectedFSObject = tmp;
         if (selectedFSObject.getPath() == null) {
             parent.setPath("/");
             selectedFSObject.setPath("/");
             navigationList.add(selectedFSObject);
         } else {
             parent.setPath(selectedFSObject.getPath());
-            System.out.println("FSObjec added to list = " + navigationList.add(selectedFSObject));
-            System.out.println("Size is " + navigationList.size());
         }
         fsList = CMISService.getChildren(parent);
     }
@@ -132,6 +137,26 @@ public class TreeBean implements Serializable {
         System.out.println(getNumber() + "number11111111111111111111111111111111111111111111111111111111");
     }
 
+    public void onRowSelect(SelectEvent event) {
+        if(event == null) {
+            logger.log(Level.INFO, "EVENT NULL");
+        }
+        this.selectedFSObject = (FSObject) event.getObject();
+        if((selectedFSObject instanceof FSFolder) && (selectedFSObject != null)) {
+            this.parent = (FSFolder) selectedFSObject;
+        }
+        logger.log(Level.INFO, "onRowSelect: " + selectedFSObject.getName());
+    }
+
+    public void onTreeSelect(SelectEvent event) {
+        this.selectedNodes = (TreeNode) event.getObject();
+        this.selectedFSObject = (FSObject) selectedNodes.getData();
+        if((selectedFSObject instanceof FSFolder) && (selectedFSObject != null)) {
+            this.parent = (FSFolder) selectedFSObject;
+        }
+        logger.log(Level.INFO, "onTreeSelect: " + selectedFSObject.getName());
+    }
+
     public static int getNumber() {
         return number;
     }
@@ -161,7 +186,8 @@ public class TreeBean implements Serializable {
     }
 
     public void setSelectedFSObject(FSObject sn) {
-        this.selectedFSObject = sn;
+        if(sn != null)
+            this.selectedFSObject = sn;
     }
 
     public FSFolder getParent() {

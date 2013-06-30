@@ -5,9 +5,9 @@ import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
 import com.engagepoint.labs.core.service.CMISService;
 import com.engagepoint.labs.core.service.CMISServiceImpl;
+import org.primefaces.event.SelectEvent;
 
-import javax.faces.bean.ApplicationScoped;
-import javax.faces.bean.ManagedBean;
+import javax.faces.bean.*;
 import javax.faces.event.ActionEvent;
 import java.io.Serializable;
 import java.util.logging.Level;
@@ -26,39 +26,58 @@ import java.util.logging.Logger;
 public class ActionBean implements Serializable {
 
     private String name;
+    private String newName;
     private boolean deleteAllTree = false;
-    private static Logger logger = Logger.getLogger(TreeBean.class.getName());
+
+    private static Logger logger = Logger.getLogger(ActionBean.class.getName());
 
     private final CMISService service = CMISServiceImpl.getService();
 
-    public FSFolder createFolder(FSFolder parent) {
-        return service.createFolder(parent, name);
+    public void createFolder(FSFolder parent) {
+        logger.log(Level.INFO, "I'm in create folder, parent: "+parent.getPath()+" and name:"+name);
+        service.createFolder(parent, name);
+        this.name = "";
     }
 
-    public FSObject rename(FSObject fsObject) {
+    public void rename(FSObject fsObject) {
+        logger.log(Level.INFO, "RENAMEEEEEEEEEE");
+        logger.log(Level.INFO, "fsObject null? - " + (fsObject == null));
         if(fsObject instanceof FSFolder) {
-            return service.renameFolder((FSFolder)fsObject, name);
+            logger.log(Level.INFO, "I'm renaming folder: " + fsObject.getName());
+            service.renameFolder((FSFolder)fsObject, newName);
         } else if(fsObject instanceof FSFile) {
-            return service.renameFile((FSFile)fsObject, name);
+            logger.log(Level.INFO, "I'm renaming file: " + fsObject.getName());
+            service.renameFile((FSFile)fsObject, newName);
         }
-        //for future, when will not only documents and folders
-        return null;
+        this.newName = "";
     }
 
-    public boolean delete(FSFolder folder) {
+    public void delete(FSFolder folder) {
+        logger.log(Level.INFO, "DELEEEETEEEEEEEEEE");
         if(deleteAllTree) {
             deleteAllTree = false;
-            return service.deleteAllTree(folder);
+            service.deleteAllTree(folder);
+        } else {
+            service.deleteFolder(folder);
         }
-        return service.deleteFolder(folder);
     }
 
     public String getName() {
+        logger.log(Level.INFO, "getName: "+name);
         return name;
     }
 
     public void setName(String name) {
+        logger.log(Level.INFO, "setName: "+name);
         this.name = name;
+    }
+
+    public String getNewName() {
+        return newName;
+    }
+
+    public void setNewName(String newName) {
+        this.newName = newName;
     }
 
     public boolean isDeleteAllTree() {

@@ -25,7 +25,7 @@ public interface CMISService {
      * @return root folder
      * @see FSObject
      */
-    public FSObject getRootFolder();
+    public FSFolder getRootFolder();
 
     /**
      * Get all nodes from parent object subtree

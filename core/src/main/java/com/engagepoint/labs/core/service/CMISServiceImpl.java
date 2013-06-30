@@ -14,7 +14,6 @@ import java.util.List;
 
 public class CMISServiceImpl implements CMISService {
     private FSFolderDao fsFolderDao;
-    private ConnectionFactory connect;
     private List<FSObject> list;
 
     private static CMISServiceImpl service = null;
@@ -36,7 +35,7 @@ public class CMISServiceImpl implements CMISService {
      * {@inheritDoc}
      */
     @Override
-    public FSObject getRootFolder() {
+    public FSFolder getRootFolder() {
         return fsFolderDao.getRoot();
     }
 
