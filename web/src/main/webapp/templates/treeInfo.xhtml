@@ -36,7 +36,7 @@
                              selection="#{treeBean.selectedFSObject}"
                              selectionMode="single"
                         >
-                    <p:ajax event="rowSelect" listener="#{treeBean.onRowSelect}" update="@form" />
+                    <p:ajax event="rowSelect" listener="#{treeBean.onRowSelect}" update="@form"/>
 
 
                     <f:facet name="header">
@@ -79,15 +79,16 @@
             </p:contextMenu>
 
             <p:dialog id="createFolder" widgetVar="createFolderDialog" header="Create Folder" modal="true"
-                    showEffect="fade"
-                    hideEffect="fade"
-                    resizable="false"
-                >
-                    <p:inputText id="name" value="#{action.name}"/>
-                    <br></br>
-                    <p:commandButton value="OK" action="#{treeBean.updateTree}"  actionListener="#{action.createFolder(treeBean.parent)}"
-                        onclick="createFolderDialog.hide()" update=":treeForm" />
-                    <p:commandButton value="Cancel" oncomplete="createFolderDialog.hide()"/>
+                      showEffect="fade"
+                      hideEffect="fade"
+                      resizable="false"
+                    >
+                <p:inputText id="name" value="#{action.name}"/>
+                <br></br>
+                <p:commandButton value="OK" action="#{treeBean.updateTree}"
+                                 actionListener="#{action.createFolder(treeBean.parent)}"
+                                 onclick="createFolderDialog.hide()" update=":treeForm"/>
+                <p:commandButton value="Cancel" oncomplete="createFolderDialog.hide()"/>
             </p:dialog>
 
             <p:dialog id="rename" widgetVar="renameDialog" header="Rename" modal="true"
@@ -95,24 +96,26 @@
                       hideEffect="fade"
                       resizable="false"
                     >
-                    <p:inputText id="newName" value="#{action.newName}"/>
-                    <br></br>
-                    <p:commandButton type="submit" value="OK" action="#{treeBean.updateTree}" actionListener="#{action.rename(treeBean.selectedFSObject)}"
-                                     onclick="renameDialog.hide()" update=":treeForm" />
-                    <p:commandButton value="Cancel" oncomplete="renameDialog.hide()"/>
+                <p:inputText id="newName" value="#{action.newName}"/>
+                <br></br>
+                <p:commandButton type="submit" value="OK" action="#{treeBean.updateTree}"
+                                 actionListener="#{action.rename(treeBean.selectedFSObject)}"
+                                 onclick="renameDialog.hide()" update=":treeForm"/>
+                <p:commandButton value="Cancel" oncomplete="renameDialog.hide()"/>
             </p:dialog>
 
             <p:dialog id="delete" widgetVar="deleteDialog" header="Delete" modal="true"
-                    showEffect="fade"
-                    hideEffect="fade"
-                    resizable="false"
-                >
-                    <h:outputText value="Delete all tree?" />
-                    <p:selectBooleanCheckbox value="#{action.deleteAllTree}" />
-                    <br></br>
-                    <p:commandButton value="OK" action="#{treeBean.updateTree}" actionListener="#{action.delete(treeBean.selectedFSObject)}"
-                        onclick="deleteFolderDialog.hide()" update=":treeForm"/>
-                    <p:commandButton value="Cancel" oncomplete="deleteFolderDialog.hide()"/>
+                      showEffect="fade"
+                      hideEffect="fade"
+                      resizable="false"
+                    >
+                <h:outputText value="Delete all tree?"/>
+                <p:selectBooleanCheckbox value="#{action.deleteAllTree}"/>
+                <br></br>
+                <p:commandButton value="OK" action="#{treeBean.updateTree}"
+                                 actionListener="#{action.delete(treeBean.selectedFSObject)}"
+                                 onclick="deleteFolderDialog.hide()" update=":treeForm"/>
+                <p:commandButton value="Cancel" oncomplete="deleteFolderDialog.hide()"/>
             </p:dialog>
 
         </h:form>

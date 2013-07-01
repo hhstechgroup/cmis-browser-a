@@ -50,7 +50,7 @@ public class TreeBean implements Serializable {
     public void updateTree() {
         logger.log(Level.INFO, "UPDATING... TREEEE...");
         FSFolder root = CMISService.getRootFolder();
-        parent = root;
+        parent.setPath("/");
         fsList = CMISService.getChildren(parent);
         main = new DefaultTreeNode("Main", null);
         TreeNode node0 = new DefaultTreeNode(root, main);
@@ -73,8 +73,8 @@ public class TreeBean implements Serializable {
         }
         this.selectedNodes = selectedNodes;
         FSObject tmp = (FSObject) selectedNodes.getData();
-        if(tmp != null)
-            this.selectedFSObject = tmp;
+        logger.log(Level.INFO, "setSelectedNode  tmp null? - " + (tmp == null));
+        setSelectedFSObject(tmp);
         if (selectedFSObject.getPath() == null) {
             parent.setPath("/");
             selectedFSObject.setPath("/");
@@ -142,19 +142,7 @@ public class TreeBean implements Serializable {
             logger.log(Level.INFO, "EVENT NULL");
         }
         this.selectedFSObject = (FSObject) event.getObject();
-        if((selectedFSObject instanceof FSFolder) && (selectedFSObject != null)) {
-            this.parent = (FSFolder) selectedFSObject;
-        }
         logger.log(Level.INFO, "onRowSelect: " + selectedFSObject.getName());
-    }
-
-    public void onTreeSelect(SelectEvent event) {
-        this.selectedNodes = (TreeNode) event.getObject();
-        this.selectedFSObject = (FSObject) selectedNodes.getData();
-        if((selectedFSObject instanceof FSFolder) && (selectedFSObject != null)) {
-            this.parent = (FSFolder) selectedFSObject;
-        }
-        logger.log(Level.INFO, "onTreeSelect: " + selectedFSObject.getName());
     }
 
     public static int getNumber() {
@@ -186,6 +174,7 @@ public class TreeBean implements Serializable {
     }
 
     public void setSelectedFSObject(FSObject sn) {
+        logger.log(Level.INFO, "setSelectedFSObject sn - null? - "+(sn == null));
         if(sn != null)
             this.selectedFSObject = sn;
     }

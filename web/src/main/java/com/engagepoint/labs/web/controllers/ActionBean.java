@@ -73,10 +73,12 @@ public class ActionBean implements Serializable {
     }
 
     public String getNewName() {
+        logger.log(Level.INFO, "getNewName: "+newName);
         return newName;
     }
 
     public void setNewName(String newName) {
+        logger.log(Level.INFO, "setNewName: "+newName);
         this.newName = newName;
     }
 
