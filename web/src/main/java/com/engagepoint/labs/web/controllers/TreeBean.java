@@ -41,6 +41,8 @@ public class TreeBean implements Serializable {
 
     private static int number = 2;
 
+    private int backCounter = 0;
+
 
     public TreeBean() {
         navigationList = new LinkedList<FSObject>();
@@ -68,6 +70,7 @@ public class TreeBean implements Serializable {
     }
 
     public void setSelectedNode(TreeNode selectedNodes) {
+        setForwardButtonDisabled(true);
         if (navigationList.size() == 1 && isBackButtonDisabled()) {
             setBackButtonDisabled(false);
         }
@@ -75,10 +78,27 @@ public class TreeBean implements Serializable {
         FSObject tmp = (FSObject) selectedNodes.getData();
         logger.log(Level.INFO, "setSelectedNode  tmp null? - " + (tmp == null));
         setSelectedFSObject(tmp);
+
+        int index = navigationList.size() - backCounter;
+
+        logger.log(Level.INFO, "INDEX: " + index);
+        int temp = 0;
+        for (; index < navigationList.size() + temp; ++index) {
+            int s = temp++;
+            logger.log(Level.INFO, "object: " + navigationList.get(index - s).getName() + " REMOVED");
+            setNumber(getNumber()-1);
+            navigationList.remove(index - s);
+        }
+        //TODO HARDCORE LIST[0] = ROOT
+        navigationList.add(selectedFSObject);
+
+        for (int i = 0; i < navigationList.size(); i++) {
+            logger.log(Level.INFO, navigationList.get(i).getName());
+        }
+
         if (selectedFSObject.getPath() == null) {
             parent.setPath("/");
             selectedFSObject.setPath("/");
-            navigationList.add(selectedFSObject);
         } else {
             parent.setPath(selectedFSObject.getPath());
         }
@@ -86,35 +106,26 @@ public class TreeBean implements Serializable {
     }
 
     public void backButton() {
-        navigationList.remove(navigationList.size()-1);
-        System.out.println(navigationList.size() + " size111111111111111111111111111111111111111111111111");
+        logger.log(Level.INFO, "SECOND");
+        ++backCounter;
+        logger.log(Level.INFO, "SIZE: " + navigationList.size());
+        logger.log(Level.INFO, "NUMBER: " + getNumber());
         FSObject currentObject = navigationList.get(navigationList.size() - getNumber());
-        System.out.println(navigationList.size() + " size222222222222222222222222222222222222222222222222");
-        System.out.println(currentObject.getPath() + " baaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
         setNumber(getNumber() + 1);
         if ((navigationList.size() - getNumber()) < 0) {
             setBackButtonDisabled(true);
-            System.out.println("baaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
         }
-        System.out.println(navigationList.size() + " size3333333333333333333333333333333333333333333333333333");
         setForwardButtonDisabled(false);
-
-        System.out.println("BACK BUTTON___________________________________________" + currentObject.getName());
-        System.out.println(navigationList.size() + " size44444444444444444444444444444444444444444");
         if (selectedFSObject.getPath() == null) {
             parent.setPath("/");
             selectedFSObject.setPath("/");
         } else {
             parent.setPath(currentObject.getPath());
         }
-        System.out.println(navigationList.size() + " size5555555555555555555555555555555555555555555555555");
         fsList = CMISService.getChildren(parent);
-        System.out.println(navigationList.size() + " size666666666666666666666666666666666666666666666666");
-        System.out.println(getNumber() + " number11111111111111111111111111111111111111111111111111111111");
     }
 
     public void forwardButton() {
-        navigationList.remove(navigationList.size()-1);
         FSObject currentObject = navigationList.get(navigationList.size() - getNumber() + 2);
         setNumber(getNumber() - 1);
         if (getNumber() <= 2) {
@@ -138,7 +149,7 @@ public class TreeBean implements Serializable {
     }
 
     public void onRowSelect(SelectEvent event) {
-        if(event == null) {
+        if (event == null) {
             logger.log(Level.INFO, "EVENT NULL");
         }
         this.selectedFSObject = (FSObject) event.getObject();
@@ -174,8 +185,8 @@ public class TreeBean implements Serializable {
     }
 
     public void setSelectedFSObject(FSObject sn) {
-        logger.log(Level.INFO, "setSelectedFSObject sn - null? - "+(sn == null));
-        if(sn != null)
+        logger.log(Level.INFO, "setSelectedFSObject sn - null? - " + (sn == null));
+        if (sn != null)
             this.selectedFSObject = sn;
     }
 

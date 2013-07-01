@@ -30,14 +30,28 @@ public class FSFolder extends FSObject {
         return "folder.png";
     };
 
+//    @Override
+//    public boolean equals(Object o) {
+//        if (this == o) return true;
+//        if (!(o instanceof FSFolder)) return false;
+//
+//        FSFolder fsFolder = (FSFolder) o;
+//
+//        if (children != null ? !children.equals(fsFolder.children) : fsFolder.children != null) return false;
+//
+//        return true;
+//    }
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof FSFolder)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
 
-        FSFolder fsFolder = (FSFolder) o;
+        FSFolder folder = (FSFolder) o;
 
-        if (children != null ? !children.equals(fsFolder.children) : fsFolder.children != null) return false;
+        if (children != null ? !children.equals(folder.children) : folder.children != null) return false;
 
         return true;
     }

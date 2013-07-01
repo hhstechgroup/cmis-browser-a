@@ -1,5 +1,8 @@
 package com.engagepoint.labs.core.models;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * User: vitaliy.vasilenko
  * Date: 6/17/13
@@ -75,10 +78,13 @@ public abstract class FSObject {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof FSObject)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
 
         FSObject fsObject = (FSObject) o;
 
+        if (absolutePath != null ? !absolutePath.equals(fsObject.absolutePath) : fsObject.absolutePath != null)
+            return false;
+        if (icon != null ? !icon.equals(fsObject.icon) : fsObject.icon != null) return false;
         if (id != null ? !id.equals(fsObject.id) : fsObject.id != null) return false;
         if (name != null ? !name.equals(fsObject.name) : fsObject.name != null) return false;
         if (parent != null ? !parent.equals(fsObject.parent) : fsObject.parent != null) return false;
@@ -86,25 +92,6 @@ public abstract class FSObject {
         if (type != null ? !type.equals(fsObject.type) : fsObject.type != null) return false;
 
         return true;
-    }
-
-    private boolean getHashCode(FSObject fsObject) {
-        if (id != null ? !id.equals(fsObject.id) : fsObject.id != null) {
-            return true;
-        }
-        if (name != null ? !name.equals(fsObject.name) : fsObject.name != null){
-            return true;
-        }
-        if (parent != null ? !parent.equals(fsObject.parent) : fsObject.parent != null) {
-            return true;
-        }
-        if (path != null ? !path.equals(fsObject.path) : fsObject.path != null){
-            return true;
-        }
-        if (type != null ? !type.equals(fsObject.type) : fsObject.type != null) {
-            return true;
-        }
-        return false;
     }
 
     @Override

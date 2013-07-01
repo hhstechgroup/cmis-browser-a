@@ -40,13 +40,15 @@
 
 
                     <f:facet name="header">
-                        <p:commandButton value="←" disabled="#{treeBean.backButtonDisabled}" id="backButton"
-                                         actionListener="#{treeBean.backButton}"
-                                         update=":treeForm:fsTable :treeForm:fsTable:backButton"/>
+                        <h:commandButton value="←" disabled="#{treeBean.backButtonDisabled}" id="backButton">
+                            <f:ajax listener="#{treeBean.backButton}"
+                                    render=":treeForm:fsTable :treeForm:fsTable:backButton"/>
+                        </h:commandButton>
 
-                        <p:commandButton value="→" disabled="#{treeBean.forwardButtonDisabled}" id="forwardButton"
-                                         actionListener="#{treeBean.forwardButton}"
-                                         update=":treeForm:fsTable :treeForm:fsTable:forwardButton"/>
+                        <h:commandButton value="→" disabled="#{treeBean.forwardButtonDisabled}" id="forwardButton">
+                            <f:ajax listener="#{treeBean.forwardButton}"
+                                    render=":treeForm:fsTable :treeForm:fsTable:forwardButton"/>
+                        </h:commandButton>
 
                         <p:inputText value="#{treeBean.parent.path}"
                                      style="font-size: 13px; margin-bottom: 5px" size="90" disabled="true"/>
