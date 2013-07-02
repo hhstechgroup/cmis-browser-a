@@ -21,11 +21,9 @@ import static java.util.Arrays.asList;
 import static org.jbehave.core.io.CodeLocations.codeLocationFromClass;
 import static org.jbehave.core.reporters.Format.*;
 /**
- * Created with IntelliJ IDEA.
- * User: iryna.domachuk
- * Date: 6/19/13
- * Time: 7:40 PM
- * To change this template use File | Settings | File Templates.
+ * User: vitaliy.vasilenko
+ * Date: 7/2/13
+ * Time: 6:20 PM
  */
 public class BrowserWebStories extends JUnitStories {
 

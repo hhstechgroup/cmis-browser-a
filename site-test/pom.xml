@@ -122,11 +122,11 @@
                     </execution>
                 </executions>
             </plugin>
+
+
             <plugin>
                 <groupId>org.jbehave</groupId>
                 <artifactId>jbehave-maven-plugin</artifactId>
-                <version>3.8</version>
-
                 <executions>
                     <execution>
                         <id>run-stories</id>
@@ -150,6 +150,8 @@
                     </dependency>
                 </dependencies>
             </plugin>
+
+
             <plugin>
                 <groupId>org.codehaus.cargo</groupId>
                 <artifactId>cargo-maven2-plugin</artifactId>

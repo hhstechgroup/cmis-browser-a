@@ -5,11 +5,9 @@ import org.jbehave.web.selenium.WebDriverProvider;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created with IntelliJ IDEA.
- * User: iryna.domachuk
- * Date: 6/21/13
- * Time: 12:40 PM
- * To change this template use File | Settings | File Templates.
+ * User: vitaliy.vasilenko
+ * Date: 7/2/13
+ * Time: 6:30 PM
  */
 public class Index extends AbstractPage  {
 

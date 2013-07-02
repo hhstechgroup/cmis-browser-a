@@ -16,34 +16,33 @@ public class Home extends AbstractPage {
         manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
     }
 
-    public void treeExpand(){
+    public void treeExpand() {
 
-         findElement(By.xpath(".//*[@id='form:panelGrid:tree:0']/span[1]")).click();
-
-        manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
-
-    }
-
-    public void treeClick(){
-
-        findElement(By.xpath(".//*[@id='treeForm:tree:0:link']")).click();
+        findElement(By.xpath(".//*[@id='formLeftTree:tree:0']/span/span[1]")).click();
 
         manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 
     }
 
-    public void treeClickCheck(){
+    public void treeClick() {
 
-         findElement(By.xpath(".//*[@id='treeForm:tree:0']/span[@aria-selected='true']"));
+        findElement(By.xpath(".//*[@id='formLeftTree:tree:0']/span/span[3]")).click();
 
-    }
-
-    public void treeExpandCheck(){
-
-        findElement(By.xpath(".//*[@id='treeForm:tree:0' and @aria-expanded='true']"));
+        manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 
     }
 
+    public void treeClickCheck() {
+
+        findElement(By.xpath(".//*[@id='formLeftTree:tree:0'][@aria-selected='true']"));
+
+    }
+
+    public void treeExpandCheck() {
+
+        findElement(By.xpath(".//*[@id='formLeftTree:tree:0' and @aria-expanded='true']"));
+
+    }
 
 
 }
