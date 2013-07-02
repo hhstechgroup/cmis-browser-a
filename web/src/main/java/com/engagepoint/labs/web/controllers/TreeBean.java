@@ -8,10 +8,8 @@ import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 
-import javax.annotation.PostConstruct;
 import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
-import javax.faces.event.ActionEvent;
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,7 +41,6 @@ public class TreeBean implements Serializable {
 
     private int backCounter = 0;
 
-
     public TreeBean() {
         navigationList = new LinkedList<FSObject>();
         updateTree();
@@ -70,10 +67,7 @@ public class TreeBean implements Serializable {
     }
 
     public void setSelectedNode(TreeNode selectedNodes) {
-        setForwardButtonDisabled(true);
-        if (navigationList.size() == 1 && isBackButtonDisabled()) {
-            setBackButtonDisabled(false);
-        }
+
         this.selectedNodes = selectedNodes;
         FSObject tmp = (FSObject) selectedNodes.getData();
         logger.log(Level.INFO, "setSelectedNode  tmp null? - " + (tmp == null));
@@ -86,12 +80,24 @@ public class TreeBean implements Serializable {
         for (; index < navigationList.size() + temp; ++index) {
             int s = temp++;
             logger.log(Level.INFO, "object: " + navigationList.get(index - s).getName() + " REMOVED");
-            setNumber(getNumber()-1);
+            setNumber(getNumber() - 1);
             navigationList.remove(index - s);
         }
         //TODO HARDCORE LIST[0] = ROOT
-        navigationList.add(selectedFSObject);
-
+        if (navigationList.size() == 0) {
+            navigationList.add(selectedFSObject);
+        }
+        if ((navigationList.size() > 0) && (!selectedFSObject.equals(navigationList.get(navigationList.size() - 1)))) {
+            navigationList.add(selectedFSObject);
+        } else {
+            logger.log(Level.INFO, "Item exist");
+        }
+        setForwardButtonDisabled(true);
+        if (navigationList.size() > 1 && isBackButtonDisabled()) {
+            logger.log(Level.INFO, "VKL BACK BUT");
+            setBackButtonDisabled(false);
+        }
+        this.backCounter = 0;
         for (int i = 0; i < navigationList.size(); i++) {
             logger.log(Level.INFO, navigationList.get(i).getName());
         }
@@ -103,11 +109,12 @@ public class TreeBean implements Serializable {
             parent.setPath(selectedFSObject.getPath());
         }
         fsList = CMISService.getChildren(parent);
+        logger.log(Level.INFO, "_NUMBER: "+getNumber());
     }
 
     public void backButton() {
         logger.log(Level.INFO, "SECOND");
-        ++backCounter;
+        backCounter++;
         logger.log(Level.INFO, "SIZE: " + navigationList.size());
         logger.log(Level.INFO, "NUMBER: " + getNumber());
         FSObject currentObject = navigationList.get(navigationList.size() - getNumber());
@@ -123,17 +130,19 @@ public class TreeBean implements Serializable {
             parent.setPath(currentObject.getPath());
         }
         fsList = CMISService.getChildren(parent);
+        logger.log(Level.INFO, "__NUMBER: "+getNumber());
     }
 
     public void forwardButton() {
+        backCounter--;
+        logger.log(Level.INFO, "SIZE: " + navigationList.size());
+        logger.log(Level.INFO, "NUMBER: " + getNumber());
         FSObject currentObject = navigationList.get(navigationList.size() - getNumber() + 2);
         setNumber(getNumber() - 1);
         if (getNumber() <= 2) {
             setForwardButtonDisabled(true);
-            System.out.println("fffffffffaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
         }
         setBackButtonDisabled(false);
-
 
         System.out.println("FORWARD BUTTON________________________________________" + currentObject.getName());
 
@@ -144,8 +153,7 @@ public class TreeBean implements Serializable {
             parent.setPath(currentObject.getPath());
         }
         fsList = CMISService.getChildren(parent);
-        System.out.println(navigationList.size() + "size111111111111111111111111111111111111111111111111");
-        System.out.println(getNumber() + "number11111111111111111111111111111111111111111111111111111111");
+        logger.log(Level.INFO, "NUMBER__: "+getNumber());
     }
 
     public void onRowSelect(SelectEvent event) {
