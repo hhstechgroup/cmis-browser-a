@@ -79,7 +79,6 @@ public abstract class FSObject {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         FSObject fsObject = (FSObject) o;
 
         if (absolutePath != null ? !absolutePath.equals(fsObject.absolutePath) : fsObject.absolutePath != null)

@@ -10,6 +10,8 @@ package com.engagepoint.labs.core.dao;
 
 import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
+import org.apache.chemistry.opencmis.client.api.Document;
+import org.apache.chemistry.opencmis.client.api.Folder;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -43,8 +45,8 @@ public class FSFolderDaoImplTest {
         FSFolder expected = new FSFolder();
         expected.setPath("/junit_test_folder");
         expected.setName("junit_test_folder");
-        expected.setType("cmis:folder");
-        expected.setChildren(null);
+        expected.setType("Folder");
+        expected.setId(actual.getId());
         expected.setParent(parent);
         assertEquals(expected, actual);
         fsFolderDao.delete(actual);
@@ -60,16 +62,21 @@ public class FSFolderDaoImplTest {
 
     @Test
     public void testGetChildren() throws Exception {
-        List<FSFolder> expected = new ArrayList<FSFolder>(1);
-
-        FSFolder folder = new FSFolder();
-        folder.setPath("/junit_test_folder/test");
-        folder.setId("3254");
-        folder.setType("cmis:folder");
-        expected.add(folder);
         FSFolder test = fsFolderDao.create(actual, "test");
+        Folder cmisTest = (Folder) ConnectionFactory.getSession().getObjectByPath(test.getPath());
+        FSFolder expected = new FSFolder();
+        expected.setPath("/junit_test_folder/test");
+        expected.setId(cmisTest.getId());
+        expected.setType("Folder");
+        expected.setParent(actual);
+        expected.setName("test");
+
+        System.out.println("name: "+expected.getName()+" type: "+expected.getType()+" path: "+expected.getPath()
+                +"\nparent name: "+expected.getParent().getName()+" id: "+expected.getId());
+
         List<FSObject> actualList = fsFolderDao.getChildren(actual);
-        assertEquals(expected, actualList);
+        FSFolder act = (FSFolder) actualList.get(0);
+        assertEquals(expected, act);
         fsFolderDao.delete(test);
         fsFolderDao.delete(actual);
     }
