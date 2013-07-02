@@ -1,8 +1,5 @@
 package com.engagepoint.labs.core.models;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
  * User: vitaliy.vasilenko
  * Date: 6/17/13

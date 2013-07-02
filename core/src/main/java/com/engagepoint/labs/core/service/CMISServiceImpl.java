@@ -13,6 +13,7 @@ import java.util.List;
  */
 
 public class CMISServiceImpl implements CMISService {
+
     private FSFolderDao fsFolderDao;
     private List<FSObject> list;
 
@@ -75,14 +76,6 @@ public class CMISServiceImpl implements CMISService {
      * {@inheritDoc}
      */
     @Override
-    public String getFileContent(FSFile file) {
-        return fsFolderDao.getFsFileDao().getContent(file);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public boolean deleteFile(FSFile file) {
         return fsFolderDao.getFsFileDao().delete(file);
     }
@@ -137,7 +130,7 @@ public class CMISServiceImpl implements CMISService {
     }
 
     public static CMISServiceImpl getService() {
-        if(service == null) {
+        if (service == null) {
             service = new CMISServiceImpl();
         }
         return service;
@@ -149,7 +142,7 @@ public class CMISServiceImpl implements CMISService {
     }
 
     @Override
-    public int getMaxNumberOfPage(FSFolder parent, int numberOfRows){
+    public int getMaxNumberOfPage(FSFolder parent, int numberOfRows) {
         return fsFolderDao.getMaxNumberOfPage(parent, numberOfRows);
     }
 }

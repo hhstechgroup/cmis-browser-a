@@ -26,9 +26,11 @@ public class FSFolder extends FSObject {
     }
 
     @Override
-    public String getIcon(){
+    public String getIcon() {
         return "folder.png";
-    };
+    }
+
+    ;
 
     @Override
     public boolean equals(Object o) {

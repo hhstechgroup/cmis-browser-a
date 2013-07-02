@@ -24,9 +24,10 @@ public class ConnectionFactory {
 
     /**
      * Return session
+     *
      * @return session
      */
-    public static Session getSession(){
+    public static Session getSession() {
         SessionFactory sessionFactory = SessionFactoryImpl.newInstance();
         Map<String, String> parameter = new HashMap<String, String>();
 

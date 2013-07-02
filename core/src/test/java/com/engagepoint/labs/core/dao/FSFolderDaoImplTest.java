@@ -15,8 +15,10 @@ import org.apache.chemistry.opencmis.client.api.Folder;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import static org.junit.Assert.*;
 
 public class FSFolderDaoImplTest {
@@ -71,8 +73,8 @@ public class FSFolderDaoImplTest {
         expected.setParent(actual);
         expected.setName("test");
 
-        System.out.println("name: "+expected.getName()+" type: "+expected.getType()+" path: "+expected.getPath()
-                +"\nparent name: "+expected.getParent().getName()+" id: "+expected.getId());
+        System.out.println("name: " + expected.getName() + " type: " + expected.getType() + " path: " + expected.getPath()
+                + "\nparent name: " + expected.getParent().getName() + " id: " + expected.getId());
 
         List<FSObject> actualList = fsFolderDao.getChildren(actual);
         FSFolder act = (FSFolder) actualList.get(0);

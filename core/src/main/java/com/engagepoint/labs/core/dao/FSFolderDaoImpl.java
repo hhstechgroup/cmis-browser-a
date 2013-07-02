@@ -147,7 +147,8 @@ public class FSFolderDaoImpl implements FSFolderDao {
         return children;
     }
 
-    public int getMaxNumberOfPage(FSFolder parent,int numberOfRows){
+    @Override
+    public int getMaxNumberOfPage(FSFolder parent, int numberOfRows){
         Folder cmisParent = (Folder) session.getObjectByPath(parent.getPath());
         ItemIterable<CmisObject> cmisChildren = cmisParent.getChildren();
 
@@ -155,5 +156,4 @@ public class FSFolderDaoImpl implements FSFolderDao {
         if (total%numberOfRows == 0) return  total/numberOfRows;
         else return  total/numberOfRows + 1;
     }
-
 }

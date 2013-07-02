@@ -36,7 +36,6 @@ public class TreeBean implements Serializable {
     private FSFolder parent = new FSFolder();
     private CMISService CMISService = CMISServiceImpl.getService();
     private static Logger logger = Logger.getLogger(TreeBean.class.getName());
-    private List<FSObject> fsList;
     private List<FSObject> navigationList;
 
     private static int number = 2;
@@ -65,7 +64,6 @@ public class TreeBean implements Serializable {
         logger.log(Level.INFO, "UPDATING... TREEEE...");
         FSFolder root = CMISService.getRootFolder();
         parent.setPath("/");
-        fsList = CMISService.getChildren(parent);
         main = new DefaultTreeNode("Main", null);
         TreeNode node0 = new DefaultTreeNode(root, main);
         SubObjects(parent, node0);
@@ -196,8 +194,6 @@ public class TreeBean implements Serializable {
 
         //for paging
         changedTableParentFolder();
-
-
     }
 
     public void backButton() {
@@ -217,7 +213,7 @@ public class TreeBean implements Serializable {
         } else {
             parent.setPath(currentObject.getPath());
         }
-        fsList = CMISService.getChildren(parent);
+        changedTableParentFolder();
         logger.log(Level.INFO, "__NUMBER: " + getNumber());
     }
 
@@ -240,7 +236,7 @@ public class TreeBean implements Serializable {
         } else {
             parent.setPath(currentObject.getPath());
         }
-        fsList = CMISService.getChildren(parent);
+        changedTableParentFolder();
         logger.log(Level.INFO, "NUMBER__: " + getNumber());
     }
 
@@ -266,14 +262,6 @@ public class TreeBean implements Serializable {
 
     public TreeNode getSelectedNode() {
         return selectedNodes;
-    }
-
-    public List<FSObject> getFsList() {
-        return fsList;
-    }
-
-    public void setFsList(List<FSObject> fsList) {
-        this.fsList = fsList;
     }
 
     public FSObject getSelectedFSObject() {
@@ -344,14 +332,6 @@ public class TreeBean implements Serializable {
 
     public void setLastPage(int lastPage) {
         this.lastPage = lastPage;
-    }
-
-    public int getCurrentPage() {
-        return currentPage;
-    }
-
-    public void setCurrentPage(int currentPage) {
-        this.currentPage = currentPage;
     }
 
     public int getFirstPage() {

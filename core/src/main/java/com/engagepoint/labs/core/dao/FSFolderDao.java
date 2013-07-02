@@ -16,13 +16,15 @@ public interface FSFolderDao {
 
     /**
      * Connect to repository
+     *
      * @param session - session
      */
     public void setSession(Session session);
 
     /**
      * Create new folder in parent folder
-     * @param parent - folder in which you want create new folder
+     *
+     * @param parent     - folder in which you want create new folder
      * @param folderName - name of folder which you want create
      * @return created folder, FSFolder type
      */
@@ -30,7 +32,8 @@ public interface FSFolderDao {
 
     /**
      * Method that will rename folder
-     * @param folder - folder which you want rename
+     *
+     * @param folder  - folder which you want rename
      * @param newName - new name of folder
      * @return renamed folder
      */
@@ -38,6 +41,7 @@ public interface FSFolderDao {
 
     /**
      * Get all children from parent folder
+     *
      * @param parent - folder in which you want get children
      * @return - list of FSObject files
      */
@@ -45,6 +49,7 @@ public interface FSFolderDao {
 
     /**
      * Method that will delete folder from repository
+     *
      * @param folder - folder which you want to delete
      * @return <b>true</b> if deleted
      */
@@ -53,13 +58,11 @@ public interface FSFolderDao {
     public boolean deleteAllTree(FSFolder folder);
 
     /**
-     *
      * @return root folder
      */
     public FSFolder getRoot();
 
     /**
-     *
      * @return reference to FSFileDao
      */
     public FSFileDao getFsFileDao();

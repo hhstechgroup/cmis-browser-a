@@ -35,7 +35,7 @@ public class FSFileDaoImpl implements FSFileDao {
 
         byte[] buf = new byte[0];
         //TODO check that content not null
-        if(content == null) {
+        if (content == null) {
             content = "";
         }
         try {

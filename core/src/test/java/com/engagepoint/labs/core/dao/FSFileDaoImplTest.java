@@ -15,6 +15,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
 import static org.junit.Assert.*;
 
 /**
@@ -56,7 +57,7 @@ public class FSFileDaoImplTest {
     @Test
     public void testCreate() throws Exception {
         created = fsFileDao.create(parent, name, content);
-        Document doc = (Document) connection.getSession().getObjectByPath("/My_Folder-0-1/"+name);
+        Document doc = (Document) connection.getSession().getObjectByPath("/My_Folder-0-1/" + name);
         FSFile expected = new FSFile();
         expected.setId(doc.getId());
         expected.setName(doc.getName());
@@ -71,7 +72,7 @@ public class FSFileDaoImplTest {
     @Test
     public void testRename() throws Exception {
         created = fsFileDao.create(parent, name, content);
-        String newFileName =  "qwerty.txt";
+        String newFileName = "qwerty.txt";
         created = fsFileDao.rename(created, newFileName);
         assertEquals(newFileName, created.getName());
         fsFileDao.delete(created);
