@@ -10,15 +10,15 @@
 
 <h:body>
     <ui:composition>
-        <h:form id="treeForm">
-
+        <h:form id="treeForm" onclick="bajb_backdetect.onbeforeunload">
             <p:panelGrid columns="2" style="width: 100%; height: 400px;" styleClass="table">
                 <h:outputStylesheet library="style" name="style.css"/>
 
                 <p:tree id="tree" value="#{treeBean.root}" var="node" dynamic="true" cache="false"
                         selectionMode="single" selection="#{treeBean.selectedNode}" style="width: 300px;">
 
-                    <p:ajax event="select" update=":treeForm:fsTable :treeForm:fsTable:backButton"/>
+                    <p:ajax event="select"
+                            update=":treeForm:fsTable :treeForm:fsTable:lastPage :treeForm:fsTable:backButton :treeForm:fsTable:back  :treeForm:fsTable:next"/>
 
                     <p:treeNode expandedIcon="ui-icon-folder-open"
                                 collapsedIcon="ui-icon-folder-collapsed">
@@ -28,7 +28,7 @@
                     </p:treeNode>
                 </p:tree>
 
-                <p:dataTable id="fsTable" var="fsObject" value="#{treeBean.fsList}"
+                <p:dataTable id="fsTable" var="fsObject" value="#{treeBean.tablePageList}"
                              scrollable="true" scrollWidth="790"
                              scrollHeight="400" style="width: 770px;"
                              emptyMessage="This folder is empty"
@@ -71,6 +71,27 @@
                     <p:column headerText="Type" sortBy="#{fsObject.type}">
                         <h:outputText value="#{fsObject.type}"/>
                     </p:column>
+
+                    <f:facet name="footer">
+
+                        <p:messages id="messages" showDetail="true" autoUpdate="true" closable="true"/>
+                        <p:commandButton id="back" value="Back" actionListener="#{treeBean.previousPage}"
+                                         update=":treeForm:fsTable :treeForm:fsTable:pageNumber "
+                                         process="fsTable"
+                                         disabled="#{treeBean.disableBackButton}"/>
+                        <h:outputText id="firstPage" value="#{treeBean.firstPage}..."/>
+                        <p:inputText onselect="false" value="#{treeBean.testingCurrentPage}" id="pageNumber" process="fsTable" >
+
+                            <p:ajax event="keyup" listener="#{treeBean.CurrentPageToJSF}"
+                                    update=":treeForm:fsTable"/>
+                        </p:inputText>
+                        <h:outputText id="lastPage" value="...#{treeBean.lastPage}"/>
+                        <p:commandButton id="next" value="Next" actionListener="#{treeBean.nextPage}"
+                                         update=":treeForm:fsTable :treeForm:fsTable:pageNumber :treeForm:fsTable:back :treeForm:fsTable:next "
+                                         process="fsTable"
+                                         disabled="#{treeBean.disableNextButton}"/>
+                    </f:facet>
+
                 </p:dataTable>
             </p:panelGrid>
 

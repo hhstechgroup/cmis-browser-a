@@ -11,6 +11,12 @@ import java.util.List;
  */
 public interface CMISService {
     /**
+     * Return  max value  of page number
+     * @param parent parent object, pageNumber, numbersOfRows for right pagination
+     * @return List of FSObjects on the page
+     */
+    public int getMaxNumberOfPage(FSFolder parent, int numberOfRows);
+    /**
      * Return a list children of our parent fsFolder folder
      *
      * @param fsFolder an parent folder which is supposed to get children
@@ -18,6 +24,13 @@ public interface CMISService {
      * @see FSFolder
      */
     public List<FSObject> getChildren(FSFolder fsFolder);
+
+    /**
+     * Return list of FSObject on actually page
+     * @param parent parent object, pageNumber, numbersOfRows for right pagination
+     * @return List of FSObjects on the page
+     */
+    public List<FSObject> getPage(FSFolder parent, int pageNumber, int numberOfRows);
 
     /**
      * Return a root folder from our repository

@@ -116,4 +116,44 @@ public class FSFolderDaoImpl implements FSFolderDao {
         root.setId(cmisRoot.getId());
         return root;
     }
+
+    @Override
+    public List<FSObject> getPage(FSFolder parent, int pageNumber, int numberOfRows) {
+        String notRootFolder = parent.getPath().equals("/") ? "" : parent.getPath();
+        List<FSObject> children = new ArrayList<FSObject>();
+        Folder cmisParent = (Folder) session.getObjectByPath(parent.getPath());
+
+        OperationContext operationContext = session.createOperationContext();
+        operationContext.setMaxItemsPerPage(numberOfRows);
+        ItemIterable<CmisObject> childrenCmis = cmisParent.getChildren(operationContext);
+        ItemIterable<CmisObject> cmisChildren = childrenCmis.skipTo(pageNumber * numberOfRows).getPage();
+
+        for(CmisObject o : cmisChildren) {
+            FSObject fsObject;
+            if(o instanceof Folder){
+                fsObject = new FSFolder();
+                fsObject.setPath(((Folder) o).getPath());
+            } else {
+                fsObject = new FSFile();
+                fsObject.setPath(notRootFolder);
+                fsObject.setAbsolutePath(notRootFolder + "/" + o.getName());
+            }
+            fsObject.setName(o.getName());
+            fsObject.setId(o.getId());
+            fsObject.setParent(parent);
+            children.add(fsObject);
+        }
+
+        return children;
+    }
+
+    public int getMaxNumberOfPage(FSFolder parent,int numberOfRows){
+        Folder cmisParent = (Folder) session.getObjectByPath(parent.getPath());
+        ItemIterable<CmisObject> cmisChildren = cmisParent.getChildren();
+
+        int total = (int)cmisChildren.getTotalNumItems();
+        if (total%numberOfRows == 0) return  total/numberOfRows;
+        else return  total/numberOfRows + 1;
+    }
+
 }

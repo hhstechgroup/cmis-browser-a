@@ -142,4 +142,14 @@ public class CMISServiceImpl implements CMISService {
         }
         return service;
     }
+
+    @Override
+    public List<FSObject> getPage(FSFolder parent, int pageNumber, int numberOfRows) {
+        return fsFolderDao.getPage(parent, pageNumber - 1, numberOfRows);
+    }
+
+    @Override
+    public int getMaxNumberOfPage(FSFolder parent, int numberOfRows){
+        return fsFolderDao.getMaxNumberOfPage(parent, numberOfRows);
+    }
 }

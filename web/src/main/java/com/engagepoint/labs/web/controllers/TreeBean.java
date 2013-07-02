@@ -8,8 +8,10 @@ import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
+import javax.faces.context.FacesContext;
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
@@ -41,9 +43,22 @@ public class TreeBean implements Serializable {
 
     private int backCounter = 0;
 
+    private final int firstPage = 1;
+    private int currentPage;
+    private int lastPage = 100;
+    private int amountOfRowsInPage = 3;
+    private List<FSObject> tablePageList;
+    private String testingCurrentPage;
+
+    private Boolean disableBackButton;
+    private Boolean disableNextButton = false;
+
+
     public TreeBean() {
         navigationList = new LinkedList<FSObject>();
         updateTree();
+        //for paging
+        changedTableParentFolder();
     }
 
     public void updateTree() {
@@ -64,6 +79,74 @@ public class TreeBean implements Serializable {
                 SubObjects((FSFolder) i, treeNode);
             }
         }
+    }
+
+    public void setTestingCurrentPage(String testingCurrentPage) {
+        this.testingCurrentPage = testingCurrentPage;
+        if (testingCurrentPage == "") return;
+        try {
+            Integer.parseInt(testingCurrentPage);
+        } catch (NumberFormatException e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "WRONG PAGE DUDE!!!", "here should be number between" + firstPage + " and " + lastPage));
+            return;
+        }
+        int test = Integer.parseInt(testingCurrentPage);
+        if (test > lastPage || test < firstPage)
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "WRONG PAGE DUDE!!!", "here should be number between" + firstPage + " and trololoool " + lastPage));
+        else {
+            currentPage = test;
+
+            if (currentPage == lastPage) disableNextButton = true;
+            else disableNextButton = false;
+
+            if (currentPage == firstPage) disableBackButton = true;
+            else disableBackButton = false;
+
+            tablePageList = CMISService.getPage(parent, currentPage, amountOfRowsInPage);
+        }
+    }
+
+    public void changedTableParentFolder() {
+        currentPage = firstPage;
+        tablePageList = CMISService.getPage(parent, currentPage, amountOfRowsInPage);
+        lastPage = CMISService.getMaxNumberOfPage(parent, amountOfRowsInPage);
+        testingCurrentPage = Integer.toString(currentPage);
+        disableBackButton = true;
+        if (lastPage == 0) lastPage = 1;
+        if (currentPage == lastPage) {
+            disableNextButton = true;
+        } else {
+            disableNextButton = false;
+        }
+    }
+
+    public void nextPage() {
+        if (currentPage < lastPage) {
+            ++currentPage;
+            tablePageList = CMISService.getPage(parent, currentPage, amountOfRowsInPage);
+            testingCurrentPage = Integer.toString(currentPage);
+            if (currentPage == lastPage) disableNextButton = true;
+            disableBackButton = false;
+        }
+
+    }
+
+    public void previousPage() {
+        if (currentPage > firstPage) {
+            --currentPage;
+            tablePageList = CMISService.getPage(parent, currentPage, amountOfRowsInPage);
+            testingCurrentPage = Integer.toString(currentPage);
+            if (currentPage == firstPage) disableBackButton = true;
+            disableNextButton = false;
+        }
+    }
+
+    public void CurrentPageToJSF() {
+        if (currentPage > lastPage || currentPage < firstPage)
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "WRONG PAGE DUDE!!!", "it should be between " + firstPage + " and " + lastPage));
+        if (currentPage == firstPage) disableBackButton = true;
+        if (currentPage == lastPage) disableNextButton = true;
+        tablePageList = CMISService.getPage(parent, currentPage, amountOfRowsInPage);
     }
 
     public void setSelectedNode(TreeNode selectedNodes) {
@@ -108,8 +191,13 @@ public class TreeBean implements Serializable {
         } else {
             parent.setPath(selectedFSObject.getPath());
         }
-        fsList = CMISService.getChildren(parent);
-        logger.log(Level.INFO, "_NUMBER: "+getNumber());
+
+        logger.log(Level.INFO, "_NUMBER: " + getNumber());
+
+        //for paging
+        changedTableParentFolder();
+
+
     }
 
     public void backButton() {
@@ -130,7 +218,7 @@ public class TreeBean implements Serializable {
             parent.setPath(currentObject.getPath());
         }
         fsList = CMISService.getChildren(parent);
-        logger.log(Level.INFO, "__NUMBER: "+getNumber());
+        logger.log(Level.INFO, "__NUMBER: " + getNumber());
     }
 
     public void forwardButton() {
@@ -153,7 +241,7 @@ public class TreeBean implements Serializable {
             parent.setPath(currentObject.getPath());
         }
         fsList = CMISService.getChildren(parent);
-        logger.log(Level.INFO, "NUMBER__: "+getNumber());
+        logger.log(Level.INFO, "NUMBER__: " + getNumber());
     }
 
     public void onRowSelect(SelectEvent event) {
@@ -221,4 +309,53 @@ public class TreeBean implements Serializable {
     public void setBackButtonDisabled(boolean backButtonDisabled) {
         this.backButtonDisabled = backButtonDisabled;
     }
+
+    public Boolean getDisableNextButton() {
+        return disableNextButton;
+    }
+
+    public Boolean getDisableBackButton() {
+        return disableBackButton;
+    }
+
+    public String getTestingCurrentPage() {
+        return testingCurrentPage;
+    }
+
+    public List<FSObject> getTablePageList() {
+        return tablePageList;
+    }
+
+    public void setTablePageList(List<FSObject> tablePageList) {
+        this.tablePageList = tablePageList;
+    }
+
+    public int getAmountOfRowsInPage() {
+        return amountOfRowsInPage;
+    }
+
+    public void setAmountOfRowsInPage(int amountOfRowsInPage) {
+        this.amountOfRowsInPage = amountOfRowsInPage;
+    }
+
+    public int getLastPage() {
+        return lastPage;
+    }
+
+    public void setLastPage(int lastPage) {
+        this.lastPage = lastPage;
+    }
+
+    public int getCurrentPage() {
+        return currentPage;
+    }
+
+    public void setCurrentPage(int currentPage) {
+        this.currentPage = currentPage;
+    }
+
+    public int getFirstPage() {
+        return firstPage;
+    }
+
 }

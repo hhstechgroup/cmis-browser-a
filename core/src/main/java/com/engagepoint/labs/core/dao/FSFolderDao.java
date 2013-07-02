@@ -64,4 +64,8 @@ public interface FSFolderDao {
      */
     public FSFileDao getFsFileDao();
 
+    public int getMaxNumberOfPage(FSFolder parent, int numberOfRows);
+
+    public List<FSObject> getPage(FSFolder parent, int pageNumber, int numberOfRows);
+
 }
