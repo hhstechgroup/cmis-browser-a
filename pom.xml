@@ -3,21 +3,38 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <groupId>com.engagepoint.labs</groupId>
     <artifactId>CMISBrowser</artifactId>
     <packaging>pom</packaging>
     <version>1.0</version>
+
     <modules>
         <module>core</module>
         <module>site</module>
         <module>site-test</module>
     </modules>
+
     <properties>
         <junit.version>4.11</junit.version>
         <log4j.version>1.2.17</log4j.version>
         <slf4j.version>1.5.11</slf4j.version>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.chemistry.opencmis</groupId>
+            <artifactId>chemistry-opencmis-server-inmemory</artifactId>
+            <type>war</type>
+            <version>0.9.0</version>
+        </dependency>
+
+    </dependencies>
     <build>
         <plugins>
             <plugin>
@@ -42,29 +59,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <dependencies>
-        <!--<dependency>-->
-            <!--<groupId>log4j</groupId>-->
-            <!--<artifactId>log4j</artifactId>-->
-            <!--<version>1.2.14</version>-->
-        <!--</dependency>-->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.chemistry.opencmis</groupId>
-            <artifactId>chemistry-opencmis-client-impl</artifactId>
-            <version>0.9.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.chemistry.opencmis</groupId>
-            <artifactId>chemistry-opencmis-server-inmemory</artifactId>
-            <type>war</type>
-            <version>0.9.0</version>
-        </dependency>
-    </dependencies>
 </project>

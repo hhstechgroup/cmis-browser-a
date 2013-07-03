@@ -5,6 +5,11 @@ import org.jbehave.core.annotations.Given;
 import org.jbehave.core.annotations.Then;
 import org.jbehave.core.annotations.When;
 
+/**
+ * User: vitaliy.vasilenko
+ * Date: 7/2/13
+ * Time: 6:30 PM
+ */
 public class BrowserWebSteps {
 
     private final Pages pages;
@@ -15,47 +20,47 @@ public class BrowserWebSteps {
     }
 
     @Given("user is on Home page")
-    public void userIsOnHomePage(){
+    public void userIsOnHomePage() {
         pages.home().open();
     }
 
     @Then("Find title $title user")
-    public void findTitle(String title){
+    public void findTitle(String title) {
         pages.home().found(title);
     }
 
     @Given("user is on Index page")
-    public void userIsOnIndexPage(){
+    public void userIsOnIndexPage() {
         pages.index().open();
     }
 
     @Then("Find text $title")
-    public void findText(String title){
+    public void findText(String title) {
         pages.index().found(title);
     }
 
     @When("user clicks tree root")
-    public void userClickTreeRoot(){
+    public void userClickTreeRoot() {
         pages.home().treeClick();
     }
 
     @Then("node $node is found")
-    public void treeNodeIsSelected(String node){
+    public void treeNodeIsSelected(String node) {
         pages.home().found(node);
     }
 
     @Then("root is selected")
-    public void treeRootSelected(){
+    public void treeRootSelected() {
         pages.home().treeClickCheck();
     }
 
     @When("user clicks root expand")
-    public void userClickRootChild(){
+    public void userClickRootChild() {
         pages.home().treeExpand();
     }
 
     @Then("root is expanded")
-    public void treeRootChildSelected(){
+    public void treeRootChildSelected() {
         pages.home().treeExpandCheck();
     }
 

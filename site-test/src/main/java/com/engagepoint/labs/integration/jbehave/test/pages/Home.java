@@ -5,6 +5,11 @@ import org.openqa.selenium.By;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * User: vitaliy.vasilenko
+ * Date: 7/2/13
+ * Time: 6:32 PM
+ */
 public class Home extends AbstractPage {
 
     public Home(WebDriverProvider driverProvider) {

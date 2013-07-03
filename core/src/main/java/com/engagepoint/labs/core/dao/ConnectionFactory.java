@@ -7,6 +7,8 @@ import org.apache.chemistry.opencmis.client.api.SessionFactory;
 import org.apache.chemistry.opencmis.client.runtime.SessionFactoryImpl;
 import org.apache.chemistry.opencmis.commons.SessionParameter;
 import org.apache.chemistry.opencmis.commons.enums.BindingType;
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,7 +21,7 @@ import java.util.Map;
  * Time: 1:39 PM
  */
 public class ConnectionFactory {
-
+    static final Logger logger = Logger.getLogger(ConnectionFactory.class);
     private static Session session;
 
     /**
@@ -27,6 +29,7 @@ public class ConnectionFactory {
      * @return session
      */
     public static Session getSession(){
+        BasicConfigurator.configure();
         SessionFactory sessionFactory = SessionFactoryImpl.newInstance();
         Map<String, String> parameter = new HashMap<String, String>();
 
