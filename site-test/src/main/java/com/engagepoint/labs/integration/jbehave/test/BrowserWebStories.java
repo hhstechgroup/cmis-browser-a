@@ -2,10 +2,9 @@ package com.engagepoint.labs.integration.jbehave.test;
 
 import com.engagepoint.labs.integration.jbehave.test.pages.Pages;
 import com.engagepoint.labs.integration.jbehave.test.steps.BrowserWebSteps;
-import com.google.common.util.concurrent.MoreExecutors;
 import org.jbehave.core.Embeddable;
 import org.jbehave.core.configuration.Configuration;
-import org.jbehave.core.embedder.Embedder;
+import org.jbehave.core.embedder.executors.SameThreadExecutors;
 import org.jbehave.core.io.LoadFromClasspath;
 import org.jbehave.core.io.StoryFinder;
 import org.jbehave.core.junit.JUnitStories;
@@ -34,9 +33,8 @@ public class BrowserWebStories extends JUnitStories {
     private ContextView contextView = new LocalFrameContextView().sized(500, 100);
 
     public BrowserWebStories() {
-        // If configuring lifecycle per-stories, you need to ensure that you a same-thread executor
         if ( lifecycleSteps instanceof PerStoriesWebDriverSteps ){
-            configuredEmbedder().useExecutorService(MoreExecutors.sameThreadExecutor());
+            configuredEmbedder().useExecutorService(new SameThreadExecutors().create(configuredEmbedder().embedderControls()));
         }
     }
 
@@ -69,14 +67,4 @@ public class BrowserWebStories extends JUnitStories {
         return new StoryFinder()
                 .findPaths(codeLocationFromClass(this.getClass()).getFile(), asList("**/*.story"), null);
     }
-
-    // This Embedder is used by Maven or Ant and it will override anything set in the constructor
-    public static class SameThreadEmbedder extends Embedder {
-
-        public SameThreadEmbedder() {
-            useExecutorService(MoreExecutors.sameThreadExecutor());
-        }
-
-    }
-
 }

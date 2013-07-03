@@ -12,7 +12,7 @@
     <name>site-test</name>
 
     <properties>
-        <jbehave.core.version>4.0-beta-3</jbehave.core.version>
+        <jbehave.core.version>3.8</jbehave.core.version>
         <jbehave.site.version>3.1.1</jbehave.site.version>
         <jbehave.web.version>3.6</jbehave.web.version>
         <embeddables>**/*Stories.java</embeddables>
@@ -111,7 +111,7 @@
             <plugin>
                 <groupId>org.jbehave</groupId>
                 <artifactId>jbehave-maven-plugin</artifactId>
-                <version>3.8</version>
+                <version>${jbehave.core.version}</version>
                 <executions>
                     <execution>
                         <id>unpack-view-resources</id>
@@ -127,6 +127,7 @@
             <plugin>
                 <groupId>org.jbehave</groupId>
                 <artifactId>jbehave-maven-plugin</artifactId>
+                <version>${jbehave.core.version}</version>
                 <executions>
                     <execution>
                         <id>run-stories</id>
