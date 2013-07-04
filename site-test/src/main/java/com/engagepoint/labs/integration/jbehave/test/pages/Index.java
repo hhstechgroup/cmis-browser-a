@@ -1,13 +1,16 @@
 package com.engagepoint.labs.integration.jbehave.test.pages;
 
 import org.jbehave.web.selenium.WebDriverProvider;
+import org.openqa.selenium.By;
 
 import java.util.concurrent.TimeUnit;
 
 /**
- * User: vitaliy.vasilenko
- * Date: 7/2/13
- * Time: 6:30 PM
+ * Created with IntelliJ IDEA.
+ * User: iryna.domachuk
+ * Date: 6/21/13
+ * Time: 12:40 PM
+ * To change this template use File | Settings | File Templates.
  */
 public class Index extends AbstractPage  {
 
@@ -17,7 +20,36 @@ public class Index extends AbstractPage  {
 
     public void open() {
         get("http://localhost:8080/site/index.xhtml"); //  --- > url in story
-        manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+
+    }
+
+    public void treeExpand() {
+
+        findElement(By.xpath(".//*[@id='treeForm:tree:0']/span/span[1]")).click();
+
+        manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+
+    }
+
+    public void treeClick() {
+
+        findElement(By.xpath(".//*[@id='treeForm:tree:0']/span/span[3]")).click();
+
+        manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+
+    }
+
+    public void treeClickCheck() {
+
+        findElement(By.xpath(".//*[@id='treeForm:tree:0'][@aria-selected='true']"));
+
+    }
+
+    public void treeExpandCheck() {
+
+        findElement(By.xpath(".//*[@id='treeForm:tree:0' and @aria-expanded='true']"));
+
     }
 
 }

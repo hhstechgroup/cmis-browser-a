@@ -12,10 +12,10 @@
     <name>site-test</name>
 
     <properties>
-        <jbehave.core.version>3.8</jbehave.core.version>
+        <jbehave.core.version>4.0-beta-3</jbehave.core.version>
         <jbehave.site.version>3.1.1</jbehave.site.version>
         <jbehave.web.version>3.6</jbehave.web.version>
-        <embeddables>**/*Stories.java</embeddables>
+
     </properties>
 
     <dependencyManagement>
@@ -28,13 +28,14 @@
         </dependencies>
     </dependencyManagement>
     <dependencies>
-        <dependency>
+         <dependency>
             <groupId>org.jbehave</groupId>
             <artifactId>jbehave-core</artifactId>
             <version>${jbehave.core.version}</version>
             <classifier>resources</classifier>
             <type>zip</type>
         </dependency>
+
         <dependency>
             <groupId>org.jbehave.site</groupId>
             <artifactId>jbehave-site-resources</artifactId>
@@ -52,16 +53,16 @@
             <version>3.5.4</version>
         </dependency>
         <!--<dependency>-->
-        <!--<groupId>org.apache.chemistry.opencmis</groupId>-->
-        <!--<artifactId>chemistry-opencmis-server-inmemory</artifactId>-->
-        <!--<type>war</type>-->
-        <!--<scope>provided</scope>-->
+            <!--<groupId>org.apache.chemistry.opencmis</groupId>-->
+            <!--<artifactId>chemistry-opencmis-server-inmemory</artifactId>-->
+            <!--<type>war</type>-->
+            <!--<scope>provided</scope>-->
         <!--</dependency>-->
         <dependency>
             <groupId>com.engagepoint.labs</groupId>
             <artifactId>site</artifactId>
             <type>war</type>
-            <version>${project.version}</version>
+             <version>${project.version}</version>
         </dependency>
         <!-- JSF -->
         <dependency>
@@ -70,12 +71,14 @@
             <version>2.2.0</version>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>com.sun.faces</groupId>
             <artifactId>jsf-impl</artifactId>
             <version>2.2.0</version>
             <scope>provided</scope>
         </dependency>
+
     </dependencies>
 
     <build>
@@ -109,7 +112,7 @@
             <plugin>
                 <groupId>org.jbehave</groupId>
                 <artifactId>jbehave-maven-plugin</artifactId>
-                <version>${jbehave.core.version}</version>
+                <version>4.0-beta-3</version>
                 <executions>
                     <execution>
                         <id>unpack-view-resources</id>
@@ -123,7 +126,8 @@
             <plugin>
                 <groupId>org.jbehave</groupId>
                 <artifactId>jbehave-maven-plugin</artifactId>
-                <version>${jbehave.core.version}</version>
+                <version>4.0-beta-3</version>
+
                 <executions>
                     <execution>
                         <id>run-stories</id>
@@ -147,7 +151,6 @@
                     </dependency>
                 </dependencies>
             </plugin>
-
             <plugin>
                 <groupId>org.codehaus.cargo</groupId>
                 <artifactId>cargo-maven2-plugin</artifactId>
@@ -195,14 +198,14 @@
                         </properties>
                     </configuration>
                     <deployables>
-                        <deployable>
-                            <groupId>org.apache.chemistry.opencmis</groupId>
-                            <artifactId>chemistry-opencmis-server-inmemory</artifactId>
-                            <type>war</type>
-                            <properties>
-                                <context>/server</context>
-                            </properties>
-                        </deployable>
+                        <!--<deployable>-->
+                            <!--<groupId>org.apache.chemistry.opencmis</groupId>-->
+                            <!--<artifactId>chemistry-opencmis-server-inmemory</artifactId>-->
+                            <!--<type>war</type>-->
+                            <!--<properties>-->
+                                <!--<context>/server</context>-->
+                            <!--</properties>-->
+                        <!--</deployable>-->
                         <deployable>
                             <groupId>com.engagepoint.labs</groupId>
                             <artifactId>site</artifactId>
@@ -214,6 +217,8 @@
                     </deployables>
                 </configuration>
             </plugin>
+
         </plugins>
     </build>
+
 </project>

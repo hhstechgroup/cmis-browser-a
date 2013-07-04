@@ -7,15 +7,14 @@ So that I can achieve a business goal
 
 Scenario: User goes to the Index page
 
-Given user is on Home page
-Then Find title Hallo user
-
+Given user is on Index page
+Then find title CMIS
 
 Scenario: User clicks tree root
 
 Given user is on Index page
 When user clicks tree root
-Then node RootFolder is found
+Then node Root is found
 Then root is selected
 
 Scenario: User expands tree root

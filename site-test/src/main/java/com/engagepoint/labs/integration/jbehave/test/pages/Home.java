@@ -5,11 +5,6 @@ import org.openqa.selenium.By;
 
 import java.util.concurrent.TimeUnit;
 
-/**
- * User: vitaliy.vasilenko
- * Date: 7/2/13
- * Time: 6:32 PM
- */
 public class Home extends AbstractPage {
 
     public Home(WebDriverProvider driverProvider) {
@@ -23,7 +18,7 @@ public class Home extends AbstractPage {
 
     public void treeExpand() {
 
-        findElement(By.xpath(".//*[@id='formLeftTree:tree:0']/span/span[1]")).click();
+        findElement(By.xpath(".//*[@id='treeForm:tree:0']/span/span[1]")).click();
 
         manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 
@@ -31,7 +26,7 @@ public class Home extends AbstractPage {
 
     public void treeClick() {
 
-        findElement(By.xpath(".//*[@id='formLeftTree:tree:0']/span/span[3]")).click();
+        findElement(By.xpath(".//*[@id='treeForm:tree:0']/span/span[3]")).click();
 
         manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 
@@ -39,13 +34,13 @@ public class Home extends AbstractPage {
 
     public void treeClickCheck() {
 
-        findElement(By.xpath(".//*[@id='formLeftTree:tree:0'][@aria-selected='true']"));
+        findElement(By.xpath(".//*[@id='treeForm:tree:0'][@aria-selected='true']"));
 
     }
 
     public void treeExpandCheck() {
 
-        findElement(By.xpath(".//*[@id='formLeftTree:tree:0' and @aria-expanded='true']"));
+        findElement(By.xpath(".//*[@id='treeForm:tree:0' and @aria-expanded='true']"));
 
     }
 

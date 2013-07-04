@@ -2,9 +2,10 @@ package com.engagepoint.labs.integration.jbehave.test;
 
 import com.engagepoint.labs.integration.jbehave.test.pages.Pages;
 import com.engagepoint.labs.integration.jbehave.test.steps.BrowserWebSteps;
+import com.google.common.util.concurrent.MoreExecutors;
 import org.jbehave.core.Embeddable;
 import org.jbehave.core.configuration.Configuration;
-import org.jbehave.core.embedder.executors.SameThreadExecutors;
+import org.jbehave.core.embedder.Embedder;
 import org.jbehave.core.io.LoadFromClasspath;
 import org.jbehave.core.io.StoryFinder;
 import org.jbehave.core.junit.JUnitStories;
@@ -19,10 +20,13 @@ import java.util.List;
 import static java.util.Arrays.asList;
 import static org.jbehave.core.io.CodeLocations.codeLocationFromClass;
 import static org.jbehave.core.reporters.Format.*;
+
 /**
- * User: vitaliy.vasilenko
- * Date: 7/2/13
- * Time: 6:20 PM
+ * Created with IntelliJ IDEA.
+ * User: iryna.domachuk
+ * Date: 6/19/13
+ * Time: 7:40 PM
+ * To change this template use File | Settings | File Templates.
  */
 public class BrowserWebStories extends JUnitStories {
 
@@ -33,8 +37,9 @@ public class BrowserWebStories extends JUnitStories {
     private ContextView contextView = new LocalFrameContextView().sized(500, 100);
 
     public BrowserWebStories() {
+        // If configuring lifecycle per-stories, you need to ensure that you a same-thread executor
         if ( lifecycleSteps instanceof PerStoriesWebDriverSteps ){
-            configuredEmbedder().useExecutorService(new SameThreadExecutors().create(configuredEmbedder().embedderControls()));
+            configuredEmbedder().useExecutorService(MoreExecutors.sameThreadExecutor());
         }
     }
 
@@ -67,4 +72,14 @@ public class BrowserWebStories extends JUnitStories {
         return new StoryFinder()
                 .findPaths(codeLocationFromClass(this.getClass()).getFile(), asList("**/*.story"), null);
     }
+
+    // This Embedder is used by Maven or Ant and it will override anything set in the constructor
+    public static class SameThreadEmbedder extends Embedder {
+
+        public SameThreadEmbedder() {
+            useExecutorService(MoreExecutors.sameThreadExecutor());
+        }
+
+    }
+
 }
