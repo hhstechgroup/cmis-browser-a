@@ -54,7 +54,7 @@
                                      style="font-size: 13px; margin-bottom: 5px" size="90" disabled="true"/>
 
                         <p:tabMenu activeIndex="4">
-                            <p:menuitem value="Create Folder" onclick="createFolderDialog.show();"
+                            <p:menuitem value="New Folder" onclick="createDialog.show();"
                                         icon="ui-icon-document"/>
                             <p:menuitem value="Read" url="index.xhtml"
                                         icon="ui-icon-contact"/>
@@ -74,13 +74,13 @@
 
                     <f:facet name="footer">
 
-                        <p:messages id="messages" showDetail="true" autoUpdate="true" closable="true"/>
                         <p:commandButton id="back" value="Back" actionListener="#{treeBean.previousPage}"
                                          update=":treeForm:fsTable :treeForm:fsTable:pageNumber "
                                          process="fsTable"
                                          disabled="#{treeBean.disableBackButton}"/>
                         <h:outputText id="firstPage" value="#{treeBean.firstPage}..."/>
-                        <p:inputText onselect="false" value="#{treeBean.testingCurrentPage}" id="pageNumber" process="fsTable" >
+                        <p:inputText onselect="false" value="#{treeBean.testingCurrentPage}" id="pageNumber"
+                                     process="fsTable">
 
                             <p:ajax event="keyup" listener="#{treeBean.CurrentPageToJSF}"
                                     update=":treeForm:fsTable"/>
@@ -96,52 +96,95 @@
             </p:panelGrid>
 
             <p:contextMenu for="tree">
-                <p:menuitem value="New Folder" onclick="createFolderDialog.show();" icon="ui-icon-document"/>
+                <p:menuitem value="New Folder" onclick="createDialog.show();" icon="ui-icon-document"/>
                 <p:menuitem value="Rename" onclick="renameDialog.show();" icon="ui-icon-document"/>
                 <p:menuitem value="Delete" onclick="deleteDialog.show();" icon="ui-icon-document"/>
             </p:contextMenu>
 
-            <p:dialog id="createFolder" widgetVar="createFolderDialog" header="Create Folder" modal="true"
-                      showEffect="fade"
-                      hideEffect="fade"
-                      resizable="false"
-                    >
-                <p:inputText id="name" value="#{action.name}"/>
+        </h:form>
+
+
+        <p:dialog id="rename" widgetVar="renameDialog"
+                  header="Rename" modal="true"
+                  showEffect="fade"
+                  hideEffect="fade"
+                  resizable="false"
+                  appendToBody="true"
+                  visible="#{facesContext.validationFailed}"
+                >
+            <h:form>
+                <p:outputLabel for="newName" value="Type folder name:  "/>
+                <p:watermark for="newName" value="Folder Name"/>
+                <p:inputText id="newName" value="#{action.newName}"
+                             validatorMessage="Invalid symbols" binding="#{action.renamecomponent}">
+                    <f:validateRegex pattern="#{action.reqEx}"/>
+                </p:inputText>
+                <br></br>
+                <p:message for="newName" autoUpdate="true" closable="true"/>
+                <br></br>
+                <p:commandButton value="OK" action="#{treeBean.updateTree}"
+                                 actionListener="#{action.rename(treeBean.selectedFSObject)}"
+                                 onsuccess="#{renameDialog.hide()}"
+                                 update=":treeForm:tree :treeForm:fsTable :rename "
+                        />
+                <p:commandButton value="Cancel" type="button" onclick="renameDialog.hide()"/>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog id="create" widgetVar="createDialog" header="Create Folder" modal="true"
+                  showEffect="fade"
+                  hideEffect="fade"
+                  resizable="false"
+                  visible="#{facesContext.validationFailed}"
+                  appendToBody="true"
+                >
+
+            <h:form id="createForm">
+
+                <p:outputLabel for="name" value="Type folder name:  "/>
+                <p:watermark for="name" value="Folder Name"/>
+                <p:inputText id="name" value="#{action.name}"
+                             validatorMessage="Invalid symbols" binding="#{action.createcomponent}">
+                    <f:validateRegex pattern="#{action.reqEx}"/>
+                </p:inputText>
+
+                <p:message id="name_message" for="name" autoUpdate="true" closable="true"/>
+
+                <h:outputLabel for="type" value="Type folder type:  "/>
+                <p:watermark for="type" value="Folder Type"/>
+                <p:inputText id="type" value="#{action.type}"
+                             required="true" requiredMessage="Value is required"/>
+
+                <p:message id="type_message" for="type" autoUpdate="true" closable="true"/>
+
                 <br></br>
                 <p:commandButton value="OK" action="#{treeBean.updateTree}"
                                  actionListener="#{action.createFolder(treeBean.parent)}"
-                                 onclick="createFolderDialog.hide()" update=":treeForm"/>
-                <p:commandButton value="Cancel" oncomplete="createFolderDialog.hide()"/>
-            </p:dialog>
+                                 update=":treeForm:tree :treeForm:fsTable :create "/>
 
-            <p:dialog id="rename" widgetVar="renameDialog" header="Rename" modal="true"
-                      showEffect="fade"
-                      hideEffect="fade"
-                      resizable="false"
-                    >
-                <p:inputText id="newName" value="#{action.newName}"/>
-                <br></br>
-                <p:commandButton type="submit" value="OK" action="#{treeBean.updateTree}"
-                                 actionListener="#{action.rename(treeBean.selectedFSObject)}"
-                                 onclick="renameDialog.hide()" update=":treeForm"/>
-                <p:commandButton value="Cancel" oncomplete="renameDialog.hide()"/>
-            </p:dialog>
+                <p:commandButton value="Cancel" type="button" onclick="createDialog.hide()"/>
+            </h:form>
+        </p:dialog>
 
-            <p:dialog id="delete" widgetVar="deleteDialog" header="Delete" modal="true"
-                      showEffect="fade"
-                      hideEffect="fade"
-                      resizable="false"
-                    >
+        <p:dialog id="delete" widgetVar="deleteDialog" header="Delete" modal="true"
+                  showEffect="fade"
+                  hideEffect="fade"
+                  resizable="false"
+                  appendToBody="true"
+                  visible="#{facesContext.validationFailed}"
+                >
+            <h:form>
                 <h:outputText value="Delete all tree?"/>
                 <p:selectBooleanCheckbox value="#{action.deleteAllTree}"/>
                 <br></br>
                 <p:commandButton value="OK" action="#{treeBean.updateTree}"
                                  actionListener="#{action.delete(treeBean.selectedFSObject)}"
-                                 onclick="deleteFolderDialog.hide()" update=":treeForm"/>
-                <p:commandButton value="Cancel" oncomplete="deleteFolderDialog.hide()"/>
-            </p:dialog>
+                                 update=":treeForm:tree :treeForm:fsTable :delete"
+                                 onsuccess="#{deleteDialog.hide()}"/>
+                <p:commandButton value="Cancel" type="button" onclick="deleteDialog.hide()"/>
+            </h:form>
+        </p:dialog>
 
-        </h:form>
     </ui:composition>
 </h:body>
 </html>

@@ -7,7 +7,7 @@ import com.engagepoint.labs.core.models.FSObject;
 import java.util.List;
 
 /**
- * @author volodymyr.kozubal
+ * @author volodymyr.kozubal  <volodymyr.kozubal@engagepoint.com>
  */
 public interface CMISService {
     /**
@@ -59,15 +59,31 @@ public interface CMISService {
      */
     public String getContent(FSFile file);
 
-    public FSFolder createFolder(FSFolder parent, String folderName);
+    /**
+     * Create new folder in repository with folder name folderName
+     * @param parent    parent folder for folderName folder
+     * @param folderName
+     * @return  created FSFolder object
+     * @throws Exception if folder with this name exist in parent directory
+     * or connection is fail
+     */
+    public FSFolder createFolder(FSFolder parent, String folderName) throws Exception;
 
     public FSFile createFile(FSFolder parent, String fileName, String content);
 
-    public FSFile renameFile(FSFile file, String newName);
+    public FSFile renameFile(FSFile file, String newName)throws Exception;
 
     public boolean deleteFile(FSFile file);
 
-    public FSFolder renameFolder(FSFolder folder, String newName);
+    /**
+     * Rename {@link FSFolder} folder in repository to name newName
+     * @param folder   folder that is supposed to rename
+     * @param newName  new name to folder
+     * @return  renamed {@link FSFolder} object
+     * @throws Exception
+     */
+
+    public FSFolder renameFolder(FSFolder folder, String newName)throws Exception;
 
     public boolean deleteFolder(FSFolder folder);
 

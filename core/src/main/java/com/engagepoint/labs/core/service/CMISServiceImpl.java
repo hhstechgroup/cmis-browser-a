@@ -19,7 +19,7 @@ public class CMISServiceImpl implements CMISService {
 
     private static CMISServiceImpl service = null;
 
-    private CMISServiceImpl() {
+    CMISServiceImpl() {
         fsFolderDao = new FSFolderDaoImpl();
         fsFolderDao.setSession(ConnectionFactory.getSession());
     }
