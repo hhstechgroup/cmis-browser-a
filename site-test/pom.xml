@@ -52,10 +52,10 @@
             <version>3.5.4</version>
         </dependency>
         <!--<dependency>-->
-            <!--<groupId>org.apache.chemistry.opencmis</groupId>-->
-            <!--<artifactId>chemistry-opencmis-server-inmemory</artifactId>-->
-            <!--<type>war</type>-->
-            <!--<scope>provided</scope>-->
+        <!--<groupId>org.apache.chemistry.opencmis</groupId>-->
+        <!--<artifactId>chemistry-opencmis-server-inmemory</artifactId>-->
+        <!--<type>war</type>-->
+        <!--<scope>provided</scope>-->
         <!--</dependency>-->
         <dependency>
             <groupId>com.engagepoint.labs</groupId>
@@ -120,8 +120,6 @@
                     </execution>
                 </executions>
             </plugin>
-
-
             <plugin>
                 <groupId>org.jbehave</groupId>
                 <artifactId>jbehave-maven-plugin</artifactId>
@@ -218,5 +216,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>
