@@ -6,11 +6,9 @@ import org.openqa.selenium.By;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created with IntelliJ IDEA.
- * User: iryna.domachuk
+ * User: vitaliy.vasilenko
  * Date: 6/21/13
  * Time: 12:40 PM
- * To change this template use File | Settings | File Templates.
  */
 public class Index extends AbstractPage  {
 

@@ -22,11 +22,9 @@ import static org.jbehave.core.io.CodeLocations.codeLocationFromClass;
 import static org.jbehave.core.reporters.Format.*;
 
 /**
- * Created with IntelliJ IDEA.
- * User: iryna.domachuk
- * Date: 6/19/13
- * Time: 7:40 PM
- * To change this template use File | Settings | File Templates.
+ * User: vitaliy.vasilenko
+ * Date: 6/21/13
+ * Time: 12:40 PM
  */
 public class BrowserWebStories extends JUnitStories {
 

@@ -7,6 +7,11 @@ import java.util.List;
 
 import static org.junit.Assert.fail;
 
+/**
+ * User: vitaliy.vasilenko
+ * Date: 6/21/13
+ * Time: 12:40 PM
+ */
 public abstract class AbstractPage extends WebDriverPage {
 
     public AbstractPage(WebDriverProvider driverProvider) {

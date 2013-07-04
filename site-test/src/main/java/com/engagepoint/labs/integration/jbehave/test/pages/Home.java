@@ -2,9 +2,13 @@ package com.engagepoint.labs.integration.jbehave.test.pages;
 
 import org.jbehave.web.selenium.WebDriverProvider;
 import org.openqa.selenium.By;
-
 import java.util.concurrent.TimeUnit;
 
+/**
+ * User: vitaliy.vasilenko
+ * Date: 6/21/13
+ * Time: 12:40 PM
+ */
 public class Home extends AbstractPage {
 
     public Home(WebDriverProvider driverProvider) {
