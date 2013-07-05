@@ -64,5 +64,22 @@ public class BrowserWebSteps {
         pages.index().treeExpandCheck();
     }
 
+    @Then("user clicks delete button for folder")
+    public void userClickDeleteButtonForFolder() {
+        pages.index().deleteButtonClickForFolder();
+    }
 
+    @Then("user clicks cancel button on delete folder page")
+    public void userClickCancelButtonOnDeleteFolderPage() {
+        pages.index().cancelButtonClickOnDeleteFolderPage();
+    }
+    @Then("user clicks create button for folder")
+    public void userClickCreateButtonForFolder() {
+        pages.index().createButtonClickForFolder();
+    }
+
+    @Then("user clicks cancel button on crete page")
+    public void userClickCancelButtonOnCreatePage() {
+        pages.index().cancelButtonClickOnCreatePage();
+    }
 }

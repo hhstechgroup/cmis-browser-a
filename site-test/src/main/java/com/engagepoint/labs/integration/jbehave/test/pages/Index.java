@@ -50,4 +50,33 @@ public class Index extends AbstractPage  {
 
     }
 
+    public void deleteButtonClickForFolder() {
+
+        findElement(By.xpath(".//*[@id='treeForm:fsTable:j_idt35']")).click();
+
+        manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+
+    }
+
+    public void cancelButtonClickOnDeleteFolderPage() {
+
+        findElement(By.xpath(".//*[@id='j_idt60:j_idt65']")).click();
+
+        manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+
+    }
+    public void createButtonClickForFolder() {
+
+        findElement(By.xpath(".//*[@id='treeForm:fsTable:j_idt32']")).click();
+
+        manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+
+    }
+    public void cancelButtonClickOnCreatePage() {
+
+        findElement(By.xpath(".//*[@id='createForm:j_idt59']")).click();
+
+        manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+
+    }
 }

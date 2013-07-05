@@ -22,3 +22,11 @@ Scenario: User expands tree root
 Given user is on Home page
 When user clicks root expand
 Then root is expanded
+
+Scenario: User clicks delete button
+
+Given user is on Home page
+Then user clicks delete button for folder
+Then user clicks cancel button on delete folder page
+Then user clicks create button for folder
+Then user clicks cancel button on create folder page
