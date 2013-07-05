@@ -8,6 +8,7 @@ import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
@@ -33,7 +34,7 @@ public class TreeBean implements Serializable {
     private TreeNode selectedNodes;
     private FSObject selectedFSObject;
     private FSFolder parent = new FSFolder();
-    private CMISService CMISService = CMISServiceImpl.getService();
+    private CMISService cmisService = CMISServiceImpl.getService();
     private static Logger logger = Logger.getLogger(TreeBean.class.getName());
 
     private List<PageState> backHistory = new LinkedList<PageState>();
@@ -52,12 +53,13 @@ public class TreeBean implements Serializable {
     private Boolean disableNextButton = false;
 
     public TreeBean() {
-        updateTree();
+
     }
 
+    @PostConstruct
     public void updateTree() {
         logger.log(Level.INFO, "UPDATING... TREEEE...");
-        FSFolder root = CMISService.getRootFolder();
+        FSFolder root = cmisService.getRootFolder();
         parent.setPath("/");
         main = new DefaultTreeNode("Main", null);
         TreeNode node0 = new DefaultTreeNode(root, main);
@@ -67,7 +69,9 @@ public class TreeBean implements Serializable {
     }
 
     public void doBack() {
-        if (backHistory.size() == 0) return;
+        if (backHistory.size() == 0){
+            return;
+        }
         for (int i = 0; i < backHistory.size(); i++) {
             logger.log(Level.INFO, "BEFORE doBack REMOVE name: " + backHistory.get(i).getSelectedObject().getName());
         }
@@ -82,7 +86,9 @@ public class TreeBean implements Serializable {
     }
 
     public void doForward() {
-        if (forwardHistory.size() == 0) return;
+        if (forwardHistory.size() == 0){
+            return;
+        }
         for (int i = 0; i < forwardHistory.size(); i++) {
             logger.log(Level.INFO, "BEFORE REMOVE name: " + forwardHistory.get(i).getSelectedObject().getName());
         }
@@ -117,7 +123,7 @@ public class TreeBean implements Serializable {
     }
 
     private void SubObjects(FSFolder parent, TreeNode treenodeparent) {
-        List<FSObject> children = CMISService.getChildren(parent);
+        List<FSObject> children = cmisService.getChildren(parent);
         for (FSObject i : children) {
             if (i instanceof FSFolder) {
                 TreeNode treeNode = new DefaultTreeNode(i, treenodeparent);
@@ -127,7 +133,7 @@ public class TreeBean implements Serializable {
     }
 
     public void setTestingCurrentPage(String testingCurrentPage) {
-        if (testingCurrentPage == "") {
+        if (testingCurrentPage.isEmpty()) {
             this.testingCurrentPage = Integer.toString(currentPage);
             return;
         }
@@ -140,7 +146,7 @@ public class TreeBean implements Serializable {
         }
 
         int test = Integer.parseInt(testingCurrentPage);
-        lastPage = CMISService.getMaxNumberOfPage(parent, amountOfRowsInPage);
+        lastPage = cmisService.getMaxNumberOfPage(parent, amountOfRowsInPage);
         if (lastPage == 0) {
             lastPage = 1;
             currentPage = 1;
@@ -161,8 +167,8 @@ public class TreeBean implements Serializable {
 
     public void changedTableParentFolder() {
         currentPage = firstPage;
-        tablePageList = CMISService.getPage(parent, currentPage, amountOfRowsInPage);
-        lastPage = CMISService.getMaxNumberOfPage(parent, amountOfRowsInPage);
+        tablePageList = cmisService.getPage(parent, currentPage, amountOfRowsInPage);
+        lastPage = cmisService.getMaxNumberOfPage(parent, amountOfRowsInPage);
         testingCurrentPage = Integer.toString(currentPage);
         disableBackButton = true;
         if (lastPage == 0) {
@@ -178,7 +184,7 @@ public class TreeBean implements Serializable {
     }
 
     public void nextPage() {
-        lastPage = CMISService.getMaxNumberOfPage(parent, amountOfRowsInPage);
+        lastPage = cmisService.getMaxNumberOfPage(parent, amountOfRowsInPage);
         // All this IFs  for dynamic updating number of pages(so all situations are here)
         if (lastPage == 0) {
             lastPage = 1;
@@ -186,7 +192,7 @@ public class TreeBean implements Serializable {
             disableNextButton = true;
             disableBackButton = true;
 
-            tablePageList = CMISService.getPage(parent, currentPage, amountOfRowsInPage);
+            tablePageList = cmisService.getPage(parent, currentPage, amountOfRowsInPage);
             testingCurrentPage = Integer.toString(currentPage);
             return;
         }
@@ -194,32 +200,40 @@ public class TreeBean implements Serializable {
             disableNextButton = true;
         }
         if (lastPage < currentPage) {
-            if (lastPage > 1) currentPage = lastPage;
+            if (lastPage > 1) {
+                currentPage = lastPage;
+            }
             disableNextButton = true;
             if (lastPage == 0 || lastPage == 1) {
                 disableBackButton = true;
                 currentPage = 1;
             }
-            if (lastPage != firstPage)
-                FacesContext.getCurrentInstance().addMessage(messageForPaging.getClientId(), new FacesMessage(FacesMessage.SEVERITY_INFO, "WRONG PAGE!", "it should be between  " + firstPage + " and " + lastPage));
-            else
-                FacesContext.getCurrentInstance().addMessage(messageForPaging.getClientId(), new FacesMessage(FacesMessage.SEVERITY_INFO, "WARNING", "here is only one page"));
-            tablePageList = CMISService.getPage(parent, currentPage, amountOfRowsInPage);
+            if (lastPage != firstPage) {
+                FacesContext.getCurrentInstance().addMessage(messageForPaging.getClientId(),
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "WRONG PAGE!", "it should be between  " + firstPage + " and " + lastPage));
+            }
+            else {
+                FacesContext.getCurrentInstance().addMessage(messageForPaging.getClientId(),
+                     new FacesMessage(FacesMessage.SEVERITY_INFO, "WARNING", "here is only one page"));
+            }
+            tablePageList = cmisService.getPage(parent, currentPage, amountOfRowsInPage);
             testingCurrentPage = Integer.toString(currentPage);
             return;
         }
         if (currentPage < lastPage) {
             ++currentPage;
-            tablePageList = CMISService.getPage(parent, currentPage, amountOfRowsInPage);
+            tablePageList = cmisService.getPage(parent, currentPage, amountOfRowsInPage);
             testingCurrentPage = Integer.toString(currentPage);
-            if (currentPage == lastPage) disableNextButton = true;
+            if (currentPage == lastPage) {
+                disableNextButton = true;
+            }
             disableBackButton = false;
         }
 
     }
 
     public void previousPage() {
-        lastPage = CMISService.getMaxNumberOfPage(parent, amountOfRowsInPage);
+        lastPage = cmisService.getMaxNumberOfPage(parent, amountOfRowsInPage);
 
         // All this IFs  for dynamic updating number of pages(so all situations are here)
         if (lastPage == 0) {
@@ -228,7 +242,7 @@ public class TreeBean implements Serializable {
             disableNextButton = true;
             disableBackButton = true;
 
-            tablePageList = CMISService.getPage(parent, currentPage, amountOfRowsInPage);
+            tablePageList = cmisService.getPage(parent, currentPage, amountOfRowsInPage);
             testingCurrentPage = Integer.toString(currentPage);
             return;
         }
@@ -237,7 +251,7 @@ public class TreeBean implements Serializable {
             disableNextButton = true;
             // FacesContext.getCurrentInstance().addMessage(messageForPaging.getClientId(), new FacesMessage(FacesMessage.SEVERITY_INFO, "UPDATING", "Somebody delete folders in this node"));
 
-            tablePageList = CMISService.getPage(parent, currentPage, amountOfRowsInPage);
+            tablePageList = cmisService.getPage(parent, currentPage, amountOfRowsInPage);
             testingCurrentPage = Integer.toString(currentPage);
             return;
         }
@@ -247,7 +261,7 @@ public class TreeBean implements Serializable {
             disableBackButton = true;
             // FacesContext.getCurrentInstance().addMessage(messageForPaging.getClientId(), new FacesMessage(FacesMessage.SEVERITY_INFO, "UPDATING", "Somebody delete folders in this node"));
 
-            tablePageList = CMISService.getPage(parent, currentPage, amountOfRowsInPage);
+            tablePageList = cmisService.getPage(parent, currentPage, amountOfRowsInPage);
             testingCurrentPage = Integer.toString(currentPage);
         }
         if (lastPage == currentPage) {
@@ -256,26 +270,39 @@ public class TreeBean implements Serializable {
         if (currentPage > firstPage) {
             --currentPage;
 
-            tablePageList = CMISService.getPage(parent, currentPage, amountOfRowsInPage);
+            tablePageList = cmisService.getPage(parent, currentPage, amountOfRowsInPage);
             testingCurrentPage = Integer.toString(currentPage);
 
-            if (currentPage == firstPage) disableBackButton = true;
+            if (currentPage == firstPage) {
+                disableBackButton = true;
+            }
             disableNextButton = false;
         }
     }
 
-    public void CurrentPageToJSF() {
-        if (currentPage > lastPage || currentPage < firstPage)
-            if (lastPage != firstPage)
-                FacesContext.getCurrentInstance().addMessage(messageForPaging.getClientId(), new FacesMessage(FacesMessage.SEVERITY_INFO, "WRONG PAGE!", "it should be between  " + firstPage + " and " + lastPage));
-            else
+    public void currentPageToJSF() {
+        if (currentPage > lastPage || currentPage < firstPage) {
+            if (lastPage != firstPage) {
+                FacesContext.getCurrentInstance().addMessage(messageForPaging.getClientId(),
+                        new FacesMessage(FacesMessage.SEVERITY_INFO, "WRONG PAGE!", "it should be between  " + firstPage + " and " + lastPage));
+            } else {
                 FacesContext.getCurrentInstance().addMessage(messageForPaging.getClientId(), new FacesMessage(FacesMessage.SEVERITY_INFO, "WARNING", "here is only one page"));
-        if (currentPage == firstPage) disableBackButton = true;
-        else disableBackButton = false;
-        if (currentPage == lastPage) disableNextButton = true;
-        else disableNextButton = false;
+            }
+        }
+        if (currentPage == firstPage) {
+            disableBackButton = true;
+        }
+        else {
+            disableBackButton = false;
+        }
+        if (currentPage == lastPage) {
+            disableNextButton = true;
+        }
+        else {
+            disableNextButton = false;
+        }
 
-        tablePageList = CMISService.getPage(parent, currentPage, amountOfRowsInPage);
+        tablePageList = cmisService.getPage(parent, currentPage, amountOfRowsInPage);
         testingCurrentPage = Integer.toString(currentPage);
     }
 
@@ -318,8 +345,9 @@ public class TreeBean implements Serializable {
     }
 
     public void setSelectedFSObject(FSObject sn) {
-        if (sn != null)
+        if (sn != null) {
             this.selectedFSObject = sn;
+        }
     }
 
     public FSFolder getParent() {

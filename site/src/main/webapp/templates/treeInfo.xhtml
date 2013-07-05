@@ -81,7 +81,7 @@
                                      onkeypress="if (event.keyCode == 13) { onchange(); return false; }"
                                      binding="#{treeBean.messageForPaging}">
 
-                            <p:ajax event="change" listener="#{treeBean.CurrentPageToJSF}" render="@this"
+                            <p:ajax event="change" listener="#{treeBean.currentPageToJSF}" render="@this"
                                     update=":treeForm:fsTable:pageNumber :treeForm:fsTable " process="fsTable"/>
                         </p:inputText>
                         <h:outputText id="lastPage" value="...#{treeBean.lastPage}"/>

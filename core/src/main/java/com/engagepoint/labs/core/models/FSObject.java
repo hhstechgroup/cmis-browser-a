@@ -74,18 +74,35 @@ public abstract class FSObject {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o){
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()){
+            return false;
+        }
         FSObject fsObject = (FSObject) o;
 
-        if (absolutePath != null ? !absolutePath.equals(fsObject.absolutePath) : fsObject.absolutePath != null)
+        if (absolutePath != null ? !absolutePath.equals(fsObject.absolutePath) : fsObject.absolutePath != null) {
             return false;
-        if (icon != null ? !icon.equals(fsObject.icon) : fsObject.icon != null) return false;
-        if (id != null ? !id.equals(fsObject.id) : fsObject.id != null) return false;
-        if (name != null ? !name.equals(fsObject.name) : fsObject.name != null) return false;
-        if (parent != null ? !parent.equals(fsObject.parent) : fsObject.parent != null) return false;
-        if (path != null ? !path.equals(fsObject.path) : fsObject.path != null) return false;
-        if (type != null ? !type.equals(fsObject.type) : fsObject.type != null) return false;
+        }
+        if (icon != null ? !icon.equals(fsObject.icon) : fsObject.icon != null) {
+            return false;
+        }
+        if (id != null ? !id.equals(fsObject.id) : fsObject.id != null) {
+            return false;
+        }
+        if (name != null ? !name.equals(fsObject.name) : fsObject.name != null) {
+            return false;
+        }
+        if (parent != null ? !parent.equals(fsObject.parent) : fsObject.parent != null) {
+            return false;
+        }
+        if (path != null ? !path.equals(fsObject.path) : fsObject.path != null) {
+            return false;
+        }
+        if (type != null ? !type.equals(fsObject.type) : fsObject.type != null) {
+            return false;
+        }
 
         return true;
     }

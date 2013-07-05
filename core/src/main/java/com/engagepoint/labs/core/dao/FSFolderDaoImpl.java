@@ -153,7 +153,11 @@ public class FSFolderDaoImpl implements FSFolderDao {
         ItemIterable<CmisObject> cmisChildren = cmisParent.getChildren();
 
         int total = (int)cmisChildren.getTotalNumItems();
-        if (total%numberOfRows == 0) return  total/numberOfRows;
-        else return  total/numberOfRows + 1;
+        if (total%numberOfRows == 0) {
+            return  total/numberOfRows;
+        }
+        else {
+            return  total/numberOfRows + 1;
+        }
     }
 }

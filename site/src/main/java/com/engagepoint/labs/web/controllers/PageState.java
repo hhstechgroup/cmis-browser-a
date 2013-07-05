@@ -52,17 +52,27 @@ public class PageState {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof PageState)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof PageState)) {
+            return false;
+        }
 
         PageState pageState = (PageState) o;
 
-        if (currentPage != pageState.currentPage) return false;
-        if (parentpath != null ? !parentpath.equals(pageState.parentpath) : pageState.parentpath != null) return false;
-        if (selectedNode != null ? !selectedNode.equals(pageState.selectedNode) : pageState.selectedNode != null)
+        if (currentPage != pageState.currentPage) {
             return false;
-        if (selectedObject != null ? !selectedObject.equals(pageState.selectedObject) : pageState.selectedObject != null)
+        }
+        if (parentpath != null ? !parentpath.equals(pageState.parentpath) : pageState.parentpath != null) {
             return false;
+        }
+        if (selectedNode != null ? !selectedNode.equals(pageState.selectedNode) : pageState.selectedNode != null) {
+            return false;
+        }
+        if (selectedObject != null ? !selectedObject.equals(pageState.selectedObject) : pageState.selectedObject != null) {
+            return false;
+        }
 
         return true;
     }
