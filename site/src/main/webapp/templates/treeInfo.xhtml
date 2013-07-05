@@ -10,15 +10,18 @@
 
 <h:body>
     <ui:composition>
-        <h:form id="treeForm" onclick="bajb_backdetect.onbeforeunload">
+        <h:outputScript library="js" name="native_but.js"/>
+        <h:form id="treeForm">
+            <p:remoteCommand name="invokeBack" action="#{treeBean.doBack}" update=":treeForm:tree :treeForm:fsTable" />
+            <p:remoteCommand name="invokeForward" action="#{treeBean.doForward}" update=":treeForm:tree :treeForm:fsTable" />
             <p:panelGrid columns="2" style="width: 100%; height: 400px;" styleClass="table">
                 <h:outputStylesheet library="style" name="style.css"/>
 
-                <p:tree id="tree" value="#{treeBean.root}" var="node" dynamic="true" cache="false"
-                        selectionMode="single" selection="#{treeBean.selectedNode}" style="width: 300px;">
+                <p:tree id="tree" value="#{treeBean.root}" var="node" dynamic="true"
+                        selectionMode="single" selection="#{treeBean.selectedNode}" onNodeClick="doNav();" style="width: 300px;">
 
                     <p:ajax event="select"
-                            update=":treeForm:fsTable :treeForm:fsTable:lastPage :treeForm:fsTable:backButton :treeForm:fsTable:back  :treeForm:fsTable:next"/>
+                            update=":treeForm:fsTable :treeForm:fsTable:lastPage :treeForm:fsTable:back  :treeForm:fsTable:next"/>
 
                     <p:treeNode expandedIcon="ui-icon-folder-open"
                                 collapsedIcon="ui-icon-folder-collapsed">
@@ -40,15 +43,6 @@
 
 
                     <f:facet name="header">
-                        <h:commandButton value="←" disabled="#{treeBean.backButtonDisabled}" id="backButton">
-                            <f:ajax listener="#{treeBean.backButton}"
-                                    render=":treeForm:fsTable :treeForm:fsTable:backButton"/>
-                        </h:commandButton>
-
-                        <h:commandButton value="→" disabled="#{treeBean.forwardButtonDisabled}" id="forwardButton">
-                            <f:ajax listener="#{treeBean.forwardButton}"
-                                    render=":treeForm:fsTable :treeForm:fsTable:forwardButton"/>
-                        </h:commandButton>
 
                         <p:inputText value="#{treeBean.parent.path}"
                                      style="font-size: 13px; margin-bottom: 5px" size="90" disabled="true"/>
@@ -103,6 +97,9 @@
 
         </h:form>
 
+        <iframe id="dj_history" src="resources/js/dojo/resources/iframe_history.html" name="dj_history"
+                style="border:0;width:1px;height:1px;position:absolute;visibility:hidden;bottom:0;right:0;">
+        </iframe>
 
         <p:dialog id="rename" widgetVar="renameDialog"
                   header="Rename" modal="true"

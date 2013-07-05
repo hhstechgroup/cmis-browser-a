@@ -14,7 +14,7 @@ Scenario: User clicks tree root
 
 Given user is on Index page
 When user clicks tree root
-Then node Root is found
+Then node RootFolder is found
 Then root is selected
 
 Scenario: User expands tree root
