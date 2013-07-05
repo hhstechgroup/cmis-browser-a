@@ -43,7 +43,7 @@ public class TreeBean implements Serializable {
     private final int firstPage = 1;
     private int currentPage;
     private int lastPage = 100;
-    private int amountOfRowsInPage = 1;
+    private int amountOfRowsInPage = 3;
     private List<FSObject> tablePageList;
     private String testingCurrentPage;
     private UIComponent messageForPaging;
@@ -147,7 +147,8 @@ public class TreeBean implements Serializable {
 //            FacesContext.getCurrentInstance().addMessage(messageForPaging.getClientId(), new FacesMessage(FacesMessage.SEVERITY_INFO, "WARNING", "somebody delete all pages"));
         } else {
             if (test > lastPage || test < firstPage) {
-                FacesContext.getCurrentInstance().addMessage(messageForPaging.getClientId(), new FacesMessage(FacesMessage.SEVERITY_INFO, "WRONG PAGE!", "here should be number between " + firstPage + " and " + lastPage));
+                if(lastPage != firstPage)FacesContext.getCurrentInstance().addMessage(messageForPaging.getClientId(), new FacesMessage(FacesMessage.SEVERITY_INFO, "WRONG PAGE!", "it should be between  " + firstPage + " and " + lastPage));
+                else  FacesContext.getCurrentInstance().addMessage(messageForPaging.getClientId(), new FacesMessage(FacesMessage.SEVERITY_INFO, "WARNING", "here is only one page"));
                 this.testingCurrentPage = Integer.toString(currentPage);
             } else {
                 currentPage = test;
@@ -197,7 +198,8 @@ public class TreeBean implements Serializable {
                 disableBackButton = true;
                 currentPage = 1;
             }
-            FacesContext.getCurrentInstance().addMessage(messageForPaging.getClientId(), new FacesMessage(FacesMessage.SEVERITY_INFO, "WRONG PAGE!", "it should be between  " + firstPage + " and " + lastPage));
+            if(lastPage != firstPage)FacesContext.getCurrentInstance().addMessage(messageForPaging.getClientId(), new FacesMessage(FacesMessage.SEVERITY_INFO, "WRONG PAGE!", "it should be between  " + firstPage + " and " + lastPage));
+            else  FacesContext.getCurrentInstance().addMessage(messageForPaging.getClientId(), new FacesMessage(FacesMessage.SEVERITY_INFO, "WARNING", "here is only one page"));
             tablePageList = CMISService.getPage(parent, currentPage, amountOfRowsInPage);
             testingCurrentPage = Integer.toString(currentPage);
             return;
@@ -260,7 +262,8 @@ public class TreeBean implements Serializable {
 
     public void CurrentPageToJSF() {
         if (currentPage > lastPage || currentPage < firstPage)
-            FacesContext.getCurrentInstance().addMessage(messageForPaging.getClientId(), new FacesMessage(FacesMessage.SEVERITY_INFO, "WRONG PAGE!", "it should be between  " + firstPage + " and " + lastPage));
+            if(lastPage != firstPage)FacesContext.getCurrentInstance().addMessage(messageForPaging.getClientId(), new FacesMessage(FacesMessage.SEVERITY_INFO, "WRONG PAGE!", "it should be between  " + firstPage + " and " + lastPage));
+            else  FacesContext.getCurrentInstance().addMessage(messageForPaging.getClientId(), new FacesMessage(FacesMessage.SEVERITY_INFO, "WARNING", "here is only one page"));
         if (currentPage == firstPage) disableBackButton = true;
         else disableBackButton = false;
         if (currentPage == lastPage) disableNextButton = true;
