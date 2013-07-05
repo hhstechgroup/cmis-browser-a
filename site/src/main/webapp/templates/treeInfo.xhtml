@@ -12,13 +12,15 @@
     <ui:composition>
         <h:outputScript library="js" name="native_but.js"/>
         <h:form id="treeForm">
-            <p:remoteCommand name="invokeBack" action="#{treeBean.doBack}" update=":treeForm:tree :treeForm:fsTable" />
-            <p:remoteCommand name="invokeForward" action="#{treeBean.doForward}" update=":treeForm:tree :treeForm:fsTable" />
+            <p:remoteCommand name="invokeBack" action="#{treeBean.doBack}" update=":treeForm:tree :treeForm:fsTable"/>
+            <p:remoteCommand name="invokeForward" action="#{treeBean.doForward}"
+                             update=":treeForm:tree :treeForm:fsTable"/>
             <p:panelGrid columns="2" style="width: 100%; height: 400px;" styleClass="table">
                 <h:outputStylesheet library="style" name="style.css"/>
 
                 <p:tree id="tree" value="#{treeBean.root}" var="node" dynamic="true"
-                        selectionMode="single" selection="#{treeBean.selectedNode}" onNodeClick="doNav();" style="width: 300px;">
+                        selectionMode="single" selection="#{treeBean.selectedNode}" onNodeClick="doNav();"
+                        style="width: 300px;">
 
                     <p:ajax event="select"
                             update=":treeForm:fsTable :treeForm:fsTable:lastPage :treeForm:fsTable:back  :treeForm:fsTable:next"/>
@@ -67,23 +69,31 @@
                     </p:column>
 
                     <f:facet name="footer">
-
-                        <p:commandButton id="back" value="Back" actionListener="#{treeBean.previousPage}"
+                        <p:focus for="pageNumber"/>
+                        <p:commandButton id="fakeButton" style="visibility: hidden; width: 1px" process="fsTable"/>
+                        <p:commandButton id="back" value="Back"
                                          update=":treeForm:fsTable :treeForm:fsTable:pageNumber "
                                          process="fsTable"
-                                         disabled="#{treeBean.disableBackButton}"/>
+                                         disabled="#{treeBean.disableBackButton}"
+                                         actionListener="#{treeBean.previousPage}"/>
                         <h:outputText id="firstPage" value="#{treeBean.firstPage}..."/>
-                        <p:inputText onselect="false" value="#{treeBean.testingCurrentPage}" id="pageNumber"
-                                     process="fsTable">
+                        <p:inputText value="#{treeBean.testingCurrentPage}" id="pageNumber"
+                                     onkeypress="if (event.keyCode == 13) { onchange(); return false; }"
+                                     binding="#{treeBean.messageForPaging}">
 
-                            <p:ajax event="keyup" listener="#{treeBean.CurrentPageToJSF}"
-                                    update=":treeForm:fsTable"/>
+                            <p:ajax event="change" listener="#{treeBean.CurrentPageToJSF}" render="@this"
+                                    update=":treeForm:fsTable:pageNumber :treeForm:fsTable " process="fsTable"/>
                         </p:inputText>
                         <h:outputText id="lastPage" value="...#{treeBean.lastPage}"/>
-                        <p:commandButton id="next" value="Next" actionListener="#{treeBean.nextPage}"
+                        <p:commandButton id="next" value="Next"
                                          update=":treeForm:fsTable :treeForm:fsTable:pageNumber :treeForm:fsTable:back :treeForm:fsTable:next "
                                          process="fsTable"
-                                         disabled="#{treeBean.disableNextButton}"/>
+                                         disabled="#{treeBean.disableNextButton}"
+                                         actionListener="#{treeBean.nextPage}"/>
+                        <br>
+                            <p:message id="messages" for=":treeForm:fsTable:pageNumber"/>
+                        </br>
+
                     </f:facet>
 
                 </p:dataTable>

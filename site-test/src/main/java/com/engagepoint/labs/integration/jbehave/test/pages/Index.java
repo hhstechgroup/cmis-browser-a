@@ -60,7 +60,7 @@ public class Index extends AbstractPage  {
 
     public void cancelButtonClickOnDeleteFolderPage() {
 
-        findElement(By.xpath(".//*[@id='j_idt65:j_idt70']")).click();
+        findElement(By.xpath(".//*[@id='j_idt68:j_idt73']")).click();
 
         manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 
@@ -74,7 +74,7 @@ public class Index extends AbstractPage  {
     }
     public void cancelButtonClickOnCreatePage() {
 
-        findElement(By.xpath(".//*[@id='createForm:j_idt64']")).click();
+        findElement(By.xpath(".//*[@id='createForm:j_idt67']")).click();
 
         manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 
