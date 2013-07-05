@@ -72,9 +72,9 @@ public class FSFolderDaoImpl implements FSFolderDao {
         List<FSObject> children = new ArrayList<FSObject>();
         Folder cmisParent = (Folder) session.getObjectByPath(parent.getPath());
         ItemIterable<CmisObject> cmisChildren = cmisParent.getChildren();
-        for(CmisObject o : cmisChildren) {
+        for (CmisObject o : cmisChildren) {
             FSObject fsObject;
-            if(o instanceof Folder){
+            if (o instanceof Folder) {
                 fsObject = new FSFolder();
                 fsObject.setPath(((Folder) o).getPath());
                 fsObject.setType("Folder");
@@ -128,9 +128,9 @@ public class FSFolderDaoImpl implements FSFolderDao {
         ItemIterable<CmisObject> childrenCmis = cmisParent.getChildren(operationContext);
         ItemIterable<CmisObject> cmisChildren = childrenCmis.skipTo(pageNumber * numberOfRows).getPage();
 
-        for(CmisObject o : cmisChildren) {
+        for (CmisObject o : cmisChildren) {
             FSObject fsObject;
-            if(o instanceof Folder){
+            if (o instanceof Folder) {
                 fsObject = new FSFolder();
                 fsObject.setPath(((Folder) o).getPath());
             } else {
@@ -148,12 +148,27 @@ public class FSFolderDaoImpl implements FSFolderDao {
     }
 
     @Override
-    public int getMaxNumberOfPage(FSFolder parent, int numberOfRows){
+    public int getMaxNumberOfPage(FSFolder parent, int numberOfRows) {
         Folder cmisParent = (Folder) session.getObjectByPath(parent.getPath());
         ItemIterable<CmisObject> cmisChildren = cmisParent.getChildren();
 
-        int total = (int)cmisChildren.getTotalNumItems();
-        if (total%numberOfRows == 0) return  total/numberOfRows;
-        else return  total/numberOfRows + 1;
+        int total = (int) cmisChildren.getTotalNumItems();
+        if (total % numberOfRows == 0) return total / numberOfRows;
+        else return total / numberOfRows + 1;
+    }
+
+    @Override
+    public boolean hasChildFolder(FSFolder folder) {
+        List<FSObject> children = getChildren(folder);
+        if (!children.isEmpty()) {
+            for (FSObject iterator : children) if (iterator instanceof FSFolder) return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean hasChildren(FSFolder folder) {
+        List<FSObject> children = getChildren(folder);
+        return !children.isEmpty();
     }
 }

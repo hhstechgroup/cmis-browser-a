@@ -61,31 +61,43 @@ public interface CMISService {
 
     /**
      * Create new folder in repository with folder name folderName
-     * @param parent    parent folder for folderName folder
+     *
+     * @param parent     parent folder for folderName folder
      * @param folderName
-     * @return  created FSFolder object
+     * @return created FSFolder object
      * @throws Exception if folder with this name exist in parent directory
-     * or connection is fail
+     *                   or connection is fail
      */
     public FSFolder createFolder(FSFolder parent, String folderName) throws Exception;
 
     public FSFile createFile(FSFolder parent, String fileName, String content);
 
-    public FSFile renameFile(FSFile file, String newName)throws Exception;
+    public FSFile renameFile(FSFile file, String newName) throws Exception;
 
     public boolean deleteFile(FSFile file);
 
     /**
      * Rename {@link FSFolder} folder in repository to name newName
-     * @param folder   folder that is supposed to rename
-     * @param newName  new name to folder
-     * @return  renamed {@link FSFolder} object
+     *
+     * @param folder  folder that is supposed to rename
+     * @param newName new name to folder
+     * @return renamed {@link FSFolder} object
      * @throws Exception
      */
 
-    public FSFolder renameFolder(FSFolder folder, String newName)throws Exception;
+    public FSFolder renameFolder(FSFolder folder, String newName) throws Exception;
 
     public boolean deleteFolder(FSFolder folder);
 
     public boolean deleteAllTree(FSFolder folder);
+
+    /**
+     * Say does folder has any clild folder
+     *
+     * @param folder  folder which is explored to find any child folder
+     * @return  true if has more than one child folder
+     */
+    public boolean hasChildFolder(FSFolder folder);
+
+    public boolean hasChildren(FSFolder folder);
 }

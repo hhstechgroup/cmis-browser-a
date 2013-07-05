@@ -10,15 +10,20 @@
 
 <h:body>
     <ui:composition>
-        <h:form id="treeForm" onclick="bajb_backdetect.onbeforeunload">
+        <h:form id="treeForm">
             <p:panelGrid columns="2" style="width: 100%; height: 400px;" styleClass="table">
                 <h:outputStylesheet library="style" name="style.css"/>
 
-                <p:tree id="tree" value="#{treeBean.root}" var="node" dynamic="true" cache="false"
+                <p:tree id="tree" value="#{treeBean.model}" var="node" dynamic="true" cache="false"
                         selectionMode="single" selection="#{treeBean.selectedNode}" style="width: 300px;">
 
                     <p:ajax event="select"
-                            update=":treeForm:fsTable :treeForm:fsTable:lastPage :treeForm:fsTable:backButton :treeForm:fsTable:back  :treeForm:fsTable:next"/>
+                            update=":treeForm:fsTable :treeForm:fsTable:lastPage :treeForm:tree
+                            :treeForm:fsTable:backButton :treeForm:fsTable:back  :treeForm:fsTable:next"
+                            />
+
+                    <p:ajax event="expand" listener="#{treeBean.onNodeExpand}"/>
+                    <p:ajax event="collapse" update=":treeForm:tree" listener="#{treeBean.onNodeCollapse}"/>
 
                     <p:treeNode expandedIcon="ui-icon-folder-open"
                                 collapsedIcon="ui-icon-folder-collapsed">
@@ -29,7 +34,7 @@
                 </p:tree>
 
                 <p:dataTable id="fsTable" var="fsObject" value="#{treeBean.tablePageList}"
-                             scrollable="true" scrollWidth="790"
+                             scrollable="true"
                              scrollHeight="400" style="width: 770px;"
                              emptyMessage="This folder is empty"
                              rowKey="#{fsObject.name}"
@@ -104,6 +109,7 @@
         </h:form>
 
 
+
         <p:dialog id="rename" widgetVar="renameDialog"
                   header="Rename" modal="true"
                   showEffect="fade"
@@ -122,7 +128,7 @@
                 <br></br>
                 <p:message for="newName" autoUpdate="true" closable="true"/>
                 <br></br>
-                <p:commandButton value="OK" action="#{treeBean.updateTree}"
+                <p:commandButton value="OK"
                                  actionListener="#{action.rename(treeBean.selectedFSObject)}"
                                  onsuccess="#{renameDialog.hide()}"
                                  update=":treeForm:tree :treeForm:fsTable :rename "
@@ -158,7 +164,7 @@
                 <p:message id="type_message" for="type" autoUpdate="true" closable="true"/>
 
                 <br></br>
-                <p:commandButton value="OK" action="#{treeBean.updateTree}"
+                <p:commandButton value="OK"
                                  actionListener="#{action.createFolder(treeBean.parent)}"
                                  update=":treeForm:tree :treeForm:fsTable :create "/>
 
@@ -176,8 +182,11 @@
             <h:form>
                 <h:outputText value="Delete all tree?"/>
                 <p:selectBooleanCheckbox value="#{action.deleteAllTree}"/>
+                <p:message id="del_msg" for="submitbutton" autoUpdate="true" closable="true"  />
                 <br></br>
-                <p:commandButton value="OK" action="#{treeBean.updateTree}"
+                <p:commandButton id="submitbutton"
+                                 value="OK"
+                                 binding="#{action.deletecomponent}"
                                  actionListener="#{action.delete(treeBean.selectedFSObject)}"
                                  update=":treeForm:tree :treeForm:fsTable :delete"
                                  onsuccess="#{deleteDialog.hide()}"/>

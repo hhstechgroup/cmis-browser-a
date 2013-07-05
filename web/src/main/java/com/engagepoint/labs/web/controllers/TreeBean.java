@@ -4,6 +4,8 @@ import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
 import com.engagepoint.labs.core.service.CMISService;
 import com.engagepoint.labs.core.service.CMISServiceImpl;
+import org.primefaces.event.NodeCollapseEvent;
+import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
@@ -12,6 +14,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
 import javax.faces.context.FacesContext;
+import javax.faces.event.ActionEvent;
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
@@ -52,32 +55,62 @@ public class TreeBean implements Serializable {
     private Boolean disableBackButton;
     private Boolean disableNextButton = false;
 
-
     public TreeBean() {
         navigationList = new LinkedList<FSObject>();
-        updateTree();
-        //for paging
-        changedTableParentFolder();
-    }
 
-    public void updateTree() {
-        logger.log(Level.INFO, "UPDATING... TREEEE...");
         FSFolder root = CMISService.getRootFolder();
         parent.setPath("/");
         main = new DefaultTreeNode("Main", null);
         TreeNode node0 = new DefaultTreeNode(root, main);
-        SubObjects(parent, node0);
+
+        FSFolder fold = new FSFolder();
+        fold.setName("Empty Folder");
+        new DefaultTreeNode(fold, node0);
+
+        //for paging
+        changedTableParentFolder();
     }
 
-    private void SubObjects(FSFolder parent, TreeNode treenodeparent) {
-        List<FSObject> children = CMISService.getChildren(parent);
+    public void updateTree(TreeNode parent) {
+        logger.log(Level.INFO, "UPDATING... TREEEE...");
+        parent.getChildren().clear();
+        List<FSObject> children = CMISService.getChildren((FSFolder)parent.getData());
         for (FSObject i : children) {
             if (i instanceof FSFolder) {
-                TreeNode treeNode = new DefaultTreeNode(i, treenodeparent);
-                SubObjects((FSFolder) i, treeNode);
+                TreeNode treeNode = new DefaultTreeNode(i, parent);
+                if (CMISService.hasChildFolder((FSFolder) treeNode.getData())) {
+                    FSFolder fold = new FSFolder();
+                    fold.setName("Empty Folder");
+                    new DefaultTreeNode(fold, treeNode);
+                    logger.log(Level.INFO, "FOLDER "+((FSFolder) treeNode.getData()).getName()+" HAS CHILD FOLDER");
+                }
             }
         }
     }
+    public void onNodeExpand(NodeExpandEvent event) {
+        updateTree(event.getTreeNode()) ;
+    }
+
+    /**
+     * if files in our repository has changed when node collapse
+     * we clear all children and check if node has children
+     * @param event   that is fired on NodeCollapse
+     */
+    public void onNodeCollapse( NodeCollapseEvent event) {
+        event.getTreeNode().getChildren().clear();
+        if (CMISService.hasChildFolder((FSFolder) event.getTreeNode().getData())) {
+            FSFolder fold = new FSFolder();
+            fold.setName("Empty Folder");
+            new DefaultTreeNode(fold, event.getTreeNode());
+        }
+    }
+
+    public void addNewNode(ActionEvent event) {
+        FSFolder fold = new FSFolder();
+        fold.setName("Empty Folder");
+        new DefaultTreeNode(fold, selectedNodes);
+    }
+
 
     public void setTestingCurrentPage(String testingCurrentPage) {
         this.testingCurrentPage = testingCurrentPage;
@@ -147,9 +180,15 @@ public class TreeBean implements Serializable {
         tablePageList = CMISService.getPage(parent, currentPage, amountOfRowsInPage);
     }
 
+    /**
+     * Sets the selected node in the tree.
+     *
+     * @param selectedNodes node to be set as selected.
+     */
     public void setSelectedNode(TreeNode selectedNodes) {
 
         this.selectedNodes = selectedNodes;
+
         FSObject tmp = (FSObject) selectedNodes.getData();
         logger.log(Level.INFO, "setSelectedNode  tmp null? - " + (tmp == null));
         setSelectedFSObject(tmp);
@@ -256,9 +295,16 @@ public class TreeBean implements Serializable {
         TreeBean.number = number;
     }
 
-    public TreeNode getRoot() {
+    public TreeNode getModel() {
+//        return root;
         return main;
     }
+
+    /**
+     * Gets the selected node in the tree.
+     *
+     * @return selected node in tree.
+     */
 
     public TreeNode getSelectedNode() {
         return selectedNodes;
@@ -337,5 +383,14 @@ public class TreeBean implements Serializable {
     public int getFirstPage() {
         return firstPage;
     }
-
+    //fail method
+    private void SubObjects(FSFolder parent, TreeNode treenodeparent) {
+        List<FSObject> children = CMISService.getChildren(parent);
+        for (FSObject i : children) {
+            if (i instanceof FSFolder) {
+                TreeNode treeNode = new DefaultTreeNode(i, treenodeparent);
+                SubObjects((FSFolder) i, treeNode);
+            }
+        }
+    }
 }
