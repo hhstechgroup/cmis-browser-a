@@ -88,4 +88,7 @@ public interface CMISService {
     public boolean deleteFolder(FSFolder folder);
 
     public boolean deleteAllTree(FSFolder folder);
+
+    public boolean hasChildFolder(FSFolder folder);
+
 }

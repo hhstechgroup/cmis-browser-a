@@ -4,6 +4,8 @@ import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
 import com.engagepoint.labs.core.service.CMISService;
 import com.engagepoint.labs.core.service.CMISServiceImpl;
+import org.primefaces.event.NodeCollapseEvent;
+import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
@@ -53,19 +55,40 @@ public class TreeBean implements Serializable {
     private Boolean disableNextButton = false;
 
     public TreeBean() {
-
-    }
-
-    @PostConstruct
-    public void updateTree() {
-        logger.log(Level.INFO, "UPDATING... TREEEE...");
         FSFolder root = cmisService.getRootFolder();
         parent.setPath("/");
         main = new DefaultTreeNode("Main", null);
         TreeNode node0 = new DefaultTreeNode(root, main);
-        SubObjects(parent, node0);
-        //for paging
+
+        FSFolder fold = new FSFolder();
+        fold.setName("Empty Folder");
+        new DefaultTreeNode(fold, node0);
+
         changedTableParentFolder();
+    }
+
+    public void updateTree(TreeNode parent) {
+        logger.log(Level.INFO, "UPDATING... TREEEE...");
+        parent.getChildren().clear();
+
+        List<FSObject> children = cmisService.getChildren((FSFolder) parent.getData());
+
+        for (FSObject child : children) {
+            if (child instanceof FSFolder) {
+                TreeNode treeNode = new DefaultTreeNode(child, parent);
+                long start = System.currentTimeMillis();
+                if (cmisService.hasChildFolder((FSFolder) treeNode.getData())) {
+                    FSFolder fold = new FSFolder();
+                    fold.setName("Empty Folder");
+                    new DefaultTreeNode(fold, treeNode);
+                    logger.log(Level.INFO, "FOLDER "+((FSFolder) treeNode.getData()).getName()+" HAS CHILD FOLDER");
+                }
+                long end = System.currentTimeMillis();
+                logger.log(Level.INFO, "TIME: " + (end - start) + "ms");
+            }
+        }
+
+
     }
 
     public void doBack() {
@@ -122,6 +145,25 @@ public class TreeBean implements Serializable {
         changedTableParentFolder();
     }
 
+    public void onNodeExpand(NodeExpandEvent event) {
+        updateTree(event.getTreeNode()) ;
+    }
+
+    /**
+     * if files in our repository has changed when node collapse
+     * we clear all children and check if node has children
+     * @param event that is fired on NodeCollapse
+     */
+    public void onNodeCollapse( NodeCollapseEvent event) {
+        logger.log(Level.INFO, "onNodeCollapse");
+        event.getTreeNode().getChildren().clear();
+        if (cmisService.hasChildFolder((FSFolder) event.getTreeNode().getData())) {
+            FSFolder fold = new FSFolder();
+            fold.setName("Empty Folder");
+            new DefaultTreeNode(fold, event.getTreeNode());
+        }
+    }
+
     private void SubObjects(FSFolder parent, TreeNode treenodeparent) {
         List<FSObject> children = cmisService.getChildren(parent);
         for (FSObject i : children) {
@@ -163,7 +205,6 @@ public class TreeBean implements Serializable {
             }
         }
     }
-
 
     public void changedTableParentFolder() {
         currentPage = firstPage;

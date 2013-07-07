@@ -25,6 +25,9 @@
                     <p:ajax event="select"
                             update=":treeForm:fsTable :treeForm:fsTable:lastPage :treeForm:fsTable:back  :treeForm:fsTable:next"/>
 
+                    <p:ajax event="expand" listener="#{treeBean.onNodeExpand}"/>
+                    <p:ajax event="collapse" update=":treeForm:tree" listener="#{treeBean.onNodeCollapse}"/>
+
                     <p:treeNode expandedIcon="ui-icon-folder-open"
                                 collapsedIcon="ui-icon-folder-collapsed">
 
@@ -129,7 +132,7 @@
                 <br></br>
                 <p:message for="newName" autoUpdate="true" closable="true"/>
                 <br></br>
-                <p:commandButton value="OK" action="#{treeBean.updateTree}"
+                <p:commandButton value="OK"
                                  actionListener="#{action.rename(treeBean.selectedFSObject)}"
                                  onsuccess="#{renameDialog.hide()}"
                                  update=":treeForm:tree :treeForm:fsTable :rename "
@@ -165,7 +168,7 @@
                 <p:message id="type_message" for="type" autoUpdate="true" closable="true"/>
 
                 <br></br>
-                <p:commandButton value="OK" action="#{treeBean.updateTree}"
+                <p:commandButton value="OK"
                                  actionListener="#{action.createFolder(treeBean.parent)}"
                                  update=":treeForm:tree :treeForm:fsTable :create "/>
 
@@ -184,7 +187,7 @@
                 <h:outputText value="Delete all tree?"/>
                 <p:selectBooleanCheckbox value="#{action.deleteAllTree}"/>
                 <br></br>
-                <p:commandButton value="OK" action="#{treeBean.updateTree}"
+                <p:commandButton value="OK"
                                  actionListener="#{action.delete(treeBean.selectedFSObject)}"
                                  update=":treeForm:tree :treeForm:fsTable :delete"
                                  onsuccess="#{deleteDialog.hide()}"/>

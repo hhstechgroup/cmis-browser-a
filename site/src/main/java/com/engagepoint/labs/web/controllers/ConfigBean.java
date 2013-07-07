@@ -8,6 +8,7 @@ import java.io.Serializable;
 @ManagedBean
 @SessionScoped
 public class ConfigBean implements Serializable {
+
     @ManagedProperty(value = "#{treeBean}")
     private TreeBean treeBean;
     private String name;

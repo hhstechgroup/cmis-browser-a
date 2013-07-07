@@ -7,6 +7,8 @@ import com.engagepoint.labs.core.models.FSObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author volodymyr.kozubal
@@ -16,6 +18,7 @@ public class CMISServiceImpl implements CMISService {
 
     private FSFolderDao fsFolderDao;
     private List<FSObject> list;
+    private static Logger logger = Logger.getLogger(CMISServiceImpl.class.getName());
 
     private static CMISServiceImpl service = null;
 
@@ -145,4 +148,14 @@ public class CMISServiceImpl implements CMISService {
     public int getMaxNumberOfPage(FSFolder parent, int numberOfRows) {
         return fsFolderDao.getMaxNumberOfPage(parent, numberOfRows);
     }
+
+    @Override
+    public boolean hasChildFolder(FSFolder folder) {
+        long start = System.currentTimeMillis();
+        boolean c = fsFolderDao.hasChildFolder(folder);
+        long end = System.currentTimeMillis();
+        logger.log(Level.INFO, "TIME hasChildFolder: " + (end - start) + "ms");
+        return c;
+    }
+
 }

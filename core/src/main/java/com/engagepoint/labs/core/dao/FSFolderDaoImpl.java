@@ -143,7 +143,6 @@ public class FSFolderDaoImpl implements FSFolderDao {
             fsObject.setParent(parent);
             children.add(fsObject);
         }
-
         return children;
     }
 
@@ -159,5 +158,23 @@ public class FSFolderDaoImpl implements FSFolderDao {
         else {
             return  total/numberOfRows + 1;
         }
+    }
+
+    @Override
+    public boolean hasChildFolder(FSFolder folder) {
+        List<FSObject> children = getChildren(folder);
+        if (!children.isEmpty()) {
+            for (FSObject iterator : children)
+                if (iterator instanceof FSFolder) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean hasChildren(FSFolder folder) {
+        List<FSObject> children = getChildren(folder);
+        return !children.isEmpty();
     }
 }
