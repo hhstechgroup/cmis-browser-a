@@ -83,9 +83,6 @@ public class TreeBean implements Serializable {
                     new DefaultTreeNode(fold, treeNode);
                     logger.log(Level.INFO, "FOLDER "+((FSFolder) treeNode.getData()).getName()+" HAS CHILD FOLDER");
                 }
-                /*FSFolder fold = new FSFolder();
-                fold.setName("Empty Folder");
-                new DefaultTreeNode(fold, treeNode);*/
                 long end = System.currentTimeMillis();
                 logger.log(Level.INFO, "TIME: " + (end - start) + "ms");
             }
@@ -165,21 +162,8 @@ public class TreeBean implements Serializable {
             fold.setName("Empty Folder");
             new DefaultTreeNode(fold, event.getTreeNode());
         }
-     /*   FSFolder fold = new FSFolder();
-        fold.setName("Empty Folder");
-        new DefaultTreeNode(fold, event.getTreeNode());*/
     }
-
-    private void SubObjects(FSFolder parent, TreeNode treenodeparent) {
-        List<FSObject> children = cmisService.getChildren(parent);
-        for (FSObject i : children) {
-            if (i instanceof FSFolder) {
-                TreeNode treeNode = new DefaultTreeNode(i, treenodeparent);
-                SubObjects((FSFolder) i, treeNode);
-            }
-        }
-    }
-
+    
     public void setTestingCurrentPage(String testingCurrentPage) {
         if (testingCurrentPage.isEmpty()) {
             this.testingCurrentPage = Integer.toString(currentPage);
