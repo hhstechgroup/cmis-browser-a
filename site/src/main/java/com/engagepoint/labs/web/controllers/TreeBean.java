@@ -83,6 +83,9 @@ public class TreeBean implements Serializable {
                     new DefaultTreeNode(fold, treeNode);
                     logger.log(Level.INFO, "FOLDER "+((FSFolder) treeNode.getData()).getName()+" HAS CHILD FOLDER");
                 }
+                /*FSFolder fold = new FSFolder();
+                fold.setName("Empty Folder");
+                new DefaultTreeNode(fold, treeNode);*/
                 long end = System.currentTimeMillis();
                 logger.log(Level.INFO, "TIME: " + (end - start) + "ms");
             }
@@ -162,6 +165,9 @@ public class TreeBean implements Serializable {
             fold.setName("Empty Folder");
             new DefaultTreeNode(fold, event.getTreeNode());
         }
+     /*   FSFolder fold = new FSFolder();
+        fold.setName("Empty Folder");
+        new DefaultTreeNode(fold, event.getTreeNode());*/
     }
 
     private void SubObjects(FSFolder parent, TreeNode treenodeparent) {
