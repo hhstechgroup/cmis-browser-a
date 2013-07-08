@@ -10,6 +10,7 @@ import org.primefaces.context.RequestContext;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import java.io.Serializable;
@@ -22,8 +23,8 @@ import java.util.logging.Logger;
 
 @ManagedBean(name = "action")
 @ApplicationScoped
-public class ActionBean implements Serializable {
 
+public class ActionBean implements Serializable {
     private String type;
     private String reqEx;
     private String name;
@@ -31,13 +32,17 @@ public class ActionBean implements Serializable {
     private boolean deleteAllTree = false;
     private UIComponent renamecomponent;
     private UIComponent createcomponent;
+    private UIComponent deletecomponent;
     private static Logger logger;
-    private final CMISService CMISservice;
+    private final CMISService cmisService;
+
+    @ManagedProperty(value = "#{treeBean}")
+    private TreeBean treeBean;
 
     /**
      * Handling exception and create a message to show user om dialog page  and log the exception
-     * method fail validation and skip all the subsequent phases and go to render response
-     * phase to avoid closing dialog with the client
+     * method fail validation and skip all the subsequent phases and go to render response phase
+     * to avoid closing dialog with the client
      *
      * @param ex        Exception that is thown from service layer
      * @param component Component to which error is binding
@@ -55,7 +60,7 @@ public class ActionBean implements Serializable {
 
     public ActionBean() {
         logger = Logger.getLogger(ActionBean.class.getName());
-        CMISservice = CMISServiceImpl.getService();
+        cmisService = CMISServiceImpl.getService();
         reqEx = "^(\\w+\\.?)*\\w+$";
     }
 
@@ -67,12 +72,14 @@ public class ActionBean implements Serializable {
      */
     public void createFolder(FSFolder parent) {
         try {
-            CMISservice.createFolder(parent, name);
+            cmisService.createFolder(parent, name);
+            treeBean.updateTree(treeBean.getSelectedNode());
         } catch (Exception ex) {
             catchException(ex, createcomponent);
         }
         this.name = "";
         this.type = "";
+
     }
 
     /**
@@ -84,14 +91,18 @@ public class ActionBean implements Serializable {
     public void rename(FSObject fsObject) {
         try {
             if (fsObject instanceof FSFolder) {
-                CMISservice.renameFolder((FSFolder) fsObject, newName);
+                cmisService.renameFolder((FSFolder) fsObject, newName);
+
             } else if (fsObject instanceof FSFile) {
-                CMISservice.renameFile((FSFile) fsObject, newName);
+                cmisService.renameFile((FSFile) fsObject, newName);
             }
         } catch (Exception ex) {
             catchException(ex,renamecomponent);
         }
+        treeBean.updateTree(treeBean.getSelectedNode().getParent());
+        treeBean.getSelectedNode().setExpanded(true);
         this.newName = "";
+        
     }
 
     /**
@@ -103,10 +114,15 @@ public class ActionBean implements Serializable {
     public void delete(FSFolder folder) {
         if (deleteAllTree) {
             deleteAllTree = false;
-            CMISservice.deleteAllTree(folder);
+            cmisService.deleteAllTree(folder);
         } else {
-            CMISservice.deleteFolder(folder);
+            if (!cmisService.hasChildren(folder)) cmisService.deleteFolder(folder);
+            else {
+                Exception ex = new Exception("Folder has subfolders! To remove folder select checkbox ") ;
+                catchException(ex, deletecomponent);
+            }
         }
+        treeBean.updateTree(treeBean.getSelectedNode().getParent());
     }
 
     public String getName() {
@@ -163,5 +179,20 @@ public class ActionBean implements Serializable {
 
     public void setReqEx(String reqEx) {
         this.reqEx = reqEx;
+    }
+    public TreeBean getTreeBean() {
+        return treeBean;
+    }
+
+    public void setTreeBean(TreeBean treeBean) {
+        this.treeBean = treeBean;
+    }
+
+    public UIComponent getDeletecomponent() {
+        return deletecomponent;
+    }
+
+    public void setDeletecomponent(UIComponent deletecomponent) {
+        this.deletecomponent = deletecomponent;
     }
 }
