@@ -148,14 +148,14 @@ public class CMISServiceImpl implements CMISService {
     public int getMaxNumberOfPage(FSFolder parent, int numberOfRows) {
         return fsFolderDao.getMaxNumberOfPage(parent, numberOfRows);
     }
-
     @Override
     public boolean hasChildFolder(FSFolder folder) {
-        long start = System.currentTimeMillis();
-        boolean c = fsFolderDao.hasChildFolder(folder);
-        long end = System.currentTimeMillis();
-        logger.log(Level.INFO, "TIME hasChildFolder: " + (end - start) + "ms");
-        return c;
+        return fsFolderDao.hasChildFolder(folder);
+    }
+
+    @Override
+    public boolean hasChildren(FSFolder folder) {
+        return fsFolderDao.hasChildFolder(folder);
     }
 
 }
