@@ -89,6 +89,14 @@ public interface CMISService {
 
     public boolean deleteAllTree(FSFolder folder);
 
+    /**
+     * Say does folder has any clild folder
+     *
+     * @param folder  folder which is explored to find any child folder
+     * @return  true if has more than one child folder
+     */
     public boolean hasChildFolder(FSFolder folder);
+
+    public boolean hasChildren(FSFolder folder);
 
 }
