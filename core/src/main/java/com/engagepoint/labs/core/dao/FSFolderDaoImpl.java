@@ -51,7 +51,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
         folder.setName(newFolder.getName());
         folder.setParent(parent);
         folder.setId(newFolder.getId());
-        folder.setType("Folder");
+        folder.setType(newFolder.getType().getDisplayName());
         return folder;
     }
 
@@ -77,13 +77,12 @@ public class FSFolderDaoImpl implements FSFolderDao {
             if(o instanceof Folder){
                 fsObject = new FSFolder();
                 fsObject.setPath(((Folder) o).getPath());
-                fsObject.setType("Folder");
             } else {
                 fsObject = new FSFile();
                 fsObject.setPath(notRootFolder);
                 fsObject.setAbsolutePath(notRootFolder + "/" + o.getName());
-                fsObject.setType("Document");
             }
+            fsObject.setType(o.getType().getDisplayName());
             fsObject.setName(o.getName());
             fsObject.setId(o.getId());
             fsObject.setParent(parent);

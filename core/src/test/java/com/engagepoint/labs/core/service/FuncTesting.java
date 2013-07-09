@@ -3,14 +3,15 @@ package com.engagepoint.labs.core.service;
 /**
  * @author volodymyr.kozubal <volodymyr.kozubal@engagepoint.com>
  */
+
 import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
-import com.engagepoint.labs.core.service.CMISService;
-import com.engagepoint.labs.core.service.CMISServiceImpl;
 import org.junit.Test;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -18,7 +19,7 @@ import static org.junit.Assert.assertThat;
 public class FuncTesting {
     @Test
     public void getFolderChildrenTest()throws Exception{
-        CMISService cmisService = new CMISServiceImpl();
+        CMISService cmisService = CMISServiceImpl.getService();
         FSFolder parent = new FSFolder();
         parent.setPath("/");
         cmisService.deleteAllTree(parent);
@@ -38,9 +39,8 @@ public class FuncTesting {
 
     @Test
     public void getRootFolderTest() {
-        CMISService cmisService = new CMISServiceImpl();
-        FSObject root = new FSFolder();
-        root = cmisService.getRootFolder();
+        CMISService cmisService = CMISServiceImpl.getService();
+        FSObject root = cmisService.getRootFolder();
         String expectedPath = "/";
         assertEquals(root.getParent(), null);
         assertEquals(expectedPath, root.getPath());

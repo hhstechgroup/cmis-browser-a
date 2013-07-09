@@ -1,5 +1,7 @@
 package com.engagepoint.labs.core.models;
 
+import java.util.Arrays;
+
 /**
  * User: vitaliy.vasilenko
  * Date: 6/17/13
@@ -7,19 +9,33 @@ package com.engagepoint.labs.core.models;
  */
 public class FSFile extends FSObject {
 
-    private String content;
+    private String mimetype;
+    private byte[] content;
 
-    public String getContent() {
+    public String getMimetype() {
+        return mimetype;
+    }
+
+    public void setMimetype(String mimetype) {
+        this.mimetype = mimetype;
+    }
+
+    public byte[] getContent() {
         return content;
     }
 
-    public void setContent(String content) {
+    public void setContent(byte[] content) {
         this.content = content;
     }
 
     @Override
     public String getType() {
-        return "Document";
+        return super.getType();
+    }
+
+    @Override
+    public void setType(String type) {
+        super.setType(type);
     }
 
     @Override
@@ -32,12 +48,19 @@ public class FSFile extends FSObject {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof FSFile)) {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
+        if (!super.equals(o)) {
+            return false;
+        }
+
         FSFile fsFile = (FSFile) o;
 
-        if (content != null ? !content.equals(fsFile.content) : fsFile.content != null) {
+        if (!Arrays.equals(content, fsFile.content)) {
+            return false;
+        }
+        if (mimetype != null ? !mimetype.equals(fsFile.mimetype) : fsFile.mimetype != null) {
             return false;
         }
 
@@ -46,6 +69,9 @@ public class FSFile extends FSObject {
 
     @Override
     public int hashCode() {
-        return content != null ? content.hashCode() : 0;
+        int result = super.hashCode();
+        result = 31 * result + (mimetype != null ? mimetype.hashCode() : 0);
+        result = 31 * result + (content != null ? Arrays.hashCode(content) : 0);
+        return result;
     }
 }

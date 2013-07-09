@@ -4,6 +4,8 @@ import com.engagepoint.labs.core.models.FSFile;
 import com.engagepoint.labs.core.models.FSFolder;
 import org.apache.chemistry.opencmis.client.api.Session;
 
+import java.io.InputStream;
+
 /**
  * User: r.reznichenko
  * Date: 6/17/13
@@ -26,7 +28,7 @@ public interface FSFileDao {
      * @param content  - content of file
      * @return created file, FSFile type
      */
-    public FSFile create(FSFolder parent, String fileName, String content);
+    public FSFile create(FSFolder parent, String fileName, byte[] content);
 
     /**
      * Method that will rename file
@@ -38,18 +40,13 @@ public interface FSFileDao {
     public FSFile rename(FSFile file, String newName);
 
     /**
-     * Getting content of file
-     *
-     * @param file - file, content of which you want to get
-     * @return content
-     */
-    public String getContent(FSFile file);
-
-    /**
      * Method that will delete file from repository
      *
      * @param file - file which you want to delete
      * @return <b>true</b> if deleted
      */
     public boolean delete(FSFile file);
+
+    public InputStream getInputStream(FSFile file);
+
 }

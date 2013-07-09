@@ -74,5 +74,4 @@ public interface FSFolderDao {
     public boolean hasChildFolder(FSFolder folder);
 
     public boolean hasChildren(FSFolder folder);
-
 }

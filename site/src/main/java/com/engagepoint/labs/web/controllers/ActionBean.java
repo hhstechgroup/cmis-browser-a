@@ -9,7 +9,6 @@ import org.primefaces.context.RequestContext;
 import org.primefaces.model.TreeNode;
 
 import javax.faces.application.FacesMessage;
-import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
@@ -73,9 +72,9 @@ public class ActionBean implements Serializable {
      */
     public void createFolder(TreeNode parent) {
         try {
-             if (parent!=null){
-            cmisService.createFolder((FSFolder)parent.getData(), name);
-            treeBean.updateTree(parent);
+             if (parent != null){
+                cmisService.createFolder((FSFolder)parent.getData(), name);
+                treeBean.updateTree(parent);
              }
             //TODO enable message when node is not selected       kozubal
             //parent not selected
@@ -137,10 +136,9 @@ public class ActionBean implements Serializable {
     public void deleteAllTree(FSObject object) {
         cmisService.deleteAllTree((FSFolder) object);
         treeBean.updateTree(treeBean.getSelectedNode().getParent());
-//        RequestContext.getCurrentInstance().update("treeForm:tree:0");
     }
 
-    public String getName() {
+     public String getName() {
         return name;
     }
 

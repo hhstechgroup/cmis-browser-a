@@ -7,10 +7,6 @@
 
     <display-name>JavaServerFaces</display-name>
 
-    <!-- Welcome page -->
-    <welcome-file-list>
-        <welcome-file>todo.xhtml</welcome-file>
-    </welcome-file-list>
 
     <welcome-file-list>
         <welcome-file>index.xhtml</welcome-file>

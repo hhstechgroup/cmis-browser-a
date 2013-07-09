@@ -60,7 +60,7 @@ public class Index extends AbstractPage  {
 
     public void cancelButtonClickOnDeleteFolderPage() {
 
-        findElement(By.xpath(".//*[@id='j_idt68:j_idt73']")).click();
+        findElement(By.xpath(".//*[@id='j_idt68:j_idt70']")).click();
 
         manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 

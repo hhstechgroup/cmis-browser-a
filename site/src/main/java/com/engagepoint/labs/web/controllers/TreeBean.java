@@ -1,5 +1,6 @@
 package com.engagepoint.labs.web.controllers;
 
+import com.engagepoint.labs.core.models.FSFile;
 import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
 import com.engagepoint.labs.core.service.CMISService;
@@ -12,6 +13,7 @@ import org.primefaces.model.TreeNode;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
@@ -30,6 +32,9 @@ import java.util.logging.Logger;
 @ManagedBean(name = "treeBean")
 @SessionScoped
 public class TreeBean implements Serializable {
+
+    @ManagedProperty(value = "#{fileActions}")
+    private FileActions fileActions;
 
     private TreeNode main;
     private TreeNode selectedNodes;
@@ -148,9 +153,6 @@ public class TreeBean implements Serializable {
         updateTree(event.getTreeNode());
     }
 
-    public void updateNodeExpand(NodeExpandEvent event) {
-        updateTree(event.getTreeNode());
-    }
     /**
      * if files in our repository has changed when node collapse
      * we clear all children and check if node has children
@@ -164,16 +166,6 @@ public class TreeBean implements Serializable {
             FSFolder fold = new FSFolder();
             fold.setName("Empty Folder");
             new DefaultTreeNode(fold, event.getTreeNode());
-        }
-    }
-
-    private void SubObjects(FSFolder parent, TreeNode treenodeparent) {
-        List<FSObject> children = cmisService.getChildren(parent);
-        for (FSObject i : children) {
-            if (i instanceof FSFolder) {
-                TreeNode treeNode = new DefaultTreeNode(i, treenodeparent);
-                SubObjects((FSFolder) i, treeNode);
-            }
         }
     }
 
@@ -348,30 +340,36 @@ public class TreeBean implements Serializable {
     }
 
     public void setSelectedNode(TreeNode selectedNodes) {
-
         logger.log(Level.INFO, "setSelectedNode");
-        this.selectedNodes = selectedNodes;
+        if(selectedNodes != null) {
+            this.selectedNodes = selectedNodes;
 
-        setSelectedFSObject((FSObject) selectedNodes.getData());
-        if (selectedFSObject.getPath() == null) {
-            parent.setPath("/");
-            selectedFSObject.setPath("/");
-        } else {
-            parent.setPath(selectedFSObject.getPath());
+            setSelectedFSObject((FSObject) selectedNodes.getData());
+            if (selectedFSObject.getPath() == null) {
+                parent.setPath("/");
+                selectedFSObject.setPath("/");
+            } else {
+                parent.setPath(selectedFSObject.getPath());
+            }
+            changedTableParentFolder();
+            PageState state = new PageState();
+            state.setCurrentPage(currentPage);
+            state.setSelectedNode(selectedNodes);
+            state.setSelectedObject(selectedFSObject);
+            state.setParentpath(parent.getPath());
+            addToBack(state);
+            this.selectedNodes.setSelected(false);
         }
-        changedTableParentFolder();
-        PageState state = new PageState();
-        state.setCurrentPage(currentPage);
-        state.setSelectedNode(selectedNodes);
-        state.setSelectedObject(selectedFSObject);
-        state.setParentpath(parent.getPath());
-        addToBack(state);
-        this.selectedNodes.setSelected(false);
     }
 
     public void onRowSelect(SelectEvent event) {
         this.selectedNodes.setSelected(false);
         this.selectedFSObject = (FSObject) event.getObject();
+        if(selectedFSObject instanceof FSFile) {
+            fileActions.setSelectedIsFile(true);
+        } else {
+            fileActions.setSelectedIsFile(false);
+        }
     }
 
     public TreeNode getRoot() {
@@ -462,5 +460,13 @@ public class TreeBean implements Serializable {
 
     public void setCurrentPage(int currentPage) {
         this.currentPage = currentPage;
+    }
+
+    public FileActions getFileActions() {
+        return fileActions;
+    }
+
+    public void setFileActions(FileActions fileActions) {
+        this.fileActions = fileActions;
     }
 }

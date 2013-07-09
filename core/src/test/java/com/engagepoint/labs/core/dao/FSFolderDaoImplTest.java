@@ -10,21 +10,19 @@ package com.engagepoint.labs.core.dao;
 
 import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
-import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Folder;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class FSFolderDaoImplTest {
 
     private static FSFolderDaoImpl fsFolderDao;
-    private static ConnectionFactory connection;
     private FSFolder actual;
 
     private FSFolder parent;
@@ -47,7 +45,7 @@ public class FSFolderDaoImplTest {
         FSFolder expected = new FSFolder();
         expected.setPath("/junit_test_folder");
         expected.setName("junit_test_folder");
-        expected.setType("Folder");
+        expected.setType(actual.getType());
         expected.setId(actual.getId());
         expected.setParent(parent);
         assertEquals(expected, actual);
@@ -69,12 +67,9 @@ public class FSFolderDaoImplTest {
         FSFolder expected = new FSFolder();
         expected.setPath("/junit_test_folder/test");
         expected.setId(cmisTest.getId());
-        expected.setType("Folder");
+        expected.setType(test.getType());
         expected.setParent(actual);
         expected.setName("test");
-
-        System.out.println("name: " + expected.getName() + " type: " + expected.getType() + " path: " + expected.getPath()
-                + "\nparent name: " + expected.getParent().getName() + " id: " + expected.getId());
 
         List<FSObject> actualList = fsFolderDao.getChildren(actual);
         FSFolder act = (FSFolder) actualList.get(0);
@@ -100,4 +95,3 @@ public class FSFolderDaoImplTest {
 
 
 }
-

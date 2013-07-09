@@ -28,40 +28,8 @@ public class FSFileDaoImpl implements FSFileDao {
     }
 
     @Override
-    public FSFile create(FSFolder parent, String fileName, String content) {
-        Folder cmisParent = (Folder) session.getObjectByPath(parent.getPath());
-
-        String mimetype = "text/plain; charset=UTF-8";
-
-        byte[] buf = new byte[0];
-        //TODO check that content not null
-        if (content == null) {
-            content = "";
-        }
-        try {
-            buf = content.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            //TODO do something with exception
-        }
-        ByteArrayInputStream input = new ByteArrayInputStream(buf);
-
-        ContentStream contentStream = session.getObjectFactory()
-                .createContentStream(fileName, buf.length, mimetype, input);
-        Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put(PropertyIds.OBJECT_TYPE_ID, "cmis:document");
-        properties.put(PropertyIds.NAME, fileName);
-
-        Document doc = cmisParent.createDocument(properties, contentStream, VersioningState.NONE);
-
-        String notRootFolder = parent.getPath().equals("/") ? "" : parent.getPath();
-        FSFile file = new FSFile();
-        file.setId(doc.getId());
-        file.setName(fileName);
-        file.setPath(notRootFolder);
-        file.setAbsolutePath(notRootFolder + "/" + fileName);
-        file.setContent(content);
-        file.setParent(parent);
-        return file;
+    public FSFile create(FSFolder parent, String fileName, byte[] content) {
+        return null;
     }
 
     @Override
@@ -76,48 +44,16 @@ public class FSFileDaoImpl implements FSFileDao {
     }
 
     @Override
-    public String getContent(FSFile file) {
-        Document cmisFile = (Document) session.getObjectByPath(file.getAbsolutePath());
-        ContentStream contentStream = cmisFile.getContentStream();
-        String content = null;
-        if (contentStream != null) {
-            try {
-                content = getContentAsString(contentStream);
-            } catch (IOException e) {
-                //TODO do something with exception
-            }
-        }
-        file.setContent(content);
-        return content;
-    }
-
-    @Override
     public boolean delete(FSFile file) {
         Document doc = (Document) session.getObjectByPath(file.getAbsolutePath());
         doc.delete(true);
         return true;
     }
 
-    private String getContentAsString(ContentStream stream) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        Reader reader = new InputStreamReader(stream.getStream(), "UTF-8");
-
-        try {
-            final char[] buffer = new char[4 * 1024];
-            int b;
-            while (true) {
-                b = reader.read(buffer, 0, buffer.length);
-                if (b > 0) {
-                    sb.append(buffer, 0, b);
-                } else if (b == -1) {
-                    break;
-                }
-            }
-        } finally {
-            reader.close();
-        }
-
-        return sb.toString();
+    @Override
+    public InputStream getInputStream(FSFile file) {
+        Document cmisFile = (Document) session.getObject(file.getId());
+        ContentStream contentStream = cmisFile.getContentStream();
+        return contentStream.getStream();
     }
-
 }

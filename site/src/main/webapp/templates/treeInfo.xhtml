@@ -57,8 +57,10 @@
                     <p:tabMenu activeIndex="4">
                         <p:menuitem value="New Folder" onclick="createDialog.show();"
                                     icon="ui-icon-document"/>
-                        <p:menuitem value="Read" url="index.xhtml"
-                                    icon="ui-icon-contact"/>
+                        <p:menuitem id="downloadLink" disabled="#{!fileActions.selectedIsFile}" value="Download" ajax="false"
+                                    icon="ui-icon-arrowthichk-s">
+                            <p:fileDownload  value="#{fileActions.download(treeBean.selectedFSObject)}" />
+                        </p:menuitem>
                         <p:menuitem value="Rename" onclick="renameDialog.show();" icon="ui-icon-arrowrefresh-1-w"/>
                         <p:menuitem value="Delete" onclick="deleteDialog.show();" icon="ui-icon-close"/>
                     </p:tabMenu>
@@ -178,6 +180,7 @@
         </h:form>
     </p:dialog>
 
+
     <p:dialog id="delete" widgetVar="deleteDialog" header="Delete" modal="true"
               showEffect="fade"
               hideEffect="fade"
@@ -185,29 +188,17 @@
               appendToBody="true"
               visible="#{facesContext.validationFailed}">
         <h:form>
-
+            "Do you realy want delete folder and all files?"
+            <br></br>
             <p:commandButton value="OK"
-                             actionListener="#{action.delete(treeBean.selectedFSObject)}"
+                             message="Do you realy want delete folder and all files?"
+                             severity="alert" widgetVar="confirmationDeleteTree" modal="true"
+                             actionListener="#{action.deleteAllTree(treeBean.selectedFSObject)}"
                              oncomplete="updater()"/>
-            <p:commandButton value="Cancel" type="button" onclick="deleteDialog.hide()"/>
-            <p:remoteCommand name="updater" update=":treeForm:tree :treeForm:fsTable :delete"/>
-
+            <p:commandButton value="Cancel" type="button" onclick="deleteDialog.hide()" style="float:right;"/>
+            <p:remoteCommand name="updater" update=":treeForm:tree :treeForm:fsTable :delete" />
         </h:form>
     </p:dialog>
-
-
-    <p:confirmDialog id="DeleteFolderWithDoc"
-                     message="This folder is not empty, do you want to delete it?"
-                     severity="alert" widgetVar="confirmationDeleteTree" modal="true"
-                     visible="#{facesContext.validationFailed}">
-        <h:form>
-            <p:commandButton id="confirm" value="Yes"
-                             onclick="confirmationDeleteTree.hide()"
-                             actionListener="#{action.deleteAllTree(treeBean.selectedFSObject)}"
-                             update=":treeForm:tree :treeForm:fsTable :delete"/>
-            <p:commandButton id="decline" value="No" onclick="confirmationDeleteTree.hide()" type="button"/>
-        </h:form>
-    </p:confirmDialog>
 
 </ui:composition>
 </h:body>
