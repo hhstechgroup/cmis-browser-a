@@ -59,6 +59,11 @@ public class CMISServiceImpl implements CMISService {
         return fsFolderDao.getFsFileDao().create(parent, fileName, content);
     }
 
+    @Override
+    public FSFile edit(FSFile file, byte[] content, String mimeType){
+        return fsFolderDao.getFsFileDao().edit(file, content, mimeType);
+    }
+
     /**
      * {@inheritDoc}
      */

@@ -363,13 +363,10 @@ public class TreeBean implements Serializable {
     }
 
     public void onRowSelect(SelectEvent event) {
-        this.selectedNodes.setSelected(false);
-        this.selectedFSObject = (FSObject) event.getObject();
-        if(selectedFSObject instanceof FSFile) {
-            fileActions.setSelectedIsFile(true);
-        } else {
-            fileActions.setSelectedIsFile(false);
+        if(selectedNodes != null) {
+            this.selectedNodes.setSelected(false);
         }
+        setSelectedFSObject((FSObject) event.getObject());
     }
 
     public TreeNode getRoot() {
@@ -386,6 +383,11 @@ public class TreeBean implements Serializable {
 
     public void setSelectedFSObject(FSObject sn) {
         if (sn != null) {
+            if(sn instanceof FSFile) {
+                fileActions.setSelectedIsFile(true);
+            } else {
+                fileActions.setSelectedIsFile(false);
+            }
             this.selectedFSObject = sn;
         }
     }

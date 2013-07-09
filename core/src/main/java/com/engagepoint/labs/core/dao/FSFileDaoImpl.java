@@ -3,13 +3,13 @@ package com.engagepoint.labs.core.dao;
 import com.engagepoint.labs.core.models.FSFile;
 import com.engagepoint.labs.core.models.FSFolder;
 import org.apache.chemistry.opencmis.client.api.Document;
-import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
-import org.apache.chemistry.opencmis.commons.enums.VersioningState;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,6 +40,22 @@ public class FSFileDaoImpl implements FSFileDao {
         cmisFile.updateProperties(properties, true);
         file.setName(cmisFile.getName());
         file.setAbsolutePath(cmisFile.getPaths().get(0));
+        return file;
+    }
+
+    @Override
+    public FSFile edit(FSFile file, byte[] content, String mimeType) {
+        Document cmisFile = (Document) session.getObject(file.getId());
+        if(content == null)
+        {
+            content = new byte[0];
+        }
+        InputStream input = new ByteArrayInputStream(content);
+        ContentStream contentStream = session.getObjectFactory().createContentStream(file.getName(),
+                content.length, mimeType, input);
+        cmisFile.setContentStream(contentStream, true, true);
+        file.setMimetype(mimeType);
+        file.setType(cmisFile.getType().getDisplayName());
         return file;
     }
 

@@ -7,6 +7,7 @@ import com.engagepoint.labs.core.service.CMISService;
 import com.engagepoint.labs.core.service.CMISServiceImpl;
 import org.primefaces.context.RequestContext;
 import org.primefaces.model.TreeNode;
+import org.primefaces.model.UploadedFile;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
@@ -29,6 +30,8 @@ public class ActionBean implements Serializable {
 
     @ManagedProperty(value = "#{treeBean}")
     private TreeBean treeBean;
+    @ManagedProperty(value = "#{fileActions}")
+    private FileActions fileActions;
 
     private String type;
     private String reqEx;
@@ -72,10 +75,10 @@ public class ActionBean implements Serializable {
      */
     public void createFolder(TreeNode parent) {
         try {
-             if (parent != null){
-                cmisService.createFolder((FSFolder)parent.getData(), name);
+            if (parent != null) {
+                cmisService.createFolder((FSFolder) parent.getData(), name);
                 treeBean.updateTree(parent);
-             }
+            }
             //TODO enable message when node is not selected       kozubal
             //parent not selected
         } catch (Exception ex) {
@@ -86,26 +89,18 @@ public class ActionBean implements Serializable {
 
     }
 
-    /**
-     * Rename folder or file with name {@link TreeBean#selectedFSObject}
-     * in {@link TreeBean#parent} parent directory
-     *
-     * @param fsObject object(file or folder) to rename
-     */
-    public void rename(FSObject fsObject) {
-        try {
-            if (fsObject instanceof FSFolder) {
-                cmisService.renameFolder((FSFolder) fsObject, newName);
-
-            } else if (fsObject instanceof FSFile) {
-                cmisService.renameFile((FSFile) fsObject, newName);
-            }
-        } catch (Exception ex) {
-            catchException(ex,renamecomponent);
+    public void edit(FSObject selected) {
+        if (!selected.getName().equals(newName)) {
+            logger.log(Level.INFO, "renaming to: " + newName);
+            rename(selected);
         }
-        //TODO   java.lang.NullPointerException      kozubal
-        treeBean.updateTree(treeBean.getSelectedNode().getParent());
-        this.newName = "";
+        if (selected instanceof FSFile) {
+            logger.log(Level.INFO, "SELECTED FILE");
+            UploadedFile file = fileActions.getFile();
+            byte[] content = file.getContents();
+            String mimeType = file.getContentType();
+            cmisService.edit((FSFile) selected, content, mimeType);
+        }
     }
 
     /**
@@ -127,6 +122,7 @@ public class ActionBean implements Serializable {
             treeBean.updateTree(treeBean.getSelectedNode().getParent());
         }
     }
+
     /**
      * Delete not empty folder with name {@link TreeBean#selectedFSObject}
      * in {@link TreeBean#parent} parent directory
@@ -138,7 +134,31 @@ public class ActionBean implements Serializable {
         treeBean.updateTree(treeBean.getSelectedNode().getParent());
     }
 
-     public String getName() {
+    /**
+     * Rename folder or file with name {@link TreeBean#selectedFSObject}
+     * in {@link TreeBean#parent} parent directory
+     *
+     * @param fsObject object(file or folder) to rename
+     */
+    private void rename(FSObject fsObject) {
+        try {
+            if (fsObject instanceof FSFolder) {
+                cmisService.renameFolder((FSFolder) fsObject, newName);
+
+            } else if (fsObject instanceof FSFile) {
+                cmisService.renameFile((FSFile) fsObject, newName);
+            }
+        } catch (Exception ex) {
+            catchException(ex, renamecomponent);
+        }
+        //TODO   java.lang.NullPointerException      kozubal
+       /* if (treeBean.getSelectedNode().getParent() != null) {
+            treeBean.updateTree(treeBean.getSelectedNode().getParent());
+        }*/
+        this.newName = "";
+    }
+
+    public String getName() {
         return name;
     }
 
@@ -190,7 +210,16 @@ public class ActionBean implements Serializable {
     public void setTreeBean(TreeBean treeBean) {
         this.treeBean = treeBean;
     }
+
     public void setNewName(String newName) {
         this.newName = newName;
+    }
+
+    public FileActions getFileActions() {
+        return fileActions;
+    }
+
+    public void setFileActions(FileActions fileActions) {
+        this.fileActions = fileActions;
     }
 }

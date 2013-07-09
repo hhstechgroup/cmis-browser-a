@@ -27,12 +27,6 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.apache.chemistry.opencmis</groupId>
-            <artifactId>chemistry-opencmis-server-inmemory</artifactId>
-            <type>war</type>
-            <version>0.9.0</version>
-        </dependency>
 
     </dependencies>
     <build>

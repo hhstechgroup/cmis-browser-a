@@ -56,13 +56,16 @@
 
                     <p:tabMenu activeIndex="4">
                         <p:menuitem value="New Folder" onclick="createDialog.show();"
-                                    icon="ui-icon-document"/>
+                                    icon="ui-icon-document"
+                                    partialSubmit="true" process="@this"/>
                         <p:menuitem id="downloadLink" disabled="#{!fileActions.selectedIsFile}" value="Download" ajax="false"
-                                    icon="ui-icon-arrowthichk-s">
-                            <p:fileDownload  value="#{fileActions.download(treeBean.selectedFSObject)}" />
+                                    icon="ui-icon-arrowthichk-s" partialSubmit="true" process="@this">
+                            <p:fileDownload value="#{fileActions.download(treeBean.selectedFSObject)}" />
                         </p:menuitem>
-                        <p:menuitem value="Rename" onclick="renameDialog.show();" icon="ui-icon-arrowrefresh-1-w"/>
-                        <p:menuitem value="Delete" onclick="deleteDialog.show();" icon="ui-icon-close"/>
+                        <p:menuitem value="Edit" onclick="renameDialog.show();" icon="ui-icon-arrowrefresh-1-w"
+                                    partialSubmit="true"/>
+                        <p:menuitem value="Delete" process="@this" onclick="deleteDialog.show();" icon="ui-icon-close"
+                                    partialSubmit="true"/>
                     </p:tabMenu>
 
                 </f:facet>
@@ -114,19 +117,15 @@
 
     </h:form>
 
-    <iframe id="dj_history" src="resources/js/dojo/resources/iframe_history.html" name="dj_history"
-            style="border:0;width:1px;height:1px;position:absolute;visibility:hidden;bottom:0;right:0;">
-    </iframe>
-
     <p:dialog id="rename" widgetVar="renameDialog"
-              header="Rename" modal="true"
+              header="Edit" modal="true"
               showEffect="fade"
               hideEffect="fade"
               resizable="false"
               appendToBody="true"
               visible="#{facesContext.validationFailed}"
             >
-        <h:form>
+        <h:form enctype="multipart/form-data">
             <p:outputLabel for="newName" value="Type folder name:  "/>
             <p:watermark for="newName" value="Folder Name"/>
             <p:inputText id="newName" value="#{action.newName}"
@@ -135,9 +134,11 @@
             </p:inputText>
             <br></br>
             <p:message for="newName" autoUpdate="true" closable="true"/>
+            <p:fileUpload mode="simple" value="#{fileActions.file}" />
             <br></br>
             <p:commandButton value="OK"
-                             actionListener="#{action.rename(treeBean.selectedFSObject)}"
+                             actionListener="#{action.edit(treeBean.selectedFSObject)}"
+                             ajax="false"
                              update=":treeForm:tree :treeForm:fsTable :rename "
                     />
             <p:commandButton value="Cancel" type="button" onclick="renameDialog.hide()"/>

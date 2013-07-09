@@ -41,8 +41,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
     @Override
     public FSFolder create(FSFolder parent, String folderName) {
         Map<String, String> newFolderProps = new HashMap<String, String>();
-        String path = parent.getPath();
-        Folder cmisParent = (Folder) session.getObjectByPath(path);
+        Folder cmisParent = (Folder) session.getObjectByPath(parent.getPath());
         newFolderProps.put(PropertyIds.OBJECT_TYPE_ID, "cmis:folder");
         newFolderProps.put(PropertyIds.NAME, folderName);
         Folder newFolder = cmisParent.createFolder(newFolderProps);
@@ -79,10 +78,11 @@ public class FSFolderDaoImpl implements FSFolderDao {
                 fsObject.setPath(((Folder) o).getPath());
             } else {
                 fsObject = new FSFile();
+                ((FSFile) fsObject).setMimetype(((Document) o).getContentStreamMimeType());
                 fsObject.setPath(notRootFolder);
                 fsObject.setAbsolutePath(notRootFolder + "/" + o.getName());
             }
-            fsObject.setType(o.getType().getDisplayName());
+            fsObject.setType(o.getBaseType().getDisplayName());
             fsObject.setName(o.getName());
             fsObject.setId(o.getId());
             fsObject.setParent(parent);
@@ -134,9 +134,11 @@ public class FSFolderDaoImpl implements FSFolderDao {
                 fsObject.setPath(((Folder) o).getPath());
             } else {
                 fsObject = new FSFile();
+                ((FSFile) fsObject).setMimetype(((Document) o).getContentStreamMimeType());
                 fsObject.setPath(notRootFolder);
                 fsObject.setAbsolutePath(notRootFolder + "/" + o.getName());
             }
+            fsObject.setType(o.getBaseType().getDisplayName());
             fsObject.setName(o.getName());
             fsObject.setId(o.getId());
             fsObject.setParent(parent);
@@ -163,9 +165,10 @@ public class FSFolderDaoImpl implements FSFolderDao {
     public boolean hasChildFolder(FSFolder folder) {
         List<FSObject> children = getChildren(folder);
         if (!children.isEmpty()) {
-            for (FSObject iterator : children)
+            for (FSObject iterator : children) {
                 if (iterator instanceof FSFolder) {
-                return true;
+                    return true;
+                }
             }
         }
         return false;

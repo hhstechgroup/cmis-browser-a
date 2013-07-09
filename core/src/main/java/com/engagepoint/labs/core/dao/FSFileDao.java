@@ -47,6 +47,8 @@ public interface FSFileDao {
      */
     public boolean delete(FSFile file);
 
+    public FSFile edit(FSFile file, byte[] content, String mimeType);
+
     public InputStream getInputStream(FSFile file);
 
 }
