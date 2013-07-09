@@ -382,6 +382,7 @@ public class TreeBean implements Serializable {
     }
 
     public void setSelectedFSObject(FSObject sn) {
+        logger.log(Level.INFO, "setSelectedFSObject: "+sn.getType());
         if (sn != null) {
             if(sn instanceof FSFile) {
                 fileActions.setSelectedIsFile(true);

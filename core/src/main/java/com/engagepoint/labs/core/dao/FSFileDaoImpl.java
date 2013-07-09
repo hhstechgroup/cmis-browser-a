@@ -55,7 +55,7 @@ public class FSFileDaoImpl implements FSFileDao {
                 content.length, mimeType, input);
         cmisFile.setContentStream(contentStream, true, true);
         file.setMimetype(mimeType);
-        file.setType(cmisFile.getType().getDisplayName());
+        file.setType(cmisFile.getBaseType().getDisplayName());
         return file;
     }
 

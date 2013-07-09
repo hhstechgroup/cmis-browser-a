@@ -36,7 +36,6 @@ public class ActionBean implements Serializable {
     private String type;
     private String reqEx;
     private String name;
-    private String newName;
     private UIComponent renamecomponent;
     private UIComponent createcomponent;
     private static Logger logger;
@@ -86,14 +85,10 @@ public class ActionBean implements Serializable {
         }
         this.name = "";
         this.type = "";
-
     }
 
     public void edit(FSObject selected) {
-        if (!selected.getName().equals(newName)) {
-            logger.log(Level.INFO, "renaming to: " + newName);
-            rename(selected);
-        }
+        rename(selected);
         if (selected instanceof FSFile) {
             logger.log(Level.INFO, "SELECTED FILE");
             UploadedFile file = fileActions.getFile();
@@ -143,10 +138,10 @@ public class ActionBean implements Serializable {
     private void rename(FSObject fsObject) {
         try {
             if (fsObject instanceof FSFolder) {
-                cmisService.renameFolder((FSFolder) fsObject, newName);
+                cmisService.renameFolder((FSFolder) fsObject, fsObject.getName());
 
             } else if (fsObject instanceof FSFile) {
-                cmisService.renameFile((FSFile) fsObject, newName);
+                cmisService.renameFile((FSFile) fsObject, fsObject.getName());
             }
         } catch (Exception ex) {
             catchException(ex, renamecomponent);
@@ -155,7 +150,6 @@ public class ActionBean implements Serializable {
        /* if (treeBean.getSelectedNode().getParent() != null) {
             treeBean.updateTree(treeBean.getSelectedNode().getParent());
         }*/
-        this.newName = "";
     }
 
     public String getName() {
@@ -165,11 +159,6 @@ public class ActionBean implements Serializable {
     public void setName(String name) {
         this.name = name;
     }
-
-    public String getNewName() {
-        return newName;
-    }
-
 
     public String getType() {
         return type;
@@ -209,10 +198,6 @@ public class ActionBean implements Serializable {
 
     public void setTreeBean(TreeBean treeBean) {
         this.treeBean = treeBean;
-    }
-
-    public void setNewName(String newName) {
-        this.newName = newName;
     }
 
     public FileActions getFileActions() {
