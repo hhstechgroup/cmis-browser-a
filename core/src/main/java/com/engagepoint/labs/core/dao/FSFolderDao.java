@@ -71,9 +71,4 @@ public interface FSFolderDao {
 
     public List<FSObject> getPage(FSFolder parent, int pageNumber, int numberOfRows);
 
-    public boolean hasChildFolder(FSFolder folder);
-
-    public boolean hasChildren(FSFolder folder);
-
-
 }

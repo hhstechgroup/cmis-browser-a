@@ -32,7 +32,8 @@ public class FSFile extends FSObject {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof FSFile)){ return false;
+        if (!(o instanceof FSFile)) {
+            return false;
         }
         FSFile fsFile = (FSFile) o;
 
