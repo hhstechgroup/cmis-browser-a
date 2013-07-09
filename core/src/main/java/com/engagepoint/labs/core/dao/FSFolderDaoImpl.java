@@ -137,6 +137,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
                 fsObject.setPath(notRootFolder);
                 fsObject.setAbsolutePath(notRootFolder + "/" + o.getName());
             }
+			fsObject.setType(o.getType().getDisplayName());
             fsObject.setName(o.getName());
             fsObject.setId(o.getId());
             fsObject.setParent(parent);
