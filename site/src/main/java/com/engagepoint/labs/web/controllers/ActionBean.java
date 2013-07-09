@@ -6,11 +6,13 @@ import com.engagepoint.labs.core.models.FSObject;
 import com.engagepoint.labs.core.service.CMISService;
 import com.engagepoint.labs.core.service.CMISServiceImpl;
 import org.primefaces.context.RequestContext;
+import org.primefaces.model.TreeNode;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
+import javax.faces.bean.SessionScoped;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import java.io.Serializable;
@@ -21,28 +23,27 @@ import java.util.logging.Logger;
  * @author volodymyr.kozubal <volodymyr.kozubal@engagepoint.com>
  */
 
-@ManagedBean(name = "action")
-@ApplicationScoped
 
+@ManagedBean(name = "action")
+@SessionScoped
 public class ActionBean implements Serializable {
-    private String type;
-    private String reqEx;
-    private String name;
-    private String newName;
-    private boolean deleteAllTree = false;
-    private UIComponent renamecomponent;
-    private UIComponent createcomponent;
-    private UIComponent deletecomponent;
-    private static Logger logger;
-    private final CMISService cmisService;
 
     @ManagedProperty(value = "#{treeBean}")
     private TreeBean treeBean;
 
+    private String type;
+    private String reqEx;
+    private String name;
+    private String newName;
+    private UIComponent renamecomponent;
+    private UIComponent createcomponent;
+    private static Logger logger;
+    private final CMISService cmisService;
+
     /**
      * Handling exception and create a message to show user om dialog page  and log the exception
-     * method fail validation and skip all the subsequent phases and go to render response phase
-     * to avoid closing dialog with the client
+     * method fail validation and skip all the subsequent phases and go to render response
+     * phase to avoid closing dialog with the client
      *
      * @param ex        Exception that is thown from service layer
      * @param component Component to which error is binding
@@ -70,10 +71,14 @@ public class ActionBean implements Serializable {
      *
      * @param parent folder to set as a parent for new folder
      */
-    public void createFolder(FSFolder parent) {
+    public void createFolder(TreeNode parent) {
         try {
-            cmisService.createFolder(parent, name);
-            treeBean.updateTree(treeBean.getSelectedNode());
+             if (parent!=null){
+            cmisService.createFolder((FSFolder)parent.getData(), name);
+            treeBean.updateTree(parent);
+             }
+            //TODO enable message when node is not selected       kozubal
+            //parent not selected
         } catch (Exception ex) {
             catchException(ex, createcomponent);
         }
@@ -99,30 +104,40 @@ public class ActionBean implements Serializable {
         } catch (Exception ex) {
             catchException(ex,renamecomponent);
         }
+        //TODO   java.lang.NullPointerException      kozubal
         treeBean.updateTree(treeBean.getSelectedNode().getParent());
-        treeBean.getSelectedNode().setExpanded(true);
         this.newName = "";
-        
     }
 
     /**
      * Delete empty folder or folder subtree with name {@link TreeBean#selectedFSObject}
      * in {@link TreeBean#parent} parent directory
      *
-     * @param folder folder that is supposed to delete
+     * @param object folder that is supposed to delete
      */
-    public void delete(FSFolder folder) {
-        if (deleteAllTree) {
-            deleteAllTree = false;
-            cmisService.deleteAllTree(folder);
-        } else {
-            if (!cmisService.hasChildren(folder)) cmisService.deleteFolder(folder);
-            else {
-                Exception ex = new Exception("Folder has subfolders! To remove folder select checkbox ") ;
-                catchException(ex, deletecomponent);
+    public void delete(FSObject object) {
+        if (object instanceof FSFolder) {
+            if (cmisService.hasChildren((FSFolder) object)) {
+                RequestContext.getCurrentInstance().execute("confirmationDeleteTree.show()");
+            } else {
+                cmisService.deleteFolder((FSFolder) object);
+                treeBean.updateTree(treeBean.getSelectedNode().getParent());
             }
+        } else if (object instanceof FSFile) {
+            cmisService.deleteFile((FSFile) object);
+            treeBean.updateTree(treeBean.getSelectedNode().getParent());
         }
+    }
+    /**
+     * Delete not empty folder with name {@link TreeBean#selectedFSObject}
+     * in {@link TreeBean#parent} parent directory
+     *
+     * @param object folder that is supposed to delete
+     */
+    public void deleteAllTree(FSObject object) {
+        cmisService.deleteAllTree((FSFolder) object);
         treeBean.updateTree(treeBean.getSelectedNode().getParent());
+//        RequestContext.getCurrentInstance().update("treeForm:tree:0");
     }
 
     public String getName() {
@@ -137,17 +152,6 @@ public class ActionBean implements Serializable {
         return newName;
     }
 
-    public void setNewName(String newName) {
-        this.newName = newName;
-    }
-
-    public boolean isDeleteAllTree() {
-        return deleteAllTree;
-    }
-
-    public void setDeleteAllTree(boolean deleteAllTree) {
-        this.deleteAllTree = deleteAllTree;
-    }
 
     public String getType() {
         return type;
@@ -180,6 +184,7 @@ public class ActionBean implements Serializable {
     public void setReqEx(String reqEx) {
         this.reqEx = reqEx;
     }
+
     public TreeBean getTreeBean() {
         return treeBean;
     }
@@ -187,12 +192,7 @@ public class ActionBean implements Serializable {
     public void setTreeBean(TreeBean treeBean) {
         this.treeBean = treeBean;
     }
-
-    public UIComponent getDeletecomponent() {
-        return deletecomponent;
-    }
-
-    public void setDeletecomponent(UIComponent deletecomponent) {
-        this.deletecomponent = deletecomponent;
+    public void setNewName(String newName) {
+        this.newName = newName;
     }
 }

@@ -10,7 +10,6 @@ import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 
-import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
@@ -81,7 +80,7 @@ public class TreeBean implements Serializable {
                     FSFolder fold = new FSFolder();
                     fold.setName("Empty Folder");
                     new DefaultTreeNode(fold, treeNode);
-                    logger.log(Level.INFO, "FOLDER "+((FSFolder) treeNode.getData()).getName()+" HAS CHILD FOLDER");
+                    logger.log(Level.INFO, "FOLDER " + ((FSFolder) treeNode.getData()).getName() + " HAS CHILD FOLDER");
                 }
                 long end = System.currentTimeMillis();
                 logger.log(Level.INFO, "TIME: " + (end - start) + "ms");
@@ -92,7 +91,7 @@ public class TreeBean implements Serializable {
     }
 
     public void doBack() {
-        if (backHistory.size() == 0){
+        if (backHistory.size() == 0) {
             return;
         }
         for (int i = 0; i < backHistory.size(); i++) {
@@ -109,7 +108,7 @@ public class TreeBean implements Serializable {
     }
 
     public void doForward() {
-        if (forwardHistory.size() == 0){
+        if (forwardHistory.size() == 0) {
             return;
         }
         for (int i = 0; i < forwardHistory.size(); i++) {
@@ -146,15 +145,19 @@ public class TreeBean implements Serializable {
     }
 
     public void onNodeExpand(NodeExpandEvent event) {
-        updateTree(event.getTreeNode()) ;
+        updateTree(event.getTreeNode());
     }
 
+    public void updateNodeExpand(NodeExpandEvent event) {
+        updateTree(event.getTreeNode());
+    }
     /**
      * if files in our repository has changed when node collapse
      * we clear all children and check if node has children
+     *
      * @param event that is fired on NodeCollapse
      */
-    public void onNodeCollapse( NodeCollapseEvent event) {
+    public void onNodeCollapse(NodeCollapseEvent event) {
         logger.log(Level.INFO, "onNodeCollapse");
         event.getTreeNode().getChildren().clear();
         if (cmisService.hasChildFolder((FSFolder) event.getTreeNode().getData())) {
@@ -163,7 +166,17 @@ public class TreeBean implements Serializable {
             new DefaultTreeNode(fold, event.getTreeNode());
         }
     }
-    
+
+    private void SubObjects(FSFolder parent, TreeNode treenodeparent) {
+        List<FSObject> children = cmisService.getChildren(parent);
+        for (FSObject i : children) {
+            if (i instanceof FSFolder) {
+                TreeNode treeNode = new DefaultTreeNode(i, treenodeparent);
+                SubObjects((FSFolder) i, treeNode);
+            }
+        }
+    }
+
     public void setTestingCurrentPage(String testingCurrentPage) {
         if (testingCurrentPage.isEmpty()) {
             this.testingCurrentPage = Integer.toString(currentPage);
@@ -241,11 +254,10 @@ public class TreeBean implements Serializable {
             }
             if (lastPage != firstPage) {
                 FacesContext.getCurrentInstance().addMessage(messageForPaging.getClientId(),
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, "WRONG PAGE!", "it should be between  " + firstPage + " and " + lastPage));
-            }
-            else {
+                        new FacesMessage(FacesMessage.SEVERITY_INFO, "WRONG PAGE!", "it should be between  " + firstPage + " and " + lastPage));
+            } else {
                 FacesContext.getCurrentInstance().addMessage(messageForPaging.getClientId(),
-                     new FacesMessage(FacesMessage.SEVERITY_INFO, "WARNING", "here is only one page"));
+                        new FacesMessage(FacesMessage.SEVERITY_INFO, "WARNING", "here is only one page"));
             }
             tablePageList = cmisService.getPage(parent, currentPage, amountOfRowsInPage);
             testingCurrentPage = Integer.toString(currentPage);
@@ -322,14 +334,12 @@ public class TreeBean implements Serializable {
         }
         if (currentPage == firstPage) {
             disableBackButton = true;
-        }
-        else {
+        } else {
             disableBackButton = false;
         }
         if (currentPage == lastPage) {
             disableNextButton = true;
-        }
-        else {
+        } else {
             disableNextButton = false;
         }
 
@@ -338,6 +348,7 @@ public class TreeBean implements Serializable {
     }
 
     public void setSelectedNode(TreeNode selectedNodes) {
+
         logger.log(Level.INFO, "setSelectedNode");
         this.selectedNodes = selectedNodes;
 
