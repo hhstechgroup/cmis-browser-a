@@ -40,6 +40,8 @@ public class FSFileDaoImpl implements FSFileDao {
         cmisFile.updateProperties(properties, true);
         file.setName(cmisFile.getName());
         file.setAbsolutePath(cmisFile.getPaths().get(0));
+        file.setLastModifiedBy(cmisFile.getLastModifiedBy());
+        file.setLastModifiedTime(cmisFile.getLastModificationDate().getTime());
         return file;
     }
 
@@ -55,6 +57,8 @@ public class FSFileDaoImpl implements FSFileDao {
                 content.length, mimeType, input);
         cmisFile.setContentStream(contentStream, true, true);
         file.setMimetype(mimeType);
+        file.setLastModifiedBy(cmisFile.getLastModifiedBy());
+        file.setLastModifiedTime(cmisFile.getLastModificationDate().getTime());
         file.setType(cmisFile.getBaseType().getDisplayName());
         return file;
     }

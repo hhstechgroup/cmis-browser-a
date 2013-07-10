@@ -1,7 +1,5 @@
 package com.engagepoint.labs.core.models;
 
-import java.util.Arrays;
-
 /**
  * User: vitaliy.vasilenko
  * Date: 6/17/13
@@ -9,15 +7,15 @@ import java.util.Arrays;
  */
 public class FSFile extends FSObject {
 
-    private String mimetype;
     private byte[] content;
+    private String absolutePath;
 
-    public String getMimetype() {
-        return mimetype;
+    public String getAbsolutePath() {
+        return absolutePath;
     }
 
-    public void setMimetype(String mimetype) {
-        this.mimetype = mimetype;
+    public void setAbsolutePath(String absolutePath) {
+        this.absolutePath = absolutePath;
     }
 
     public byte[] getContent() {
@@ -41,37 +39,5 @@ public class FSFile extends FSObject {
     @Override
     public String getIcon(){
         return "document.png";
-    };
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        if (!super.equals(o)) {
-            return false;
-        }
-
-        FSFile fsFile = (FSFile) o;
-
-        if (!Arrays.equals(content, fsFile.content)) {
-            return false;
-        }
-        if (mimetype != null ? !mimetype.equals(fsFile.mimetype) : fsFile.mimetype != null) {
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (mimetype != null ? mimetype.hashCode() : 0);
-        result = 31 * result + (content != null ? Arrays.hashCode(content) : 0);
-        return result;
     }
 }

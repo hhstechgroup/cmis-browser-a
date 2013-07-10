@@ -71,13 +71,35 @@
 
                     </f:facet>
 
-                    <p:column headerText="Name" sortBy="#{fsObject.name}">
+                    <p:column style="width: 300px;" headerText="Name" sortBy="#{fsObject.name}">
                         <p:graphicImage value="/resources/images/#{fsObject.icon}" width="16" height="16"/>
                         <h:outputText value=" #{fsObject.name}"/>
                     </p:column>
-                    <p:column headerText="Type" sortBy="#{fsObject.type}">
+                    <p:column style="width: 300px;" headerText="Type" sortBy="#{fsObject.type}">
                         <h:outputText value="#{fsObject.type}"/>
                     </p:column>
+                    <p:column style="width: 300px;" headerText="Id" sortBy="#{fsObject.id}">
+                        <h:outputText value="#{fsObject.id}"/>
+                    </p:column>
+                    <p:column style="width: 300px;" headerText="Size, Kb" sortBy="#{fsObject.size}">
+                        <h:outputText value="#{fsObject.size}"/>
+                    </p:column>
+                    <p:column style="width: 300px;" headerText="Content Type" sortBy="#{fsObject.mimetype}">
+                        <h:outputText value="#{fsObject.mimetype}"/>
+                    </p:column>
+                    <p:column style="width: 300px;" headerText="Created by" sortBy="#{fsObject.createdBy}">
+                        <h:outputText value="#{fsObject.createdBy}"/>
+                    </p:column>
+                    <p:column style="width: 300px;" headerText="Creation date" sortBy="#{fsObject.creationTime}">
+                        <h:outputText value="#{fsObject.creationTime}"/>
+                    </p:column>
+                    <p:column style="width: 300px;" headerText="Last Modified By" sortBy="#{fsObject.lastModifiedBy}">
+                        <h:outputText value="#{fsObject.lastModifiedBy}"/>
+                    </p:column>
+                    <p:column style="width: 300px;" headerText="Last Modified date" sortBy="#{fsObject.lastModifiedTime}">
+                        <h:outputText value="#{fsObject.lastModifiedTime}"/>
+                    </p:column>
+
 
                     <f:facet name="footer">
                         <!--<p:focus for="pageNumber"/>-->

@@ -17,11 +17,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class FSFolderDaoImpl implements FSFolderDao {
 
     private Session session;
     private FSFileDao fsFileDao;
+    private static Logger logger = Logger.getLogger(FSFolderDaoImpl.class.getName());
+
 
     public FSFolderDaoImpl() {
         fsFileDao = new FSFileDaoImpl();
@@ -78,10 +82,15 @@ public class FSFolderDaoImpl implements FSFolderDao {
                 fsObject.setPath(((Folder) o).getPath());
             } else {
                 fsObject = new FSFile();
-                ((FSFile) fsObject).setMimetype(((Document) o).getContentStreamMimeType());
+                fsObject.setMimetype(((Document) o).getContentStreamMimeType());
                 fsObject.setPath(notRootFolder);
-                fsObject.setAbsolutePath(notRootFolder + "/" + o.getName());
+                fsObject.setSize(String.valueOf(((Document) o).getContentStreamLength() / 1024));
+                ((FSFile) fsObject).setAbsolutePath(notRootFolder + "/" + o.getName());
             }
+            fsObject.setCreatedBy(o.getCreatedBy());
+            fsObject.setCreationTime(o.getCreationDate().getTime());
+            fsObject.setLastModifiedBy(o.getLastModifiedBy());
+            fsObject.setLastModifiedTime(o.getLastModificationDate().getTime());
             fsObject.setType(o.getBaseType().getDisplayName());
             fsObject.setName(o.getName());
             fsObject.setId(o.getId());
@@ -127,7 +136,6 @@ public class FSFolderDaoImpl implements FSFolderDao {
         operationContext.setMaxItemsPerPage(numberOfRows);
         ItemIterable<CmisObject> childrenCmis = cmisParent.getChildren(operationContext);
         ItemIterable<CmisObject> cmisChildren = childrenCmis.skipTo(pageNumber * numberOfRows).getPage();
-
         for(CmisObject o : cmisChildren) {
             FSObject fsObject;
             if(o instanceof Folder){
@@ -135,10 +143,15 @@ public class FSFolderDaoImpl implements FSFolderDao {
                 fsObject.setPath(((Folder) o).getPath());
             } else {
                 fsObject = new FSFile();
-                ((FSFile) fsObject).setMimetype(((Document) o).getContentStreamMimeType());
+                fsObject.setMimetype(((Document) o).getContentStreamMimeType());
                 fsObject.setPath(notRootFolder);
-                fsObject.setAbsolutePath(notRootFolder + "/" + o.getName());
+                fsObject.setSize(String.valueOf(((Document) o).getContentStreamLength() / 1024));
+                ((FSFile) fsObject).setAbsolutePath(notRootFolder + "/" + o.getName());
             }
+            fsObject.setCreatedBy(o.getCreatedBy());
+            fsObject.setCreationTime(o.getCreationDate().getTime());
+            fsObject.setLastModifiedBy(o.getLastModifiedBy());
+            fsObject.setLastModifiedTime(o.getLastModificationDate().getTime());
             fsObject.setType(o.getBaseType().getDisplayName());
             fsObject.setName(o.getName());
             fsObject.setId(o.getId());

@@ -35,8 +35,6 @@ public class FSFolder extends FSObject {
         return "folder.png";
     }
 
-    ;
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {

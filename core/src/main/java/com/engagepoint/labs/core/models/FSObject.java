@@ -1,27 +1,73 @@
 package com.engagepoint.labs.core.models;
 
+import java.util.Date;
+
 /**
  * User: vitaliy.vasilenko
  * Date: 6/17/13
  * Time: 12:42 PM
  */
-public abstract class FSObject {
+public class FSObject {
 
     private String type;
     private String path;
     private FSFolder parent;
     private String name;
     private String id;
-    private String absolutePath;
     private String icon;
+    private String createdBy;
+    private Date creationTime;
+    private String lastModifiedBy;
+    private Date lastModifiedTime;
+    private String mimetype;
+    private String size;
 
-
-    public String getAbsolutePath() {
-        return absolutePath;
+    public String getSize() {
+        return size;
     }
 
-    public void setAbsolutePath(String absolutePath) {
-        this.absolutePath = absolutePath;
+    public void setSize(String size) {
+        this.size = size;
+    }
+
+    public String getMimetype() {
+        return mimetype;
+    }
+
+    public void setMimetype(String mimetype) {
+        this.mimetype = mimetype;
+    }
+
+    public Date getCreationTime() {
+        return creationTime;
+    }
+
+    public void setCreationTime(Date creationTime) {
+        this.creationTime = creationTime;
+    }
+
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public Date getLastModifiedTime() {
+        return lastModifiedTime;
+    }
+
+    public void setLastModifiedTime(Date lastModifiedTime) {
+        this.lastModifiedTime = lastModifiedTime;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
     }
 
     public String getType() {
@@ -74,17 +120,15 @@ public abstract class FSObject {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o){
+        if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()){
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
+
         FSObject fsObject = (FSObject) o;
 
-        if (absolutePath != null ? !absolutePath.equals(fsObject.absolutePath) : fsObject.absolutePath != null) {
-            return false;
-        }
         if (icon != null ? !icon.equals(fsObject.icon) : fsObject.icon != null) {
             return false;
         }
@@ -114,6 +158,7 @@ public abstract class FSObject {
         result = 31 * result + (parent != null ? parent.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (id != null ? id.hashCode() : 0);
+        result = 31 * result + (icon != null ? icon.hashCode() : 0);
         return result;
     }
 }
