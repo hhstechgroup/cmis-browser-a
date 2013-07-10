@@ -41,6 +41,8 @@ public class ActionBean implements Serializable {
     private static Logger logger;
     private final CMISService cmisService;
 
+    private String uploadVisible = "hidden";  // for edit dialog
+
     /**
      * Handling exception and create a message to show user om dialog page  and log the exception
      * method fail validation and skip all the subsequent phases and go to render response
@@ -63,7 +65,8 @@ public class ActionBean implements Serializable {
     public ActionBean() {
         logger = Logger.getLogger(ActionBean.class.getName());
         cmisService = CMISServiceImpl.getService();
-        reqEx = "^(\\w+\\.?)*\\w+$";
+        reqEx = "(.*[\\\\\\/]|^)(.*?)(?:[\\.]|$)([^\\.\\s]*$)";
+//        reqEx = "^(\\w+\\.?)*\\w+$";
     }
 
     /**
@@ -88,13 +91,17 @@ public class ActionBean implements Serializable {
     }
 
     public void edit(FSObject selected) {
-        rename(selected);
+        if(!selected.getName().equals(fileActions.getSelectedName())) {
+            rename(selected);
+        }
         if (selected instanceof FSFile) {
             logger.log(Level.INFO, "SELECTED FILE");
             UploadedFile file = fileActions.getFile();
-            byte[] content = file.getContents();
-            String mimeType = file.getContentType();
-            cmisService.edit((FSFile) selected, content, mimeType);
+            if(file != null) {
+                byte[] content = file.getContents();
+                String mimeType = file.getContentType();
+                cmisService.edit((FSFile) selected, content, mimeType);
+            }
         }
     }
 
@@ -150,6 +157,11 @@ public class ActionBean implements Serializable {
        /* if (treeBean.getSelectedNode().getParent() != null) {
             treeBean.updateTree(treeBean.getSelectedNode().getParent());
         }*/
+    }
+
+    public String getUploadVisible() {
+        uploadVisible = fileActions.isSelectedIsFile() ? "visible" : "hidden";
+        return uploadVisible;
     }
 
     public String getName() {

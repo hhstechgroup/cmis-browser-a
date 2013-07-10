@@ -113,6 +113,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
         root.setName(cmisRoot.getName());
         root.setPath(cmisRoot.getPath());
         root.setId(cmisRoot.getId());
+        root.setType(cmisRoot.getBaseType().getDisplayName());
         return root;
     }
 

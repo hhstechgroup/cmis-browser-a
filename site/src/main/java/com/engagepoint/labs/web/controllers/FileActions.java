@@ -30,6 +30,7 @@ public class FileActions implements Serializable {
     private CMISService cmisService;
     private static Logger logger;
     private boolean selectedIsFile;
+    private String selectedName;
 
     private UploadedFile file;
 
@@ -59,5 +60,13 @@ public class FileActions implements Serializable {
 
     public void setFile(UploadedFile file) {
         this.file = file;
+    }
+
+    public String getSelectedName() {
+        return selectedName;
+    }
+
+    public void setSelectedName(String selectedName) {
+        this.selectedName = selectedName;
     }
 }

@@ -5,7 +5,8 @@
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:p="http://primefaces.org/ui"
-      xmlns:ui="http://java.sun.com/jsf/facelets">
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:composite="http://java.sun.com/jsf/composite/composite">
 
 
 <h:body>
@@ -25,7 +26,8 @@
                         style="width: 300px;">
 
                     <p:ajax event="select"
-                            update=":treeForm:fsTable :treeForm:fsTable:lastPage :treeForm:fsTable:back  :treeForm:fsTable:next"/>
+
+                            update=":treeForm:fsTable :treeForm:fsTable:lastPage :treeForm:fsTable:back  :treeForm:fsTable:next :edit"/>
 
                     <p:ajax event="expand" listener="#{treeBean.onNodeExpand}"/>
                     <p:ajax event="collapse" update=":treeForm:tree" listener="#{treeBean.onNodeCollapse}"/>
@@ -46,7 +48,8 @@
                              selection="#{treeBean.selectedFSObject}"
                              selectionMode="single"
                         >
-                    <p:ajax event="rowSelect" listener="#{treeBean.onRowSelect}" update=":treeForm:tree :treeForm:fsTable :edit"/>
+                    <p:ajax event="rowSelect" listener="#{treeBean.onRowSelect}"
+                            update=":treeForm:tree :treeForm:fsTable :edit"/>
 
                     <f:facet name="header">
 
@@ -55,18 +58,15 @@
 
                         <p:tabMenu activeIndex="4">
                             <p:menuitem value="New Folder" onclick="createDialog.show();"
-                                        icon="ui-icon-document"
-                                        partialSubmit="true" process="@this"/>
+                                        icon="ui-icon-document"/>
                             <p:menuitem id="downloadLink" disabled="#{!fileActions.selectedIsFile}" value="Download"
                                         ajax="false"
-                                        icon="ui-icon-arrowthichk-s" partialSubmit="true" process="@this">
+                                        icon="ui-icon-arrowthichk-s">
                                 <p:fileDownload value="#{fileActions.download(treeBean.selectedFSObject)}"/>
                             </p:menuitem>
-                            <p:menuitem value="Edit" onclick="editDialog.show();" icon="ui-icon-arrowrefresh-1-w"
-                                        partialSubmit="true"/>
+                            <p:menuitem value="Edit" onclick="editDialog.show();" icon="ui-icon-arrowrefresh-1-w"/>
                             <p:menuitem value="Delete" process="@this" onclick="deleteDialog.show();"
-                                        icon="ui-icon-close"
-                                        partialSubmit="true"/>
+                                        icon="ui-icon-close"/>
                         </p:tabMenu>
 
                     </f:facet>
@@ -112,11 +112,14 @@
 
             <p:contextMenu for="tree">
                 <p:menuitem value="New Folder" onclick="createDialog.show();" icon="ui-icon-document"/>
-                <p:menuitem value="Rename" onclick="editDialog.show();" icon="ui-icon-document"/>
+                <p:menuitem value="Edit" onclick="editDialog.show();" icon="ui-icon-document"/>
                 <p:menuitem value="Delete" onclick="deleteDialog.show();" icon="ui-icon-document"/>
             </p:contextMenu>
 
         </h:form>
+        <iframe id="dj_history" src="resources/js/dojo/resources/iframe_history.html" name="dj_history"
+                style="border:0;width:1px;height:1px;position:absolute;visibility:hidden;bottom:0;right:0;">
+        </iframe>
 
         <p:dialog id="edit" widgetVar="editDialog"
                   header="Edit" modal="true"
@@ -126,26 +129,13 @@
                   appendToBody="true"
                   visible="#{facesContext.validationFailed}"
                 >
-            <h:form enctype="multipart/form-data">
-                <p:outputLabel for="newName" value="Name:  "/>
-                <p:watermark for="newName" value="Folder Name"/>
-                <p:inputText required="true" id="newName" value="#{treeBean.selectedFSObject.name}"
-                             validatorMessage="Invalid symbols" binding="#{action.renamecomponent}">
-                    <f:validateRegex pattern="#{action.reqEx}"/>
-                </p:inputText>
-                <br></br>
-                <p:outputLabel for="typeOfObject" value="Type:  "/>
-                <p:inputText id="typeOfObject" value="#{treeBean.selectedFSObject.type}" disabled="true" />
-                <p:message for="newName" autoUpdate="true" closable="true"/>
-                <p:fileUpload mode="simple" value="#{fileActions.file}"/>
-                <br></br>
-                <p:commandButton value="OK"
-                                 actionListener="#{action.edit(treeBean.selectedFSObject)}"
-                                 ajax="false"
-                                 update=":treeForm:tree :treeForm:fsTable :rename "
-                        />
-                <p:commandButton value="Cancel" type="button" onclick="editDialog.hide()"/>
-            </h:form>
+            <composite:edit
+                nameHint="Name"
+                nameValue="#{treeBean.selectedFSObject.name}"
+                typeValue="#{treeBean.selectedFSObject.type}"
+                uploadVisible="#{action.uploadVisible}"
+                submitButtonActionUpdate=":treeForm:tree :treeForm:fsTable :edit">
+            </composite:edit>
         </p:dialog>
 
         <p:dialog id="create" widgetVar="createDialog" header="Create Folder" modal="true"

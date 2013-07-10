@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:composite="http://java.sun.com/jsf/composite"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+
+<composite:interface>
+    <composite:attribute name="nameHint" />
+    <composite:attribute name="nameValue" />
+    <composite:attribute name="typeValue" />
+    <composite:attribute name="uploadVisible" />
+    <composite:attribute name="submitButtonActionUpdate"/>
+</composite:interface>
+<composite:implementation>
+    <h:form enctype="multipart/form-data">
+        <p:watermark for="newName" value="#{cc.attrs.nameHint}"/>
+        <p:inputText required="true" id="newName" value="#{cc.attrs.nameValue}"
+                     validatorMessage="Invalid symbols" binding="#{action.renamecomponent}">
+            <f:validateRegex pattern="#{action.reqEx}"/>
+        </p:inputText>
+        <br></br>
+        <p:inputText id="typeOfObject" value="#{cc.attrs.typeValue}" disabled="true"/>
+        <p:message for="newName" autoUpdate="true" closable="true"/>
+        <p:fileUpload style="visibility: #{cc.attrs.uploadVisible}"  mode="simple" value="#{fileActions.file}"/>
+        <br></br>
+        <p:commandButton value="OK"
+                         actionListener="#{action.edit(treeBean.selectedFSObject)}"
+                         ajax="false"
+                         update="#{cc.attrs.submitButtonActionUpdate}"
+                />
+        <p:commandButton value="Cancel" type="button" onclick="editDialog.hide()"/>
+    </h:form>
+</composite:implementation>
+</html>

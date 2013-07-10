@@ -7,6 +7,7 @@ import com.engagepoint.labs.core.service.CMISService;
 import com.engagepoint.labs.core.service.CMISServiceImpl;
 import org.primefaces.event.NodeCollapseEvent;
 import org.primefaces.event.NodeExpandEvent;
+import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
@@ -91,11 +92,10 @@ public class TreeBean implements Serializable {
                 logger.log(Level.INFO, "TIME: " + (end - start) + "ms");
             }
         }
-
-
     }
 
     public void doBack() {
+        logger.log(Level.INFO, "doBack");
         if (backHistory.size() == 0) {
             return;
         }
@@ -382,13 +382,13 @@ public class TreeBean implements Serializable {
     }
 
     public void setSelectedFSObject(FSObject sn) {
-        logger.log(Level.INFO, "setSelectedFSObject: "+sn.getType());
         if (sn != null) {
             if(sn instanceof FSFile) {
                 fileActions.setSelectedIsFile(true);
             } else {
                 fileActions.setSelectedIsFile(false);
             }
+            fileActions.setSelectedName(sn.getName());
             this.selectedFSObject = sn;
         }
     }
