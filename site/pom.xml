@@ -7,11 +7,9 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.engagepoint.labs</groupId>
     <artifactId>site</artifactId>
     <packaging>war</packaging>
-    <name>site Maven Webapp</name>
-    <url>http://maven.apache.org</url>
+    <name>site</name>
 
     <repositories>
         <repository>
