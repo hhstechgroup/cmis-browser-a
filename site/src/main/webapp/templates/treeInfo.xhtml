@@ -170,8 +170,7 @@
 
             <h:form id="createForm">
 
-                <p:outputLabel for="name" value="Type folder name:  "/>
-                <p:watermark for="name" value="Folder Name"/>
+                <p:watermark for="name" value="Name"/>
                 <p:inputText id="name" value="#{action.name}"
                              validatorMessage="Invalid symbols" binding="#{action.createcomponent}">
                     <f:validateRegex pattern="#{action.reqEx}"/>
@@ -179,8 +178,7 @@
 
                 <p:message id="name_message" for="name" autoUpdate="true" closable="true"/>
 
-                <h:outputLabel for="type" value="Type folder type:  "/>
-                <p:watermark for="type" value="Folder Type"/>
+                <p:watermark for="type" value="Type"/>
                 <p:inputText id="type" value="#{action.type}"
                              required="true" requiredMessage="Value is required"/>
 

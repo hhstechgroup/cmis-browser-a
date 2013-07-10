@@ -60,6 +60,7 @@ public class FSFileDaoImpl implements FSFileDao {
         file.setLastModifiedBy(cmisFile.getLastModifiedBy());
         file.setLastModifiedTime(cmisFile.getLastModificationDate().getTime());
         file.setType(cmisFile.getBaseType().getDisplayName());
+        file.setSize(String.valueOf(contentStream.getLength() / 1024));
         return file;
     }
 
