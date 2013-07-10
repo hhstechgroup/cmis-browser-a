@@ -66,7 +66,6 @@ public class ActionBean implements Serializable {
         logger = Logger.getLogger(ActionBean.class.getName());
         cmisService = CMISServiceImpl.getService();
         reqEx = "(.*[\\\\\\/]|^)(.*?)(?:[\\.]|$)([^\\.\\s]*$)";
-//        reqEx = "^(\\w+\\.?)*\\w+$";
     }
 
     /**
@@ -91,13 +90,13 @@ public class ActionBean implements Serializable {
     }
 
     public void edit(FSObject selected) {
-        if(!selected.getName().equals(fileActions.getSelectedName())) {
+        if (!selected.getName().equals(fileActions.getSelectedName())) {
             rename(selected);
         }
         if (selected instanceof FSFile) {
             logger.log(Level.INFO, "SELECTED FILE");
             UploadedFile file = fileActions.getFile();
-            if(file != null) {
+            if (file != null) {
                 byte[] content = file.getContents();
                 String mimeType = file.getContentType();
                 cmisService.edit((FSFile) selected, content, mimeType);
@@ -113,15 +112,11 @@ public class ActionBean implements Serializable {
      */
     public void delete(FSObject object) {
         if (object instanceof FSFolder) {
-            if (cmisService.hasChildren((FSFolder) object)) {
-                RequestContext.getCurrentInstance().execute("confirmationDeleteTree.show()");
-            } else {
-                cmisService.deleteFolder((FSFolder) object);
-                treeBean.updateTree(treeBean.getSelectedNode().getParent());
-            }
-        } else if (object instanceof FSFile) {
+            deleteAllTree(object);
+//            treeBean.updateTree(treeBean.getSelectedNode().getParent());
+        } else {
             cmisService.deleteFile((FSFile) object);
-            treeBean.updateTree(treeBean.getSelectedNode().getParent());
+//            treeBean.updateTree(treeBean.getSelectedNode().getParent());
         }
     }
 
@@ -133,7 +128,7 @@ public class ActionBean implements Serializable {
      */
     public void deleteAllTree(FSObject object) {
         cmisService.deleteAllTree((FSFolder) object);
-        treeBean.updateTree(treeBean.getSelectedNode().getParent());
+//        treeBean.updateTree(treeBean.getSelectedNode().getParent());
     }
 
     /**

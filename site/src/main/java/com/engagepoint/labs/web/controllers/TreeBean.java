@@ -61,7 +61,6 @@ public class TreeBean implements Serializable {
         parent.setPath("/");
         main = new DefaultTreeNode("Main", null);
         TreeNode node0 = new DefaultTreeNode(root, main);
-
         FSFolder fold = new FSFolder();
         fold.setName("Empty Folder");
         new DefaultTreeNode(fold, node0);
@@ -340,7 +339,6 @@ public class TreeBean implements Serializable {
         logger.log(Level.INFO, "setSelectedNode");
         if(selectedNodes != null) {
             this.selectedNodes = selectedNodes;
-
             setSelectedFSObject((FSObject) selectedNodes.getData());
             if (selectedFSObject.getPath() == null) {
                 parent.setPath("/");

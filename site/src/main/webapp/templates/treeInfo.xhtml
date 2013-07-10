@@ -59,45 +59,45 @@
 
                         <p:tabMenu activeIndex="4">
                             <p:menuitem value="New Folder" onclick="PF('createDialog').show();"
-                                        icon="ui-icon-document"/>
+                                        icon="ui-icon-folder-collapsed"/>
                             <p:menuitem id="downloadLink" disabled="#{!fileActions.selectedIsFile}" value="Download"
                                         ajax="false"
-                                        icon="ui-icon-folder-open">
+                                        icon="ui-icon-triangle-1-s">
                                 <p:fileDownload value="#{fileActions.download(treeBean.selectedFSObject)}"/>
                             </p:menuitem>
                             <p:menuitem value="Edit" onclick="PF('editDialog').show();" icon="ui-icon-arrowrefresh-1-w"/>
                             <p:menuitem value="Delete" process="@this" onclick="PF('deleteDialog').show();"
-                                        icon="ui-icon-close"/>
+                                        icon="ui-icon-trash"/>
                         </p:tabMenu>
 
                     </f:facet>
 
-                    <p:column style="width: 300px;" headerText="Name" sortBy="#{fsObject.name}">
+                    <p:column style="width: 300px;" headerText="Name">
                         <p:graphicImage value="/resources/images/#{fsObject.icon}" width="16" height="16"/>
-                        <h:outputText value=" #{fsObject.name}"/>
+                        <h:outputText value="hyi #{fsObject.name}"/>
                     </p:column>
-                    <p:column style="width: 300px;" headerText="Type" sortBy="#{fsObject.type}">
+                    <p:column style="width: 300px;" headerText="Type">
                         <h:outputText value="#{fsObject.type}"/>
                     </p:column>
-                    <p:column style="width: 300px;" headerText="Id" sortBy="#{fsObject.id}">
+                    <p:column style="width: 300px;" headerText="Id">
                         <h:outputText value="#{fsObject.id}"/>
                     </p:column>
-                    <p:column style="width: 300px;" headerText="Size, Kb" sortBy="#{fsObject.size}">
+                    <p:column style="width: 300px;" headerText="Size, Kb">
                         <h:outputText value="#{fsObject.size}"/>
                     </p:column>
-                    <p:column style="width: 300px;" headerText="Content Type" sortBy="#{fsObject.mimetype}">
+                    <p:column style="width: 300px;" headerText="Content Type">
                         <h:outputText value="#{fsObject.mimetype}"/>
                     </p:column>
-                    <p:column style="width: 300px;" headerText="Created by" sortBy="#{fsObject.createdBy}">
+                    <p:column style="width: 300px;" headerText="Created by">
                         <h:outputText value="#{fsObject.createdBy}"/>
                     </p:column>
-                    <p:column style="width: 300px;" headerText="Creation date" sortBy="#{fsObject.creationTime}">
+                    <p:column style="width: 300px;" headerText="Creation date">
                         <h:outputText value="#{fsObject.creationTime}"/>
                     </p:column>
-                    <p:column style="width: 300px;" headerText="Last Modified By" sortBy="#{fsObject.lastModifiedBy}">
+                    <p:column style="width: 300px;" headerText="Last Modified By">
                         <h:outputText value="#{fsObject.lastModifiedBy}"/>
                     </p:column>
-                    <p:column style="width: 300px;" headerText="Last Modification date" sortBy="#{fsObject.lastModifiedTime}">
+                    <p:column style="width: 300px;" headerText="Last Modification date">
                         <h:outputText value="#{fsObject.lastModifiedTime}"/>
                     </p:column>
 
@@ -206,12 +206,10 @@
                 "Do you realy want delete folder and all files?"
                 <br></br>
                 <p:commandButton value="OK"
-                                 message="Do you realy want delete folder and all files?"
-                                 severity="alert" widgetVar="confirmationDeleteTree" modal="true"
-                                 actionListener="#{action.deleteAllTree(treeBean.selectedFSObject)}"
-                                 oncomplete="updater()"/>
+                                 actionListener="#{action.delete(treeBean.selectedFSObject)}"
+                                 update=":treeForm:tree :treeForm:fsTable :delete"
+                                 />
                 <p:commandButton value="Cancel" type="button" onclick="PF('deleteDialog').hide()" style="float:right;"/>
-                <p:remoteCommand name="updater" update=":treeForm:tree :treeForm:fsTable :delete"/>
             </h:form>
         </p:dialog>
 

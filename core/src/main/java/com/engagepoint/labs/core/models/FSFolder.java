@@ -21,16 +21,6 @@ public class FSFolder extends FSObject {
     }
 
     @Override
-    public void setType(String type) {
-        super.setType(type);
-    }
-
-    @Override
-    public String getType() {
-        return super.getType();
-    }
-
-    @Override
     public String getIcon() {
         return "folder.png";
     }
