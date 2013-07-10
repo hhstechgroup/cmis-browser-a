@@ -14,7 +14,6 @@ public class BrowserWebSteps {
 
     private final Pages pages;
 
-
     public BrowserWebSteps(Pages pages) {
         this.pages = pages;
     }
@@ -54,6 +53,16 @@ public class BrowserWebSteps {
         pages.index().treeClickCheck();
     }
 
+    @Then("user create new folder")
+    public void userCreateNewFolder() {
+        pages.index().createNewFolder();
+    }
+
+    @Then("user create folder and clicks cancel")
+    public void createFolderAndClickCancel() {
+        pages.index().createFolderAndClickCancel();
+    }
+
     @When("user clicks root expand")
     public void userClickRootChild() {
         pages.index().treeExpand();
@@ -64,22 +73,25 @@ public class BrowserWebSteps {
         pages.index().treeExpandCheck();
     }
 
+    @Then("user delete CreateJBehaveFolder folder")
+    public void deleteFolder() {
+        pages.index().deleteFolder();
+    }
+
     @Then("user clicks delete button for folder")
     public void userClickDeleteButtonForFolder() {
         pages.index().deleteButtonClickForFolder();
+
     }
 
     @Then("user clicks cancel button on delete folder page")
     public void userClickCancelButtonOnDeleteFolderPage() {
         pages.index().cancelButtonClickOnDeleteFolderPage();
     }
-    @Then("user clicks create button for folder")
-    public void userClickCreateButtonForFolder() {
-        pages.index().createButtonClickForFolder();
+
+    @When("user select tree node")
+    public void userSelectTreeNode() {
+        pages.index().selectTreeNode();
     }
 
-    @Then("user clicks cancel button on crete page")
-    public void userClickCancelButtonOnCreatePage() {
-        pages.index().cancelButtonClickOnCreatePage();
-    }
 }
