@@ -22,9 +22,10 @@
                 <p:tree id="tree" value="#{treeBean.root}" var="node"
                         cache="false"
                         dynamic="true"
+                        draggable="true" droppable="true" dragdropScope="demo"
                         selectionMode="single" selection="#{treeBean.selectedNode}" onNodeClick="doNav();"
                         style="width: 300px;">
-
+                    <p:ajax event="dragdrop" listener="#{treeBean.onDragDrop}"/>
                     <p:ajax event="select"
 
                             update=":treeForm:fsTable :treeForm:fsTable:lastPage :treeForm:fsTable:back  :treeForm:fsTable:next :edit"/>
@@ -53,19 +54,19 @@
 
                     <f:facet name="header">
 
-                        <p:inputText value="#{treeBean.parent.path}"
-                                     style="font-size: 13px; margin-bottom: 5px" size="90" disabled="true"/>
+                        <h:inputText value="#{treeBean.parent.path}"
+                                     style="border-radius: 11px;font-size: 16px; margin-bottom: 5px; color: #000000;" size="90" disabled="true"/>
 
                         <p:tabMenu activeIndex="4">
-                            <p:menuitem value="New Folder" onclick="createDialog.show();"
+                            <p:menuitem value="New Folder" onclick="PF('createDialog').show();"
                                         icon="ui-icon-document"/>
                             <p:menuitem id="downloadLink" disabled="#{!fileActions.selectedIsFile}" value="Download"
                                         ajax="false"
-                                        icon="ui-icon-arrowthichk-s">
+                                        icon="ui-icon-folder-open">
                                 <p:fileDownload value="#{fileActions.download(treeBean.selectedFSObject)}"/>
                             </p:menuitem>
-                            <p:menuitem value="Edit" onclick="editDialog.show();" icon="ui-icon-arrowrefresh-1-w"/>
-                            <p:menuitem value="Delete" process="@this" onclick="deleteDialog.show();"
+                            <p:menuitem value="Edit" onclick="PF('editDialog').show();" icon="ui-icon-arrowrefresh-1-w"/>
+                            <p:menuitem value="Delete" process="@this" onclick="PF('deleteDialog').show();"
                                         icon="ui-icon-close"/>
                         </p:tabMenu>
 
@@ -96,7 +97,7 @@
                     <p:column style="width: 300px;" headerText="Last Modified By" sortBy="#{fsObject.lastModifiedBy}">
                         <h:outputText value="#{fsObject.lastModifiedBy}"/>
                     </p:column>
-                    <p:column style="width: 300px;" headerText="Last Modified date" sortBy="#{fsObject.lastModifiedTime}">
+                    <p:column style="width: 300px;" headerText="Last Modification date" sortBy="#{fsObject.lastModifiedTime}">
                         <h:outputText value="#{fsObject.lastModifiedTime}"/>
                     </p:column>
 
@@ -133,9 +134,9 @@
             </p:panelGrid>
 
             <p:contextMenu for="tree">
-                <p:menuitem value="New Folder" onclick="createDialog.show();" icon="ui-icon-document"/>
-                <p:menuitem value="Edit" onclick="editDialog.show();" icon="ui-icon-document"/>
-                <p:menuitem value="Delete" onclick="deleteDialog.show();" icon="ui-icon-document"/>
+                <p:menuitem value="New Folder" onclick="PF('createDialog').show();" icon="ui-icon-document"/>
+                <p:menuitem value="Edit" onclick="PF('editDialog').show();" icon="ui-icon-document"/>
+                <p:menuitem value="Delete" onclick="PF('deleteDialog').show();" icon="ui-icon-document"/>
             </p:contextMenu>
 
         </h:form>
@@ -190,7 +191,7 @@
                                  update=":treeForm:fsTable :treeForm:tree :treeForm:fsTable:lastPage :treeForm:fsTable:back  :treeForm:fsTable:next :create"
                         />
 
-                <p:commandButton value="Cancel" type="button" onclick="createDialog.hide()"/>
+                <p:commandButton value="Cancel" type="button" onclick="PF('createDialog').hide()"/>
             </h:form>
         </p:dialog>
 
@@ -209,7 +210,7 @@
                                  severity="alert" widgetVar="confirmationDeleteTree" modal="true"
                                  actionListener="#{action.deleteAllTree(treeBean.selectedFSObject)}"
                                  oncomplete="updater()"/>
-                <p:commandButton value="Cancel" type="button" onclick="deleteDialog.hide()" style="float:right;"/>
+                <p:commandButton value="Cancel" type="button" onclick="PF('deleteDialog').hide()" style="float:right;"/>
                 <p:remoteCommand name="updater" update=":treeForm:tree :treeForm:fsTable :delete"/>
             </h:form>
         </p:dialog>

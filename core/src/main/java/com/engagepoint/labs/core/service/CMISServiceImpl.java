@@ -132,4 +132,8 @@ public class CMISServiceImpl implements CMISService {
     public InputStream getInputStream(FSFile file){
         return fsFolderDao.getFsFileDao().getInputStream(file);
     }
+    @Override
+    public FSFolder move(FSFolder source, FSFolder target){
+        return fsFolderDao.move(source,target);
+    }
 }

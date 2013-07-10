@@ -83,4 +83,6 @@ public interface CMISService {
 
     public InputStream getInputStream(FSFile file);
 
+    public FSFolder move(FSFolder source, FSFolder target);
+
 }

@@ -74,4 +74,6 @@ public interface FSFolderDao {
     public boolean hasChildFolder(FSFolder folder);
 
     public boolean hasChildren(FSFolder folder);
+
+    public FSFolder move(FSFolder source, FSFolder target);
 }

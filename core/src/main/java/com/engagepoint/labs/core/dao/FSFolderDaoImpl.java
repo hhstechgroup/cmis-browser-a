@@ -10,6 +10,7 @@ import com.engagepoint.labs.core.models.FSFile;
 import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
 import org.apache.chemistry.opencmis.client.api.*;
+import org.apache.chemistry.opencmis.client.runtime.ObjectIdImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.enums.UnfileObject;
 
@@ -148,6 +149,8 @@ public class FSFolderDaoImpl implements FSFolderDao {
                 fsObject.setSize(String.valueOf(((Document) o).getContentStreamLength() / 1024));
                 ((FSFile) fsObject).setAbsolutePath(notRootFolder + "/" + o.getName());
             }
+            logger.log(Level.INFO, "ParentTypeId: "+o.getType().getParentTypeId());
+            logger.log(Level.INFO, "ParentTypeId: "+o.getType().getBaseTypeId().value());
             fsObject.setCreatedBy(o.getCreatedBy());
             fsObject.setCreationTime(o.getCreationDate().getTime());
             fsObject.setLastModifiedBy(o.getLastModifiedBy());
@@ -192,5 +195,16 @@ public class FSFolderDaoImpl implements FSFolderDao {
     public boolean hasChildren(FSFolder folder) {
         List<FSObject> children = getChildren(folder);
         return !children.isEmpty();
+    }
+
+    @Override
+    public FSFolder move(FSFolder source, FSFolder target){
+        Folder cmisFolder1 = (Folder) session.getObjectByPath(source.getPath());
+        Folder cmisFolder2 = (Folder) session.getObjectByPath(target.getPath());
+        Folder parent = cmisFolder1.getFolderParent();
+        ObjectId objectId = new ObjectIdImpl(cmisFolder2.getId());
+        ObjectId parObjectId = new ObjectIdImpl(parent.getId());
+        cmisFolder1.move(parObjectId,objectId);
+        return source;
     }
 }

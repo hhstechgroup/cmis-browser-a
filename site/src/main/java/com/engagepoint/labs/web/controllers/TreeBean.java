@@ -5,10 +5,7 @@ import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
 import com.engagepoint.labs.core.service.CMISService;
 import com.engagepoint.labs.core.service.CMISServiceImpl;
-import org.primefaces.event.NodeCollapseEvent;
-import org.primefaces.event.NodeExpandEvent;
-import org.primefaces.event.NodeSelectEvent;
-import org.primefaces.event.SelectEvent;
+import org.primefaces.event.*;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 
@@ -368,6 +365,23 @@ public class TreeBean implements Serializable {
         }
         setSelectedFSObject((FSObject) event.getObject());
     }
+
+    public void onDragDrop(TreeDragDropEvent event) {
+        TreeNode dragNode = event.getDragNode();
+        TreeNode dropNode = event.getDropNode();
+        int dropIndex = event.getDropIndex();
+        FSFolder fff = (FSFolder)dragNode.getData();
+        FSFolder ddd = (FSFolder)dropNode.getData();
+
+        logger.log(Level.INFO, "DragNode data = "+fff.getPath());
+        logger.log(Level.INFO, "DropNode data = "+ddd.getPath());
+        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Dragged " + dragNode.getData(), "Dropped on " + dropNode.getData() + " at " + dropIndex);
+        FacesContext.getCurrentInstance().addMessage(null, message);
+        cmisService.move(fff,ddd);
+        logger.log(Level.INFO, "MOVED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
+    }
+
 
     public TreeNode getRoot() {
         return main;
