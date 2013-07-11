@@ -113,16 +113,13 @@ public class ActionBean implements Serializable {
      */
     public void delete(FSObject object) {
         if (object instanceof FSFolder) {
-            if (cmisService.hasChildren((FSFolder) object)) {
-                RequestContext.getCurrentInstance().execute("confirmationDeleteTree.show()");
-            } else {
-                cmisService.deleteFolder((FSFolder) object);
-                treeBean.updateTree(treeBean.getSelectedNode().getParent());
-            }
-        } else if (object instanceof FSFile) {
+            deleteAllTree(object);
+           // treeBean.updateTree(treeBean.getSelectedNode().getParent());
+        } else {
             cmisService.deleteFile((FSFile) object);
-            treeBean.updateTree(treeBean.getSelectedNode().getParent());
+//            treeBean.updateTree(treeBean.getSelectedNode().getParent());
         }
+
     }
 
     /**
@@ -133,7 +130,7 @@ public class ActionBean implements Serializable {
      */
     public void deleteAllTree(FSObject object) {
         cmisService.deleteAllTree((FSFolder) object);
-        treeBean.updateTree(treeBean.getSelectedNode().getParent());
+//        treeBean.updateTree(treeBean.getSelectedNode().getParent());
     }
 
     /**

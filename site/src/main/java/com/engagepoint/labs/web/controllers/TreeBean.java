@@ -5,7 +5,10 @@ import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
 import com.engagepoint.labs.core.service.CMISService;
 import com.engagepoint.labs.core.service.CMISServiceImpl;
-import org.primefaces.event.*;
+import org.primefaces.event.NodeCollapseEvent;
+import org.primefaces.event.NodeExpandEvent;
+import org.primefaces.event.SelectEvent;
+import org.primefaces.event.TreeDragDropEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 
@@ -16,8 +19,10 @@ import javax.faces.bean.SessionScoped;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -56,17 +61,38 @@ public class TreeBean implements Serializable {
     private Boolean disableBackButton;
     private Boolean disableNextButton = false;
 
+
+    private String city;
+    private Map<String,String> cities = new HashMap<String, String>();
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+
+    public Map<String, String> getCities() {
+        return cities;
+    }
+
+    public void setCities(Map<String, String> cities) {
+        this.cities = cities;
+    }
+
+
     public TreeBean() {
         FSFolder root = cmisService.getRootFolder();
         parent.setPath("/");
         main = new DefaultTreeNode("Main", null);
         TreeNode node0 = new DefaultTreeNode(root, main);
-
         FSFolder fold = new FSFolder();
         fold.setName("Empty Folder");
         new DefaultTreeNode(fold, node0);
-
         changedTableParentFolder();
+        cities.put("CMIS Folder (cmis:folder)", "CMIS Folder (cmis:folder)");
     }
 
     public void updateTree(TreeNode parent) {
