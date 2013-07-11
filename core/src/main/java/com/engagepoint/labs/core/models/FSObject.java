@@ -9,7 +9,7 @@ import java.util.Date;
  */
 public class FSObject {
 
-    private String type;
+    private String typeId;
     private String path;
     private FSFolder parent;
     private String name;
@@ -21,6 +21,23 @@ public class FSObject {
     private Date lastModifiedTime;
     private String mimetype;
     private String size;
+    private String parentTypeId;
+
+    public String getTypeId() {
+        return typeId;
+    }
+
+    public void setTypeId(String typeId) {
+        this.typeId = typeId;
+    }
+
+    public String getParentTypeId() {
+        return parentTypeId;
+    }
+
+    public void setParentTypeId(String parentTypeId) {
+        this.parentTypeId = parentTypeId;
+    }
 
     public String getSize() {
         return size;
@@ -68,14 +85,6 @@ public class FSObject {
 
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public String getPath() {
@@ -144,7 +153,7 @@ public class FSObject {
         if (path != null ? !path.equals(fsObject.path) : fsObject.path != null) {
             return false;
         }
-        if (type != null ? !type.equals(fsObject.type) : fsObject.type != null) {
+        if (typeId != null ? !typeId.equals(fsObject.typeId) : fsObject.typeId != null) {
             return false;
         }
 
@@ -153,7 +162,7 @@ public class FSObject {
 
     @Override
     public int hashCode() {
-        int result = type != null ? type.hashCode() : 0;
+        int result = typeId != null ? typeId.hashCode() : 0;
         result = 31 * result + (path != null ? path.hashCode() : 0);
         result = 31 * result + (parent != null ? parent.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);

@@ -37,6 +37,7 @@ public class TreeBean implements Serializable {
     private TreeNode main;
     private TreeNode selectedNodes;
     private FSObject selectedFSObject;
+    private boolean checkThatSelected;
     private FSFolder parent = new FSFolder();
     private CMISService cmisService = CMISServiceImpl.getService();
     private static Logger logger = Logger.getLogger(TreeBean.class.getName());
@@ -47,7 +48,7 @@ public class TreeBean implements Serializable {
 
     private final int firstPage = 1;
     private int currentPage;
-    private int lastPage = 100;
+    private int lastPage = 1;
     private int amountOfRowsInPage = 5;
     private List<FSObject> tablePageList;
     private String testingCurrentPage;
@@ -64,7 +65,7 @@ public class TreeBean implements Serializable {
         FSFolder fold = new FSFolder();
         fold.setName("Empty Folder");
         new DefaultTreeNode(fold, node0);
-
+        this.selectedNodes = node0;
         changedTableParentFolder();
     }
 
@@ -380,6 +381,9 @@ public class TreeBean implements Serializable {
 
     }
 
+    public boolean isCheckThatSelected() {
+        return selectedFSObject != null ? true : false;
+    }
 
     public TreeNode getRoot() {
         return main;

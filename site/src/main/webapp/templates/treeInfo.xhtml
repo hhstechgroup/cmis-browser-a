@@ -11,13 +11,13 @@
 
 <h:body>
     <ui:composition>
-        <h:outputScript library="js" name="native_but.js"/>
+    <h:outputStylesheet library="style" name="style.css"/>
+    <h:outputScript library="js" name="native_but.js"/>
         <h:form id="treeForm">
             <p:remoteCommand name="invokeBack" action="#{treeBean.doBack}" update=":treeForm:tree :treeForm:fsTable"/>
             <p:remoteCommand name="invokeForward" action="#{treeBean.doForward}"
                              update=":treeForm:tree :treeForm:fsTable"/>
             <p:panelGrid columns="2" style="width: 100%; height: 400px;" styleClass="table">
-                <h:outputStylesheet library="style" name="style.css"/>
 
                 <p:tree id="tree" value="#{treeBean.root}" var="node"
                         cache="false"
@@ -28,7 +28,7 @@
                     <p:ajax event="dragdrop" listener="#{treeBean.onDragDrop}"/>
                     <p:ajax event="select"
 
-                            update=":treeForm:fsTable :treeForm:fsTable:lastPage :treeForm:fsTable:back  :treeForm:fsTable:next :edit"/>
+                            update=":treeForm:fsTable :treeForm:fsTable:lastPage :treeForm:fsTable:back  :treeForm:fsTable:next :edit "/>
 
                     <p:ajax event="expand" listener="#{treeBean.onNodeExpand}"/>
                     <p:ajax event="collapse" update=":treeForm:tree" listener="#{treeBean.onNodeCollapse}"/>
@@ -43,6 +43,7 @@
 
                 <p:dataTable id="fsTable" var="fsObject" value="#{treeBean.tablePageList}"
                              scrollable="true"
+
                              scrollHeight="400" style="width: 770px;"
                              emptyMessage="This folder is empty"
                              rowKey="#{fsObject.name}"
@@ -65,8 +66,8 @@
                                         icon="ui-icon-triangle-1-s">
                                 <p:fileDownload value="#{fileActions.download(treeBean.selectedFSObject)}"/>
                             </p:menuitem>
-                            <p:menuitem value="Edit" onclick="PF('editDialog').show();" icon="ui-icon-arrowrefresh-1-w"/>
-                            <p:menuitem value="Delete" process="@this" onclick="PF('deleteDialog').show();"
+                            <p:menuitem id="editButton" value="Edit" disabled="#{!treeBean.checkThatSelected}" onclick="PF('editDialog').show();" icon="ui-icon-arrowrefresh-1-w"/>
+                            <p:menuitem value="Delete" disabled="#{!treeBean.checkThatSelected}" onclick="PF('deleteDialog').show();"
                                         icon="ui-icon-trash"/>
                         </p:tabMenu>
 
@@ -74,10 +75,13 @@
 
                     <p:column style="width: 300px;" headerText="Name">
                         <p:graphicImage value="/resources/images/#{fsObject.icon}" width="16" height="16"/>
-                        <h:outputText value="hyi #{fsObject.name}"/>
+                        <h:outputText value="#{fsObject.name}"/>
                     </p:column>
-                    <p:column style="width: 300px;" headerText="Type">
-                        <h:outputText value="#{fsObject.type}"/>
+                    <p:column style="width: 300px;" headerText="Type Id">
+                        <h:outputText value="#{fsObject.typeId}"/>
+                    </p:column>
+                    <p:column style="width: 300px;" headerText="Parent Type Id">
+                        <h:outputText value="#{fsObject.parentTypeId}"/>
                     </p:column>
                     <p:column style="width: 300px;" headerText="Id">
                         <h:outputText value="#{fsObject.id}"/>
@@ -155,7 +159,7 @@
             <composite:edit
                 nameHint="Name"
                 nameValue="#{treeBean.selectedFSObject.name}"
-                typeValue="#{treeBean.selectedFSObject.type}"
+                typeValue="#{treeBean.selectedFSObject.typeId}"
                 uploadVisible="#{action.uploadVisible}"
                 submitButtonActionUpdate=":treeForm:tree :treeForm:fsTable :edit">
             </composite:edit>

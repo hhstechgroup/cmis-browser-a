@@ -55,7 +55,8 @@ public class FSFolderDaoImpl implements FSFolderDao {
         folder.setName(newFolder.getName());
         folder.setParent(parent);
         folder.setId(newFolder.getId());
-        folder.setType(newFolder.getType().getDisplayName());
+        folder.setTypeId(newFolder.getType().getDisplayName());
+        folder.setParentTypeId(newFolder.getType().getParentTypeId());
         return folder;
     }
 
@@ -88,11 +89,12 @@ public class FSFolderDaoImpl implements FSFolderDao {
                 fsObject.setSize(String.valueOf(((Document) o).getContentStreamLength() / 1024));
                 ((FSFile) fsObject).setAbsolutePath(notRootFolder + "/" + o.getName());
             }
+            fsObject.setParentTypeId(o.getType().getParentTypeId());
             fsObject.setCreatedBy(o.getCreatedBy());
             fsObject.setCreationTime(o.getCreationDate().getTime());
             fsObject.setLastModifiedBy(o.getLastModifiedBy());
             fsObject.setLastModifiedTime(o.getLastModificationDate().getTime());
-            fsObject.setType(o.getBaseType().getDisplayName());
+            fsObject.setTypeId(o.getBaseType().getDisplayName());
             fsObject.setName(o.getName());
             fsObject.setId(o.getId());
             fsObject.setParent(parent);
@@ -123,7 +125,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
         root.setName(cmisRoot.getName());
         root.setPath(cmisRoot.getPath());
         root.setId(cmisRoot.getId());
-        root.setType(cmisRoot.getBaseType().getDisplayName());
+        root.setTypeId(cmisRoot.getBaseType().getDisplayName());
         return root;
     }
 
@@ -149,13 +151,12 @@ public class FSFolderDaoImpl implements FSFolderDao {
                 fsObject.setSize(String.valueOf(((Document) o).getContentStreamLength() / 1024));
                 ((FSFile) fsObject).setAbsolutePath(notRootFolder + "/" + o.getName());
             }
-            logger.log(Level.INFO, "ParentTypeId: "+o.getType().getParentTypeId());
-            logger.log(Level.INFO, "ParentTypeId: "+o.getType().getBaseTypeId().value());
+            fsObject.setParentTypeId(o.getType().getParentTypeId());
             fsObject.setCreatedBy(o.getCreatedBy());
             fsObject.setCreationTime(o.getCreationDate().getTime());
             fsObject.setLastModifiedBy(o.getLastModifiedBy());
             fsObject.setLastModifiedTime(o.getLastModificationDate().getTime());
-            fsObject.setType(o.getBaseType().getDisplayName());
+            fsObject.setTypeId(o.getType().getId());
             fsObject.setName(o.getName());
             fsObject.setId(o.getId());
             fsObject.setParent(parent);

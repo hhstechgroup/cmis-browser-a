@@ -44,7 +44,6 @@ public class ConfigBean implements Serializable {
 
     public String getConfigTitle() {
         return configTitle;
-        //+""+getTreeBean().getSelectedFSObject().getName()
     }
 
     public void setConfigTitle(String configTitle) {

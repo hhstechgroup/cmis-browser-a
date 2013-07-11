@@ -45,7 +45,7 @@ public class FSFolderDaoImplTest {
         FSFolder expected = new FSFolder();
         expected.setPath("/junit_test_folder");
         expected.setName("junit_test_folder");
-        expected.setType(actual.getType());
+        expected.setTypeId(actual.getTypeId());
         expected.setId(actual.getId());
         expected.setParent(parent);
         assertEquals(expected, actual);
@@ -67,7 +67,7 @@ public class FSFolderDaoImplTest {
         FSFolder expected = new FSFolder();
         expected.setPath("/junit_test_folder/test");
         expected.setId(cmisTest.getId());
-        expected.setType(test.getType());
+        expected.setTypeId(test.getTypeId());
         expected.setParent(actual);
         expected.setName("test");
 
