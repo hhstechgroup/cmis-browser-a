@@ -60,24 +60,24 @@ public class TreeBean implements Serializable {
     private Boolean disableNextButton = false;
 
 
-    private String city;
-    private Map<String,String> cities = new HashMap<String, String>();
+    private String folderType;
+    private Map<String,String> folderTypes = new HashMap<String, String>();
 
-    public String getCity() {
-        return city;
+    public String getFolderType() {
+        return folderType;
     }
 
-    public void setCity(String city) {
-        this.city = city;
+    public void setFolderType(String folderType) {
+        this.folderType = folderType;
     }
 
 
-    public Map<String, String> getCities() {
-        return cities;
+    public Map<String, String> getFolderTypes() {
+        return folderTypes;
     }
 
-    public void setCities(Map<String, String> cities) {
-        this.cities = cities;
+    public void setFolderTypes(Map<String, String> folderTypes) {
+        this.folderTypes = folderTypes;
     }
 
 
@@ -91,7 +91,7 @@ public class TreeBean implements Serializable {
         new DefaultTreeNode(fold, node0);
         this.selectedNodes = node0;
         changedTableParentFolder();
-        cities.put("CMIS Folder (cmis:folder)", "CMIS Folder (cmis:folder)");
+        folderTypes.put("CMIS Folder (cmis:folder)", "CMIS Folder (cmis:folder)");
     }
 
     public void updateTree(TreeNode parent) {
