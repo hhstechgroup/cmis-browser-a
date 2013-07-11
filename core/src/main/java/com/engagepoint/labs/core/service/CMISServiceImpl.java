@@ -55,8 +55,8 @@ public class CMISServiceImpl implements CMISService {
      * {@inheritDoc}
      */
     @Override
-    public FSFile createFile(FSFolder parent, String fileName, byte[] content) {
-        return fsFolderDao.getFsFileDao().create(parent, fileName, content);
+    public FSFile createFile(FSFolder parent, String fileName, byte[] content, String mimeType) {
+        return fsFolderDao.getFsFileDao().create(parent, fileName, content, mimeType);
     }
 
     @Override

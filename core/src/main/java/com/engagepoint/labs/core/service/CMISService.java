@@ -54,7 +54,7 @@ public interface CMISService {
      */
     public FSFolder createFolder(FSFolder parent, String folderName) throws Exception;
 
-    public FSFile createFile(FSFolder parent, String fileName, byte[] content);
+    public FSFile createFile(FSFolder parent, String fileName, byte[] content, String mimeType);
 
     public FSFile renameFile(FSFile file, String newName)throws Exception;
 

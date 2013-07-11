@@ -68,6 +68,10 @@ public class ActionBean implements Serializable {
         reqEx = "(.*[\\\\\\/]|^)(.*?)(?:[\\.]|$)([^\\.\\s]*$)";
     }
 
+    public void createFile(FSFolder parent){
+        cmisService.createFile(parent , name , fileActions.getFile().getContents(), fileActions.getFile().getContentType());
+    }
+
     /**
      * Create new folder with name {@link this#name} and type {@link this#type}
      * in {@link TreeBean#parent} parent directory

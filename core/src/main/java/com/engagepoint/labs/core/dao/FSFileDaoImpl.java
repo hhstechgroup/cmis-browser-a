@@ -3,13 +3,14 @@ package com.engagepoint.labs.core.dao;
 import com.engagepoint.labs.core.models.FSFile;
 import com.engagepoint.labs.core.models.FSFolder;
 import org.apache.chemistry.opencmis.client.api.Document;
+import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
+import org.apache.chemistry.opencmis.commons.enums.VersioningState;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,8 +29,35 @@ public class FSFileDaoImpl implements FSFileDao {
     }
 
     @Override
-    public FSFile create(FSFolder parent, String fileName, byte[] content) {
-        return null;
+    public FSFile create(FSFolder parent, String fileName, byte[] content, String mimeType) {
+        String notRootFolder = parent.getPath().equals("/") ? "" : parent.getPath();
+
+        ByteArrayInputStream input = new ByteArrayInputStream(content);
+
+        ContentStream contentStream = session.getObjectFactory().createContentStream(fileName, content.length, mimeType, input);
+
+        Map<String, Object> properties = new HashMap<String, Object>();
+        properties.put(PropertyIds.OBJECT_TYPE_ID, "cmis:document");
+        properties.put(PropertyIds.NAME, fileName);
+
+        Folder cmisParent = (Folder) session.getObjectByPath(parent.getPath());
+        Document doc = cmisParent.createDocument(properties, contentStream, VersioningState.NONE);
+
+        FSFile file = new FSFile();
+
+        file.setMimetype(mimeType);
+        file.setPath(notRootFolder);
+        file.setAbsolutePath(notRootFolder + "/" + fileName);
+        file.setName(doc.getName());
+        file.setParent(parent);
+        file.setId(doc.getId());
+        file.setTypeId(doc.getType().getId());
+        file.setParentTypeId(doc.getType().getParentTypeId());
+        file.setCreatedBy(doc.getCreatedBy());
+        file.setCreationTime(doc.getCreationDate().getTime());
+        file.setLastModifiedBy(doc.getLastModifiedBy());
+        file.setLastModifiedTime(doc.getLastModificationDate().getTime());
+        return file;
     }
 
     @Override

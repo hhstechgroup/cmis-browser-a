@@ -403,7 +403,8 @@ public class TreeBean implements Serializable {
         FacesContext.getCurrentInstance().addMessage(null, message);
         cmisService.move(fff,ddd);
         logger.log(Level.INFO, "MOVED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-
+        updateTree(dragNode);
+        updateTree(dropNode);
     }
 
     public boolean isCheckThatSelected() {

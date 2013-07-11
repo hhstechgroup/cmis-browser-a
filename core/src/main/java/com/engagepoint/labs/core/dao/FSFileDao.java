@@ -28,7 +28,7 @@ public interface FSFileDao {
      * @param content  - content of file
      * @return created file, FSFile type
      */
-    public FSFile create(FSFolder parent, String fileName, byte[] content);
+    public FSFile create(FSFolder parent, String fileName, byte[] content, String mimeType);
 
     /**
      * Method that will rename file
