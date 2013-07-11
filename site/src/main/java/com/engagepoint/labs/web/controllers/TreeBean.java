@@ -5,10 +5,7 @@ import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
 import com.engagepoint.labs.core.service.CMISService;
 import com.engagepoint.labs.core.service.CMISServiceImpl;
-import org.primefaces.event.NodeCollapseEvent;
-import org.primefaces.event.NodeExpandEvent;
-import org.primefaces.event.SelectEvent;
-import org.primefaces.event.TreeDragDropEvent;
+import org.primefaces.event.*;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 
@@ -42,6 +39,7 @@ public class TreeBean implements Serializable {
     private TreeNode main;
     private TreeNode selectedNodes;
     private FSObject selectedFSObject;
+    private boolean checkThatSelected;
     private FSFolder parent = new FSFolder();
     private CMISService cmisService = CMISServiceImpl.getService();
     private static Logger logger = Logger.getLogger(TreeBean.class.getName());
@@ -52,7 +50,7 @@ public class TreeBean implements Serializable {
 
     private final int firstPage = 1;
     private int currentPage;
-    private int lastPage = 100;
+    private int lastPage = 1;
     private int amountOfRowsInPage = 5;
     private List<FSObject> tablePageList;
     private String testingCurrentPage;
@@ -91,6 +89,7 @@ public class TreeBean implements Serializable {
         FSFolder fold = new FSFolder();
         fold.setName("Empty Folder");
         new DefaultTreeNode(fold, node0);
+        this.selectedNodes = node0;
         changedTableParentFolder();
         cities.put("CMIS Folder (cmis:folder)", "CMIS Folder (cmis:folder)");
     }
@@ -366,7 +365,6 @@ public class TreeBean implements Serializable {
         logger.log(Level.INFO, "setSelectedNode");
         if(selectedNodes != null) {
             this.selectedNodes = selectedNodes;
-
             setSelectedFSObject((FSObject) selectedNodes.getData());
             if (selectedFSObject.getPath() == null) {
                 parent.setPath("/");
@@ -408,6 +406,9 @@ public class TreeBean implements Serializable {
 
     }
 
+    public boolean isCheckThatSelected() {
+        return selectedFSObject != null ? true : false;
+    }
 
     public TreeNode getRoot() {
         return main;

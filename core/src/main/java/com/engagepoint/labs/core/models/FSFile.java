@@ -7,7 +7,6 @@ package com.engagepoint.labs.core.models;
  */
 public class FSFile extends FSObject {
 
-    private byte[] content;
     private String absolutePath;
 
     public String getAbsolutePath() {
@@ -16,24 +15,6 @@ public class FSFile extends FSObject {
 
     public void setAbsolutePath(String absolutePath) {
         this.absolutePath = absolutePath;
-    }
-
-    public byte[] getContent() {
-        return content;
-    }
-
-    public void setContent(byte[] content) {
-        this.content = content;
-    }
-
-    @Override
-    public String getType() {
-        return super.getType();
-    }
-
-    @Override
-    public void setType(String type) {
-        super.setType(type);
     }
 
     @Override
