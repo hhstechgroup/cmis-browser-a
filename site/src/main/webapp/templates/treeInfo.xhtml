@@ -186,12 +186,13 @@
             </p:selectOneMenu>
 
         <br></br>
+        <br></br>
         <p:commandButton value="OK"
                          actionListener="#{action.createFolder(treeBean.selectedNode)}"
                          update=":treeForm:fsTable :treeForm:tree :treeForm:fsTable:lastPage :treeForm:fsTable:back  :treeForm:fsTable:next :create"
                 />
 
-        <p:commandButton value="Cancel" type="button" onclick="PF('createDialog').hide()"/>
+        <p:commandButton value="Cancel" type="button" onclick="PF('createDialog').hide()" style="float:right;"/>
     </h:form>
 </p:dialog>
 
