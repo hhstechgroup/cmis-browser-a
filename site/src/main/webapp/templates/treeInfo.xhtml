@@ -59,10 +59,12 @@
                              style="border-radius: 11px;font-size: 16px; margin-bottom: 5px; color: #000000;" size="90"
                              disabled="true"/>
 
-                <p:tabMenu activeIndex="5">
-                    <p:menuitem value="Create Document" onclick="PF('createDocDialog').show();"/>
-                    <p:menuitem value="New Folder" onclick="PF('createDialog').show();"
+                <p:tabMenu activeIndex="4">
+                    <p:menuitem value="Create" onclick="PF('createDocDialog222').show();"
                                 icon="ui-icon-folder-collapsed"/>
+                    <!--<p:menuitem value="Create Document" onclick="PF('createDocDialog').show();"/>-->
+                    <!--<p:menuitem value="New Folder" onclick="PF('createDialog').show();"-->
+                    <!--icon="ui-icon-folder-collapsed"/>-->
                     <p:menuitem id="downloadLink" disabled="#{!fileActions.selectedIsFile}" value="Download"
                                 ajax="false"
                                 icon="ui-icon-triangle-1-s">
@@ -179,30 +181,23 @@
         >
 
 
-
     <h:form id="createForm">
-
         <p:watermark for="name" value="Name"/>
         <p:inputText id="name" value="#{action.name}"
                      validatorMessage="Invalid symbols" binding="#{action.createcomponent}">
             <f:validateRegex pattern="#{action.reqEx}"/>
         </p:inputText>
-
         <p:message id="name_message" for="name" autoUpdate="true" closable="true"/>
-
-
         <p:selectOneMenu id="type" value="#{treeBean.folderType}">
             <f:selectItems value="#{treeBean.folderTypes}"/>
         </p:selectOneMenu>
-
         <br></br>
         <br></br>
         <p:commandButton value="OK"
                          actionListener="#{action.createFolder(treeBean.selectedNode)}"
-                         update=":treeForm:fsTable :treeForm:tree :treeForm:fsTable:lastPage :treeForm:fsTable:back  :treeForm:fsTable:next :create"
+                         update=":treeForm:fsTable :treeForm:tree :treeForm:fsTable:lastPage :treeForm:fsTable:back  :treeForm:fsTable:next :create" ajax="false"
                 />
-
-        <p:commandButton value="Cancel" type="button" onclick="PF('createDialog').hide()" style="float:right;"/>
+        <p:commandButton value="Cancel" type="button" onclick="PF('createDialog').hide()" style="float:right;" ajax="false"/>
     </h:form>
 </p:dialog>
 
@@ -225,6 +220,7 @@
         <p:remoteCommand name="updater" update=":treeForm:tree :treeForm:fsTable :delete"/>
     </h:form>
 </p:dialog>
+
 <p:dialog id="createDoc" header="Create document" widgetVar="createDocDialog"
           modal="true"
           showEffect="fade"
@@ -233,18 +229,40 @@
           appendToBody="true"
 
         >
-    <h:form id="createdDocDialog" enctype="multipart/form-data" >
+    <h:form id="createdDocDialog" enctype="multipart/form-data">
 
-        <p:fileUpload  value="#{fileActions.file}"  mode="simple"/>
+        <p:fileUpload value="#{fileActions.file}" mode="simple"/>
         <p:watermark for="inputTextForDoc" value="Name"/>
-        <p:inputText id = "inputTextForDoc" value="#{action.name}" validatorMessage="Wrong name" label="name" >
-            <f:validateRegex pattern="^[_A-Za-z0-9-\+]{0,14}$" />
+        <p:inputText id="inputTextForDoc" value="#{action.name}" validatorMessage="Wrong name" label="name">
+            <f:validateRegex pattern="^[_A-Za-z0-9-\+]{0,14}$"/>
         </p:inputText>
-        <p:commandButton value="Ok"  actionListener="#{action.createFile(treeBean.parent)}" ajax="false"/>
-        <p:commandButton value="Cansel" onclick="createDocDialog.hide();" ajax="false"/>
+        <p:commandButton value="Ok" actionListener="#{action.createFile(treeBean.parent)}" ajax="false"/>
+
+        <p:commandButton value="Cancel" type="button" onclick="PF('createDocDialog').hide();" ajax="false"/>
     </h:form>
 
 </p:dialog>
+
+
+<p:dialog id="createDoc222" header="Create" widgetVar="createDocDialog222"
+          modal="true"
+          showEffect="fade"
+          hideEffect="fade"
+          resizable="false"
+          appendToBody="true"
+        >
+    <h:form id="formw" >
+        <p:selectOneMenu id="objectw" value="#{treeBean.objectFolderOrFile}" style="width:150px">
+            <f:selectItems value="#{treeBean.objectFolderOrFiles}"/>
+        </p:selectOneMenu>
+        <br></br>
+        <br></br>
+        <p:commandButton value="Ok" actionListener="#{treeBean.showDLG(treeBean.objectFolderOrFile)}"/>
+        <p:commandButton value="Cancel" type="button" onclick="PF('createDocDialog222').hide();" ajax="false" style="float:right;"/>
+    </h:form>
+</p:dialog>
+
+
 </ui:composition>
 </h:body>
 </html>

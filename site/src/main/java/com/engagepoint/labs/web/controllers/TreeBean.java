@@ -5,6 +5,7 @@ import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
 import com.engagepoint.labs.core.service.CMISService;
 import com.engagepoint.labs.core.service.CMISServiceImpl;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.*;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
@@ -15,11 +16,9 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
+import javax.faces.model.SelectItem;
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -63,6 +62,45 @@ public class TreeBean implements Serializable {
     private String folderType;
     private Map<String,String> folderTypes = new HashMap<String, String>();
 
+    private String selectedWidgetVar;
+
+    public String getSelectedWidgetVar() {
+        return selectedWidgetVar;
+    }
+
+    public void showDLG(String id) {
+        logger.log(Level.INFO, "showDLG id: "+id);
+        RequestContext context = RequestContext.getCurrentInstance();
+        context.execute(id);
+    }
+
+    public void setSelectedWidgetVar(String selectedWidgetVar) {
+        this.selectedWidgetVar = selectedWidgetVar;
+    }
+
+    private String objectFolderOrFile;
+    private List<SelectItem> objectFolderOrFiles = new ArrayList<SelectItem>();
+
+    public List<SelectItem> getObjectFolderOrFiles() {
+        if (objectFolderOrFiles.isEmpty()) {
+            objectFolderOrFiles.add(new SelectItem("PF('createDialog').show();", "Folder"));
+            objectFolderOrFiles.add(new SelectItem("PF('createDocDialog').show();", "File"));
+        }
+        return objectFolderOrFiles;
+    }
+
+    public void setObjectFolderOrFiles(List<SelectItem> objectFolderOrFiles) {
+        this.objectFolderOrFiles = objectFolderOrFiles;
+    }
+
+    public String getObjectFolderOrFile() {
+        return objectFolderOrFile;
+    }
+
+    public void setObjectFolderOrFile(String objectFolderOrFile) {
+        this.objectFolderOrFile = objectFolderOrFile;
+    }
+
     public String getFolderType() {
         return folderType;
     }
@@ -79,6 +117,7 @@ public class TreeBean implements Serializable {
     public void setFolderTypes(Map<String, String> folderTypes) {
         this.folderTypes = folderTypes;
     }
+
 
 
     public TreeBean() {

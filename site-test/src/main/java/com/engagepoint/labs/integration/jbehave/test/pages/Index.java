@@ -57,7 +57,7 @@ public class Index extends AbstractPage {
     }
 
     public void createNewFolder() {
-        findElement(By.xpath(".//*[@id='treeForm:fsTable:j_idt36']")).click();
+        findElement(By.xpath(".//*[@id='treeForm:fsTable:j_idt37']")).click();
         sleepOnJBehave();
         findElement(By.xpath(".//*[@id='createForm:name']")).sendKeys("CreateJBehaveFolder");
         sleepOnJBehave();
