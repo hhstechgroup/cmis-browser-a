@@ -58,6 +58,7 @@ public class TreeBean implements Serializable {
     private Boolean disableBackButton;
     private Boolean disableNextButton = false;
 
+    private boolean first = true;
 
     private String folderType;
     private Map<String, String> folderTypes = new HashMap<String, String>();
@@ -123,7 +124,10 @@ public class TreeBean implements Serializable {
         for (int i = 0; i < backHistory.size(); i++) {
             logger.log(Level.INFO, "BEFORE doBack REMOVE name: " + backHistory.get(i).getSelectedObject().getName());
         }
-        backHistory.remove(0);
+        if (!first) {
+            backHistory.remove(0);
+        }
+        first = false;
         currentPageState = backHistory.remove(0);
         addToForward(currentPageState);
         currentPageState = backHistory.get(0);
@@ -436,7 +440,7 @@ public class TreeBean implements Serializable {
             }
             fileActions.setSelectedName(sn.getName());
             this.selectedFSObject = sn;
-            logger.log(Level.INFO, "selectedObject: "+sn.getName());
+            logger.log(Level.INFO, "selectedObject: " + sn.getName());
         }
     }
 

@@ -44,17 +44,17 @@ public class FSFileDaoImplTest {
 
     }
 
-    @Test
-    public void testVersion() {
-        Document doc = (Document) session.getObject("180");
-//        doc.
-        List<Document> list = doc.getAllVersions();
-        System.out.println(list.size());
-        for(Document o : list) {
-            System.out.println("Name: "+o.getName()+" Label: "+o.getVersionLabel()+" Latest: " + o.isLatestVersion()
-                    +" Latest Major: " + o.isLatestMajorVersion() + " Major: " + o.isMajorVersion());
-        }
-    }
+//    @Test
+//    public void testVersion() {
+//        Document doc = (Document) session.getObject("180");
+////        doc.
+//        List<Document> list = doc.getAllVersions();
+//        System.out.println(list.size());
+//        for(Document o : list) {
+//            System.out.println("Name: "+o.getName()+" Label: "+o.getVersionLabel()+" Latest: " + o.isLatestVersion()
+//                    +" Latest Major: " + o.isLatestMajorVersion() + " Major: " + o.isMajorVersion());
+//        }
+//    }
 
 //    @org.junit.Test
 //         public void testCopy() throws Exception {

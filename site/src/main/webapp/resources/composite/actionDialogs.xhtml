@@ -58,7 +58,7 @@
                              message="Do you realy want delete folder and all files?"
                              severity="alert" widgetVar="confirmationDeleteTree" modal="true"
                              actionListener="#{action.delete(treeBean.selectedFSObject)}"
-                             update="@form :#{cc.parent.clientId}:treeForm:panel"
+                             update="@form :#{cc.parent.clientId}:treeForm:panel :cmisbrowser:treeForm:tree:treecomponent"
                              onclick="#{cc.attrs.delete}.hide();"/>
             <p:commandButton value="Cancel" type="button" onclick="#{cc.attrs.delete}.hide();" style="float:right;"/>
         </h:form>
@@ -104,6 +104,12 @@
             <p:inputText id="typeOfObject" value="#{treeBean.selectedFSObject.typeId}" disabled="true"/>
 
             <p:fileUpload rendered="#{fileActions.selectedIsFile}" mode="simple" value="#{fileActions.file}"/>
+            <br></br>
+            <p:commandButton id="downloadmenuitem" disabled="#{!fileActions.selectedIsFile}" value="Download"
+                             ajax="false"
+                             icon="ui-icon-triangle-1-s">
+                <p:fileDownload value="#{fileActions.download(treeBean.selectedFSObject)}"/>
+            </p:commandButton>
             <br></br>
             <p:commandButton value="OK"
                              process="@form"
