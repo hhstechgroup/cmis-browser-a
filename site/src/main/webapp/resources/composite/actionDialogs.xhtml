@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:cc="http://java.sun.com/jsf/composite"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ct="http://java.sun.com/jsf/composite/composite"
+      xml:lang="en" lang="en">
+
+<cc:interface>
+    <cc:attribute name="create" default="#{cc.parent.id}Create"/>
+    <cc:attribute name="copy" default="#{cc.parent.id}Copy"/>
+    <cc:attribute name="edit" default="#{cc.parent.id}Edit"/>
+    <cc:attribute name="delete" default="#{cc.parent.id}Delete"/>
+    <cc:attribute name="createfile" default="#{cc.parent.id}Createfile"/>
+</cc:interface>
+
+<cc:implementation>
+
+    <p:dialog id="#{cc.parent.id}create" widgetVar="#{cc.attrs.create}" header="Create Folder" modal="true"
+              showEffect="fade"
+              hideEffect="fade"
+              resizable="false"
+              appendToBody="true"
+            >
+
+        <h:form id="createForm">
+
+            <p:inputText id="name" value="#{action.name}"/>
+            <p><p:selectOneMenu id="type" value="#{treeBean.folderType}">
+                <f:selectItems value="#{treeBean.folderTypes}"/>
+            </p:selectOneMenu></p>
+            <br></br>
+            <br></br>
+            <p:commandButton value="Ok"
+                             actionListener="#{action.createFolder(treeBean.selectedNode)}"
+                             process="@form"
+
+                             update="@form :#{cc.parent.clientId}:treeForm"
+                             oncomplete="if (!args.validationFailed) #{cc.attrs.create}.hide()"
+                    />
+            <p:commandButton value="Cancel" type="button"
+                             onclick="#{cc.attrs.create}.hide()" style="float:right;"/>
+        </h:form>
+    </p:dialog>
+    <p:dialog id="#{cc.parent.id}delete" widgetVar="#{cc.attrs.delete}" header="Delete" modal="true"
+              showEffect="fade"
+              hideEffect="fade"
+              resizable="false"
+              appendToBody="true">
+        <h:form>
+            "Do you realy want delete folder and all files?"
+            <br></br>
+            <p:commandButton value="OK"
+                             process="@form"
+                             message="Do you realy want delete folder and all files?"
+                             severity="alert" widgetVar="confirmationDeleteTree" modal="true"
+                             actionListener="#{action.delete(treeBean.selectedFSObject)}"
+                             update="@form :#{cc.parent.clientId}:treeForm:panel :cmisbrowser:treeForm:tree:treecomponent"
+                             onclick="#{cc.attrs.delete}.hide();"/>
+            <p:commandButton value="Cancel" type="button" onclick="#{cc.attrs.delete}.hide();" style="float:right;"/>
+        </h:form>
+    </p:dialog>
+
+    <p:dialog id="#{cc.parent.id}createDoc" header="Create document" widgetVar="#{cc.attrs.createfile}"
+              modal="true"
+              showEffect="fade"
+              hideEffect="fade"
+              resizable="false"
+              appendToBody="true"
+
+            >
+        <h:form id="createdDocDialog" enctype="multipart/form-data">
+
+            <p:fileUpload value="#{fileActions.file}" mode="simple"/>
+            <p:inputText id="inputTextForDoc" value="#{action.name}" validatorMessage="Wrong name" label="name">
+                <f:validateRegex pattern="^[_A-Za-z0-9-\+]{0,14}$"/>
+            </p:inputText>
+            <p:commandButton value="Ok" actionListener="#{action.createFile(treeBean.parent)}"
+                             ajax="false"
+                             />
+
+            <p:commandButton value="Cancel" type="button" onclick="#{cc.attrs.createfile}.hide();" ajax="false"/>
+        </h:form>
+
+    </p:dialog>
+
+
+
+    <p:dialog id="#{cc.parent.id}edit" widgetVar="#{cc.attrs.edit}"
+              header="Edit" modal="true"
+              showEffect="fade"
+              hideEffect="fade"
+              resizable="false"
+              appendToBody="true"
+              visible="#{facesContext.validationFailed}"
+            >
+        <h:form enctype="multipart/form-data">
+
+            <p:inputText required="true" id="newName" value="#{treeBean.selectedFSObject.name}"/>
+            <br></br>
+            <p:inputText id="typeOfObject" value="#{treeBean.selectedFSObject.typeId}" disabled="true"/>
+
+            <p:fileUpload rendered="#{fileActions.selectedIsFile}" mode="simple" value="#{fileActions.file}"/>
+            <br></br>
+            <p:commandButton id="downloadmenuitem" disabled="#{!fileActions.selectedIsFile}" value="Download"
+                             ajax="false"
+                             icon="ui-icon-triangle-1-s">
+                <p:fileDownload value="#{fileActions.download(treeBean.selectedFSObject)}"/>
+            </p:commandButton>
+            <br></br>
+            <p:commandButton value="OK"
+                             process="@form"
+                             actionListener="#{action.edit(treeBean.selectedFSObject)}"
+                             ajax="false"
+                             oncomplete="if (!args.validationFailed) #{cc.attrs.edit}.hide()"/>
+
+            <p:commandButton value="Cancel" type="button" onclick="#{cc.attrs.edit}.hide();" style="float:right;"/>
+        </h:form>
+
+    </p:dialog>
+
+</cc:implementation>
+</html>

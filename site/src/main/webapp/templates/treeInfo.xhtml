@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:ct="http://java.sun.com/jsf/composite/composite">
+
+
+<h:body>
+    <ui:composition>
+        <h:outputStylesheet library="style" name="style.css"/>
+        <h:outputScript library="js" name="native_but.js"/>
+
+        <ct:cmisBrowserComponent id="cmisbrowser"/>
+
+        <p:dialog id="copyDialogId" header="Copy" widgetVar="copyDialog"
+                  modal="true"
+                  showEffect="fade"
+                  hideEffect="fade"
+                  resizable="false"
+                  dynamic="true"
+                  appendToBody="true"
+                >
+
+            <ct:cmisBrowserComponent tableview="false"/>
+            <h:form id="formCopy">
+                <p:inputText id="inputCopyName" value="#{action.defaultFolderName}">
+                </p:inputText>
+                <br></br>
+
+
+                <p:commandButton value="OK"
+                                 update=":cmisbrowser"
+                                 actionListener="#{action.copyFolder(treeBean.selectedFSObject)}"
+                                 oncomplete="if (!args.validationFailed) copyDialog.hide()"/>
+
+                <p:commandButton value="Cancel" type="button" onclick="copyDialog.hide();"
+                                 style="float:right;"/>
+            </h:form>
+        </p:dialog>
+
+        <iframe id="dj_history" src="resources/js/dojo/resources/iframe_history.html" name="dj_history"
+                style="border:0;width:1px;height:1px;position:absolute;visibility:hidden;bottom:0;right:0;">
+        </iframe>
+        <p:commandButton value="View as Dialog" onclick="TreeinDialog.show();"/>
+        <p:dialog id="TreeDailog" widgetVar="TreeinDialog"
+                  showEffect="fade"
+                  hideEffect="fade"
+                  modal="true"
+                  resizable="false">
+            <ct:cmisBrowserComponent id="cmisbrowserdialog"/>
+
+            <p:commandButton value="Cancel" type="button" onclick="TreeinDialog.hide()"/>
+        </p:dialog>
+    </ui:composition>
+</h:body>
+</html>
