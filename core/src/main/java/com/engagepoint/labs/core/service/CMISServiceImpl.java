@@ -138,7 +138,7 @@ public class CMISServiceImpl implements CMISService {
     }
 
     @Override
-    public void copyFolder(String sourceId, String name, String targetID) {
-        fsFolderDao.copyFolder(sourceId, name, targetID);
+    public void copyFolder(FSFolder folder, String name, String targetID) {
+        fsFolderDao.copyFolder(folder, name, targetID);
     }
 }

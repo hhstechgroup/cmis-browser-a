@@ -42,8 +42,6 @@ public class ActionBean implements Serializable {
     private static Logger logger;
     private final CMISService cmisService;
 
-    private String uploadVisible = "hidden";  // for edit dialog
-
     private FSObject folderForCopy;
 
     /**
@@ -67,14 +65,15 @@ public class ActionBean implements Serializable {
 
     public void copyFolder(FSObject target) {
         try {
-            if (!folderForCopy.getName().equals(defaultFolderName)) {
-                folderForCopy.setName(defaultFolderName);
+            logger.log(Level.INFO, "folder name: " + folderForCopy.getName() + " def name: " + defaultFolderName);
+            if (!folderForCopy.getName().equals(getDefaultFolderName())) {
+                folderForCopy.setName(getDefaultFolderName());
             }
-            cmisService.copyFolder(folderForCopy.getId(), folderForCopy.getName(), target.getId());
+            cmisService.copyFolder((FSFolder) folderForCopy, folderForCopy.getName(), target.getId());
         } catch (NullPointerException ex) {
 
         }
-
+        defaultFolderName = "Copy_";
     }
 
     public ActionBean() {
@@ -178,11 +177,6 @@ public class ActionBean implements Serializable {
         }*/
     }
 
-    public String getUploadVisible() {
-        uploadVisible = fileActions.isSelectedIsFile() ? "visible" : "hidden";
-        return uploadVisible;
-    }
-
     public String getName() {
         return name;
     }
@@ -250,7 +244,13 @@ public class ActionBean implements Serializable {
 
     public String getDefaultFolderName() {
         if (folderForCopy != null) {
-            defaultFolderName += folderForCopy.getName();
+            if (defaultFolderName.equals("Copy_")) {
+                logger.log(Level.INFO, "if: "+folderForCopy.getName());
+                defaultFolderName += folderForCopy.getName();
+            } else {
+                logger.log(Level.INFO, "else: "+folderForCopy.getName());
+                defaultFolderName = "Copy_" + folderForCopy.getName();
+            }
         }
         return defaultFolderName;
     }

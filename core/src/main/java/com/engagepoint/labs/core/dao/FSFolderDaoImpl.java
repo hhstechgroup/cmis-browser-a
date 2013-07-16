@@ -208,18 +208,21 @@ public class FSFolderDaoImpl implements FSFolderDao {
     }
 
     @Override
-    public void copyFolder(String sourceId, String name, String targetId) {
-        Folder cmisFolderSource = (Folder) session.getObject(sourceId);
+    public void copyFolder(FSFolder folder, String name, String targetId) {
+        Folder cmisFolderSource = (Folder) session.getObject(folder.getId());
         Folder cmisFolderTarget = (Folder) session.getObject(targetId);
         ItemIterable<CmisObject> cmisFolderSourceChildren = cmisFolderSource.getChildren();
         Map<String, String> newFolderProps = new HashMap<String, String>();
-        Folder cmisParent = cmisFolderTarget;
         newFolderProps.put(PropertyIds.OBJECT_TYPE_ID, "cmis:folder");
         newFolderProps.put(PropertyIds.NAME, name);
-        Folder copySourceFolder = cmisParent.createFolder(newFolderProps);
+        Folder copySourceFolder = cmisFolderTarget.createFolder(newFolderProps);
+
         for (CmisObject o : cmisFolderSourceChildren) {
             if (o instanceof Folder) {
-                copyFolder(o.getId(), name, copySourceFolder.getId());
+                FSFolder fsFolder = new FSFolder();
+                fsFolder.setPath(((Folder) o).getPath());
+                fsFolder.setId(o.getId());
+                copyFolder(fsFolder, o.getName(), copySourceFolder.getId());
             } else {
                 ((Document) o).copy(new ObjectIdImpl(copySourceFolder.getId()));
             }

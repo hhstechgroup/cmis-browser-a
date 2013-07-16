@@ -77,5 +77,5 @@ public interface FSFolderDao {
 
     public FSFolder move(FSFolder source, FSFolder target);
 
-    public void copyFolder(String sourceId, String name, String targetId);
+    public void copyFolder(FSFolder folder, String name, String targetId);
 }

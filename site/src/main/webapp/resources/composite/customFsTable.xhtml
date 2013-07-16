@@ -57,8 +57,8 @@
                         <p:menuitem icon="ui-icon-document" value="Document" onclick="#{cc.attrs.createfile}.show();"/>
                     </p:menuButton>
                 </p:menuitem>
-                <p:menuitem id="copymenuitem" value="Copy" onclick="copyDialog.show();"
-                            actionListener="#{action.markFolder(treeBean.selectedFSObject)}"
+                <p:menuitem id="copymenuitem" value="Copy" oncomplete="copyDialog.show();"
+                            action="#{action.markFolder(treeBean.selectedFSObject)}"
                             process="@this"
                             disabled="#{fileActions.selectedIsFile}"/>
 

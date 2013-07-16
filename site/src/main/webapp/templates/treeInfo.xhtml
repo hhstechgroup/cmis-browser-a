@@ -21,12 +21,14 @@
                   showEffect="fade"
                   hideEffect="fade"
                   resizable="false"
+                  dynamic="true"
                   appendToBody="true"
                 >
 
             <ct:cmisBrowserComponent tableview="false"/>
             <h:form id="formCopy">
-                <p:inputText value="#{action.defaultFolderName}"/>
+                <p:inputText id="inputCopyName" value="#{action.defaultFolderName}">
+                </p:inputText>
                 <br></br>
 
 

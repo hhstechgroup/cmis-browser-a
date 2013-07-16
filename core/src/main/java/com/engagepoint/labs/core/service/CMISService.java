@@ -85,6 +85,6 @@ public interface CMISService {
 
     public FSFolder move(FSFolder source, FSFolder target);
 
-    public void copyFolder(String sourceId, String name, String targetID);
+    public void copyFolder(FSFolder folder, String name, String targetID);
 
 }
