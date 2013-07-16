@@ -43,13 +43,13 @@
                  selectionMode="single">
 
         <p:ajax event="rowSelect" listener="#{treeBean.onRowSelect}"
-                update="@form :#{cc.parent.clientId}:actiondialogs:#{cc.parent.clientId}edit"/>
+                update="@form :#{cc.parent.clientId}:actiondialogs:#{cc.parent.clientId}edit :historyDialogid"/>
         <f:facet name="header">
             <h:inputText value="#{treeBean.parent.path}"
                          style="border-radius: 11px;font-size: 16px; margin-bottom: 5px; color: #000000;" size="90"
                          disabled="true"/>
 
-            <p:tabMenu id="actiontabmenu" activeIndex="5" rendered="#{cc.attrs.actionPanel}">
+            <p:tabMenu id="actiontabmenu" activeIndex="6" rendered="#{cc.attrs.actionPanel}">
                 <p:menuitem>
                     <p:menuButton value="New">
                         <p:menuitem icon="ui-icon-folder-collapsed" value="Folder"
@@ -71,6 +71,10 @@
                 <p:menuitem id="editmenuitem" value="Edit" disabled="#{!treeBean.checkThatSelected}"
                             onclick="#{cc.attrs.edit}.show();" icon="ui-icon-arrowrefresh-1-w"/>
 
+                <p:menuitem id="historymenuitem" value="History" disabled="#{!fileActions.selectedIsFile}"
+                            action="#{action.fillHistory(treeBean.selectedFSObject)}"
+                            oncomplete="historyDialog.show();" icon="ui-icon-arrowrefresh-1-w"/>
+
                 <p:menuitem id="deletemenuitem" value="Delete" disabled="#{!treeBean.checkThatSelected}"
                             onclick="#{cc.attrs.delete}.show();"
                             icon="ui-icon-trash"/>
@@ -91,7 +95,7 @@
         <p:column style="width: 300px;" headerText="Id" rendered="#{cc.attrs.Id}">
             <h:outputText value="#{fsObject.id}"/>
         </p:column>
-        <p:column style="width: 300px;" headerText="Size, Kb" rendered="#{cc.attrs.Size}">
+        <p:column style="width: 300px;" headerText="Size, KB" rendered="#{cc.attrs.Size}">
             <h:outputText value="#{fsObject.size}"/>
         </p:column>
         <p:column style="width: 300px;" headerText="Content Type" rendered="#{cc.attrs.ContentType}">

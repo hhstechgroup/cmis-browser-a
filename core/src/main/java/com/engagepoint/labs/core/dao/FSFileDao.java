@@ -52,4 +52,6 @@ public interface FSFileDao {
     public InputStream getInputStream(FSFile file);
 
     public void copy(String id, String targetId);
+
+    public FSFile getHistory(FSFile file);
 }

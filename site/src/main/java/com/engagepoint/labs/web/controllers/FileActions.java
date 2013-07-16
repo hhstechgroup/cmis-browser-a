@@ -40,7 +40,8 @@ public class FileActions implements Serializable {
         selectedIsFile = false;
     }
 
-    public StreamedContent download(FSFile file) throws IllegalArgumentException{
+    public StreamedContent download(FSFile file) throws IllegalArgumentException {
+        logger.log(Level.INFO, "id: "+file.getId());
         InputStream inputStream = cmisService.getInputStream(file);
         String extension = MimeTypes.getExtension(file.getMimetype());
         return new DefaultStreamedContent(inputStream, file.getMimetype(), file.getName()+extension);

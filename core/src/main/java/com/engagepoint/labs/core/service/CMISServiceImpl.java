@@ -134,11 +134,16 @@ public class CMISServiceImpl implements CMISService {
     }
     @Override
     public FSFolder move(FSFolder source, FSFolder target){
-        return fsFolderDao.move(source,target);
+        return fsFolderDao.move(source, target);
     }
 
     @Override
     public void copyFolder(FSFolder folder, String name, String targetID) {
         fsFolderDao.copyFolder(folder, name, targetID);
+    }
+
+    @Override
+    public FSFile getHistory(FSFile file) {
+        return fsFolderDao.getFsFileDao().getHistory(file);
     }
 }

@@ -440,7 +440,6 @@ public class TreeBean implements Serializable {
             }
             fileActions.setSelectedName(sn.getName());
             this.selectedFSObject = sn;
-            logger.log(Level.INFO, "selectedObject: " + sn.getName());
         }
     }
 

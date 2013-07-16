@@ -105,7 +105,7 @@
 
             <p:fileUpload rendered="#{fileActions.selectedIsFile}" mode="simple" value="#{fileActions.file}"/>
             <br></br>
-            <p:commandButton id="downloadmenuitem" disabled="#{!fileActions.selectedIsFile}" value="Download"
+            <p:commandButton id="downloadButId" disabled="#{!fileActions.selectedIsFile}" value="Download"
                              ajax="false"
                              icon="ui-icon-triangle-1-s">
                 <p:fileDownload value="#{fileActions.download(treeBean.selectedFSObject)}"/>

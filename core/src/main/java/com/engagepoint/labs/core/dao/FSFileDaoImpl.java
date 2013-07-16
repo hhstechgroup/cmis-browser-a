@@ -2,19 +2,21 @@ package com.engagepoint.labs.core.dao;
 
 import com.engagepoint.labs.core.models.FSFile;
 import com.engagepoint.labs.core.models.FSFolder;
-import org.apache.chemistry.opencmis.client.api.Document;
-import org.apache.chemistry.opencmis.client.api.Folder;
-import org.apache.chemistry.opencmis.client.api.ObjectId;
-import org.apache.chemistry.opencmis.client.api.Session;
+import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.client.runtime.ObjectIdImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.enums.VersioningState;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisBaseException;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * User: r.reznichenko
@@ -24,6 +26,7 @@ import java.util.Map;
 public class FSFileDaoImpl implements FSFileDao {
 
     private Session session;
+    private static Logger logger = Logger.getLogger(FSFileDaoImpl.class.getName());
 
     @Override
     public void setSession(Session session) {
@@ -83,20 +86,34 @@ public class FSFileDaoImpl implements FSFileDao {
     @Override
     public FSFile edit(FSFile file, byte[] content, String mimeType) {
         Document cmisFile = (Document) session.getObject(file.getId());
-        if(content == null)
-        {
-            content = new byte[0];
+        if (((DocumentType) (cmisFile.getType())).isVersionable()) {
+            logger.log(Level.INFO, "isVersionable");
+            Document pwc = (Document) session.getObject(cmisFile.checkOut());
+            InputStream input = new ByteArrayInputStream(content);
+            ContentStream contentStream = session.getObjectFactory().createContentStream(file.getName(),
+                    content.length, mimeType, input);
+            // Check in the pwc
+            try {
+                pwc.checkIn(false, null, contentStream, "minor version");
+            } catch (CmisBaseException e) {
+                System.out.println("checkin failed, trying to cancel the checkout");
+                pwc.cancelCheckOut();
+            }
+        } else {
+            if (content == null) {
+                content = new byte[0];
+            }
+            InputStream input = new ByteArrayInputStream(content);
+            ContentStream contentStream = session.getObjectFactory().createContentStream(file.getName(),
+                    content.length, mimeType, input);
+            cmisFile.setContentStream(contentStream, true, true);
+            file.setMimetype(mimeType);
+            file.setLastModifiedBy(cmisFile.getLastModifiedBy());
+            file.setLastModifiedTime(cmisFile.getLastModificationDate().getTime());
+            file.setTypeId(cmisFile.getBaseType().getDisplayName());
+            file.setSize(String.valueOf(contentStream.getLength() / 1024));
+            file.setParentTypeId(cmisFile.getType().getParentTypeId());
         }
-        InputStream input = new ByteArrayInputStream(content);
-        ContentStream contentStream = session.getObjectFactory().createContentStream(file.getName(),
-                content.length, mimeType, input);
-        cmisFile.setContentStream(contentStream, true, true);
-        file.setMimetype(mimeType);
-        file.setLastModifiedBy(cmisFile.getLastModifiedBy());
-        file.setLastModifiedTime(cmisFile.getLastModificationDate().getTime());
-        file.setTypeId(cmisFile.getBaseType().getDisplayName());
-        file.setSize(String.valueOf(contentStream.getLength() / 1024));
-        file.setParentTypeId(cmisFile.getType().getParentTypeId());
         return file;
     }
 
@@ -121,4 +138,25 @@ public class FSFileDaoImpl implements FSFileDao {
         doc.copy(targetObjId);
     }
 
+    @Override
+    public FSFile getHistory(FSFile file) {
+        Document cmisFile = (Document) session.getObject(file.getId());
+        if (((DocumentType) (cmisFile.getType())).isVersionable()) {
+            List<Document> versions = cmisFile.getAllVersions();
+            List<FSFile> fileVersions = new ArrayList<FSFile>(versions.size());
+            for (Document version : versions) {
+                FSFile versionFile = new FSFile();
+                versionFile.setName(version.getName());
+                versionFile.setVersionLabel(version.getVersionLabel());
+                versionFile.setLastModifiedBy(version.getLastModifiedBy());
+                versionFile.setLastModifiedTime(version.getLastModificationDate().getTime());
+                versionFile.setSize(String.valueOf(version.getContentStreamLength() / 1024));
+                versionFile.setId(version.getId());
+                fileVersions.add(versionFile);
+            }
+            file.setAllVersions(fileVersions);
+            return file;
+        }
+        return null;
+    }
 }

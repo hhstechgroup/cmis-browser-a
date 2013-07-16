@@ -16,6 +16,8 @@ import javax.faces.bean.SessionScoped;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -41,6 +43,7 @@ public class ActionBean implements Serializable {
     private UIComponent createcomponent;
     private static Logger logger;
     private final CMISService cmisService;
+    private List<FSFile> history;
 
     private FSObject folderForCopy;
 
@@ -177,6 +180,18 @@ public class ActionBean implements Serializable {
         }*/
     }
 
+    public void fillHistory(FSFile fsFile) {
+        this.history = cmisService.getHistory(fsFile).getAllVersions();
+    }
+
+    public List<FSFile> getHistory() {
+        return history;
+    }
+
+    public void setHistory(List<FSFile> history) {
+        this.history = history;
+    }
+
     public String getName() {
         return name;
     }
@@ -245,10 +260,10 @@ public class ActionBean implements Serializable {
     public String getDefaultFolderName() {
         if (folderForCopy != null) {
             if (defaultFolderName.equals("Copy_")) {
-                logger.log(Level.INFO, "if: "+folderForCopy.getName());
+                logger.log(Level.INFO, "if: " + folderForCopy.getName());
                 defaultFolderName += folderForCopy.getName();
             } else {
-                logger.log(Level.INFO, "else: "+folderForCopy.getName());
+                logger.log(Level.INFO, "else: " + folderForCopy.getName());
                 defaultFolderName = "Copy_" + folderForCopy.getName();
             }
         }
