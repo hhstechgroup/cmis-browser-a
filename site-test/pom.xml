@@ -15,7 +15,6 @@
         <jbehave.core.version>4.0-beta-3</jbehave.core.version>
         <jbehave.site.version>3.1.1</jbehave.site.version>
         <jbehave.web.version>3.6</jbehave.web.version>
-
     </properties>
 
     <dependencyManagement>
@@ -28,7 +27,7 @@
         </dependencies>
     </dependencyManagement>
     <dependencies>
-         <dependency>
+        <dependency>
             <groupId>org.jbehave</groupId>
             <artifactId>jbehave-core</artifactId>
             <version>${jbehave.core.version}</version>
@@ -53,16 +52,16 @@
             <version>3.5.4</version>
         </dependency>
         <!--<dependency>-->
-            <!--<groupId>org.apache.chemistry.opencmis</groupId>-->
-            <!--<artifactId>chemistry-opencmis-server-inmemory</artifactId>-->
-            <!--<type>war</type>-->
-            <!--<scope>provided</scope>-->
+        <!--<groupId>org.apache.chemistry.opencmis</groupId>-->
+        <!--<artifactId>chemistry-opencmis-server-inmemory</artifactId>-->
+        <!--<type>war</type>-->
+        <!--<scope>provided</scope>-->
         <!--</dependency>-->
         <dependency>
             <groupId>com.engagepoint.labs</groupId>
             <artifactId>site</artifactId>
             <type>war</type>
-             <version>${project.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <!-- JSF -->
         <dependency>
@@ -77,6 +76,16 @@
             <artifactId>jsf-impl</artifactId>
             <version>2.2.0</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jbehave.web</groupId>
+            <artifactId>jbehave-web-selenium</artifactId>
+            <version>3.5.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jbehave</groupId>
+            <artifactId>jbehave-core</artifactId>
+            <version>4.0-beta-3</version>
         </dependency>
 
     </dependencies>
@@ -198,14 +207,14 @@
                         </properties>
                     </configuration>
                     <deployables>
-                        <!--<deployable>-->
-                            <!--<groupId>org.apache.chemistry.opencmis</groupId>-->
-                            <!--<artifactId>chemistry-opencmis-server-inmemory</artifactId>-->
-                            <!--<type>war</type>-->
-                            <!--<properties>-->
-                                <!--<context>/server</context>-->
-                            <!--</properties>-->
-                        <!--</deployable>-->
+                        <deployable>
+                            <groupId>org.apache.chemistry.opencmis</groupId>
+                            <artifactId>chemistry-opencmis-server-inmemory</artifactId>
+                            <type>war</type>
+                            <properties>
+                                <context>/server</context>
+                            </properties>
+                        </deployable>
                         <deployable>
                             <groupId>com.engagepoint.labs</groupId>
                             <artifactId>site</artifactId>

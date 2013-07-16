@@ -8,6 +8,7 @@ import java.io.Serializable;
 @ManagedBean
 @SessionScoped
 public class ConfigBean implements Serializable {
+
     @ManagedProperty(value = "#{treeBean}")
     private TreeBean treeBean;
     private String name;
@@ -43,7 +44,6 @@ public class ConfigBean implements Serializable {
 
     public String getConfigTitle() {
         return configTitle;
-        //+""+getTreeBean().getSelectedFSObject().getName()
     }
 
     public void setConfigTitle(String configTitle) {

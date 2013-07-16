@@ -7,45 +7,18 @@ package com.engagepoint.labs.core.models;
  */
 public class FSFile extends FSObject {
 
-    private String content;
+    private String absolutePath;
 
-    public String getContent() {
-        return content;
+    public String getAbsolutePath() {
+        return absolutePath;
     }
 
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    @Override
-    public String getType() {
-        return "Document";
+    public void setAbsolutePath(String absolutePath) {
+        this.absolutePath = absolutePath;
     }
 
     @Override
     public String getIcon(){
         return "document.png";
-    };
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof FSFile)) {
-            return false;
-        }
-        FSFile fsFile = (FSFile) o;
-
-        if (content != null ? !content.equals(fsFile.content) : fsFile.content != null) {
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        return content != null ? content.hashCode() : 0;
     }
 }

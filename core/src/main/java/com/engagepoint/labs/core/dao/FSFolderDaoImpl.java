@@ -10,6 +10,7 @@ import com.engagepoint.labs.core.models.FSFile;
 import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
 import org.apache.chemistry.opencmis.client.api.*;
+import org.apache.chemistry.opencmis.client.runtime.ObjectIdImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.enums.UnfileObject;
 
@@ -17,11 +18,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 public class FSFolderDaoImpl implements FSFolderDao {
 
     private Session session;
     private FSFileDao fsFileDao;
+    private static Logger logger = Logger.getLogger(FSFolderDaoImpl.class.getName());
+
 
     public FSFolderDaoImpl() {
         fsFileDao = new FSFileDaoImpl();
@@ -41,8 +45,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
     @Override
     public FSFolder create(FSFolder parent, String folderName) {
         Map<String, String> newFolderProps = new HashMap<String, String>();
-        String path = parent.getPath();
-        Folder cmisParent = (Folder) session.getObjectByPath(path);
+        Folder cmisParent = (Folder) session.getObjectByPath(parent.getPath());
         newFolderProps.put(PropertyIds.OBJECT_TYPE_ID, "cmis:folder");
         newFolderProps.put(PropertyIds.NAME, folderName);
         Folder newFolder = cmisParent.createFolder(newFolderProps);
@@ -51,7 +54,8 @@ public class FSFolderDaoImpl implements FSFolderDao {
         folder.setName(newFolder.getName());
         folder.setParent(parent);
         folder.setId(newFolder.getId());
-        folder.setType("Folder");
+        folder.setTypeId(newFolder.getType().getDisplayName());
+        folder.setParentTypeId(newFolder.getType().getParentTypeId());
         return folder;
     }
 
@@ -72,18 +76,24 @@ public class FSFolderDaoImpl implements FSFolderDao {
         List<FSObject> children = new ArrayList<FSObject>();
         Folder cmisParent = (Folder) session.getObjectByPath(parent.getPath());
         ItemIterable<CmisObject> cmisChildren = cmisParent.getChildren();
-        for(CmisObject o : cmisChildren) {
+        for (CmisObject o : cmisChildren) {
             FSObject fsObject;
-            if(o instanceof Folder){
+            if (o instanceof Folder) {
                 fsObject = new FSFolder();
                 fsObject.setPath(((Folder) o).getPath());
-                fsObject.setType("Folder");
             } else {
                 fsObject = new FSFile();
+                fsObject.setMimetype(((Document) o).getContentStreamMimeType());
                 fsObject.setPath(notRootFolder);
-                fsObject.setAbsolutePath(notRootFolder + "/" + o.getName());
-                fsObject.setType("Document");
+                fsObject.setSize(String.valueOf(((Document) o).getContentStreamLength() / 1024));
+                ((FSFile) fsObject).setAbsolutePath(notRootFolder + "/" + o.getName());
             }
+            fsObject.setParentTypeId(o.getType().getParentTypeId());
+            fsObject.setCreatedBy(o.getCreatedBy());
+            fsObject.setCreationTime(o.getCreationDate().getTime());
+            fsObject.setLastModifiedBy(o.getLastModifiedBy());
+            fsObject.setLastModifiedTime(o.getLastModificationDate().getTime());
+            fsObject.setTypeId(o.getBaseType().getDisplayName());
             fsObject.setName(o.getName());
             fsObject.setId(o.getId());
             fsObject.setParent(parent);
@@ -114,6 +124,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
         root.setName(cmisRoot.getName());
         root.setPath(cmisRoot.getPath());
         root.setId(cmisRoot.getId());
+        root.setTypeId(cmisRoot.getBaseType().getDisplayName());
         return root;
     }
 
@@ -127,37 +138,91 @@ public class FSFolderDaoImpl implements FSFolderDao {
         operationContext.setMaxItemsPerPage(numberOfRows);
         ItemIterable<CmisObject> childrenCmis = cmisParent.getChildren(operationContext);
         ItemIterable<CmisObject> cmisChildren = childrenCmis.skipTo(pageNumber * numberOfRows).getPage();
-
-        for(CmisObject o : cmisChildren) {
+        for (CmisObject o : cmisChildren) {
             FSObject fsObject;
-            if(o instanceof Folder){
+            if (o instanceof Folder) {
                 fsObject = new FSFolder();
                 fsObject.setPath(((Folder) o).getPath());
             } else {
                 fsObject = new FSFile();
+                fsObject.setMimetype(((Document) o).getContentStreamMimeType());
                 fsObject.setPath(notRootFolder);
-                fsObject.setAbsolutePath(notRootFolder + "/" + o.getName());
+                fsObject.setSize(String.valueOf(((Document) o).getContentStreamLength() / 1024));
+                ((FSFile) fsObject).setAbsolutePath(notRootFolder + "/" + o.getName());
             }
+            fsObject.setParentTypeId(o.getType().getParentTypeId());
+            fsObject.setCreatedBy(o.getCreatedBy());
+            fsObject.setCreationTime(o.getCreationDate().getTime());
+            fsObject.setLastModifiedBy(o.getLastModifiedBy());
+            fsObject.setLastModifiedTime(o.getLastModificationDate().getTime());
+            fsObject.setTypeId(o.getType().getId());
             fsObject.setName(o.getName());
             fsObject.setId(o.getId());
             fsObject.setParent(parent);
             children.add(fsObject);
         }
-
         return children;
     }
 
     @Override
-    public int getMaxNumberOfPage(FSFolder parent, int numberOfRows){
+    public int getMaxNumberOfPage(FSFolder parent, int numberOfRows) {
         Folder cmisParent = (Folder) session.getObjectByPath(parent.getPath());
         ItemIterable<CmisObject> cmisChildren = cmisParent.getChildren();
 
-        int total = (int)cmisChildren.getTotalNumItems();
-        if (total%numberOfRows == 0) {
-            return  total/numberOfRows;
+        int total = (int) cmisChildren.getTotalNumItems();
+        if (total % numberOfRows == 0) {
+            return total / numberOfRows;
+        } else {
+            return total / numberOfRows + 1;
         }
-        else {
-            return  total/numberOfRows + 1;
+    }
+
+    @Override
+    public boolean hasChildFolder(FSFolder folder) {
+        List<FSObject> children = getChildren(folder);
+        if (!children.isEmpty()) {
+            for (FSObject iterator : children) {
+                if (iterator instanceof FSFolder) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean hasChildren(FSFolder folder) {
+        List<FSObject> children = getChildren(folder);
+        return !children.isEmpty();
+    }
+
+    @Override
+    public FSFolder move(FSFolder source, FSFolder target) {
+        Folder cmisFolder1 = (Folder) session.getObjectByPath(source.getPath());
+        Folder cmisFolder2 = (Folder) session.getObjectByPath(target.getPath());
+        Folder parent = cmisFolder1.getFolderParent();
+        ObjectId objectId = new ObjectIdImpl(cmisFolder2.getId());
+        ObjectId parObjectId = new ObjectIdImpl(parent.getId());
+        cmisFolder1.move(parObjectId, objectId);
+        return source;
+    }
+
+    @Override
+    public void copyFolder(String sourceId, String name, String targetId) {
+        Folder cmisFolderSource = (Folder) session.getObject(sourceId);
+        Folder cmisFolderTarget = (Folder) session.getObject(targetId);
+        ItemIterable<CmisObject> cmisFolderSourceChildren = cmisFolderSource.getChildren();
+        Map<String, String> newFolderProps = new HashMap<String, String>();
+        Folder cmisParent = cmisFolderTarget;
+        newFolderProps.put(PropertyIds.OBJECT_TYPE_ID, "cmis:folder");
+        newFolderProps.put(PropertyIds.NAME, name);
+        Folder copySourceFolder = cmisParent.createFolder(newFolderProps);
+        for (CmisObject o : cmisFolderSourceChildren) {
+            if (o instanceof Folder) {
+                copyFolder(o.getId(), name, copySourceFolder.getId());
+            } else {
+                ((Document) o).copy(new ObjectIdImpl(copySourceFolder.getId()));
+            }
         }
     }
 }

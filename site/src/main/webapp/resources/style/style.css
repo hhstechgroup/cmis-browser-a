@@ -10,3 +10,7 @@
     font-size: 1em;
     border-width: 0px;
 }
+
+.ui-widget-overlay {
+    background: none repeat scroll 0 0 #c3c3c3;
+}

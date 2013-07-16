@@ -4,6 +4,7 @@ import com.engagepoint.labs.core.models.FSFile;
 import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
 
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -44,22 +45,6 @@ public interface CMISService {
     public FSFolder getRootFolder();
 
     /**
-     * Get all nodes from parent object subtree
-     *
-     * @param parent parent object
-     * @return List of all file and folder
-     */
-    public List<FSObject> getSubTreeObjects(FSFolder parent);
-
-    /**
-     * get content of the file
-     *
-     * @param file FSFile object which it is supposed to get content
-     * @return content of the file
-     */
-    public String getContent(FSFile file);
-
-    /**
      * Create new folder in repository with folder name folderName
      * @param parent    parent folder for folderName folder
      * @param folderName
@@ -69,9 +54,11 @@ public interface CMISService {
      */
     public FSFolder createFolder(FSFolder parent, String folderName) throws Exception;
 
-    public FSFile createFile(FSFolder parent, String fileName, String content);
+    public FSFile createFile(FSFolder parent, String fileName, byte[] content, String mimeType);
 
     public FSFile renameFile(FSFile file, String newName)throws Exception;
+
+    public FSFile edit(FSFile file, byte[] content, String mimeType);
 
     public boolean deleteFile(FSFile file);
 
@@ -83,9 +70,21 @@ public interface CMISService {
      * @throws Exception
      */
 
-    public FSFolder renameFolder(FSFolder folder, String newName)throws Exception;
+    public FSFolder renameFolder(FSFolder folder, String newName);
 
     public boolean deleteFolder(FSFolder folder);
 
     public boolean deleteAllTree(FSFolder folder);
+
+
+    public boolean hasChildFolder(FSFolder folder);
+
+    public boolean hasChildren(FSFolder folder);
+
+    public InputStream getInputStream(FSFile file);
+
+    public FSFolder move(FSFolder source, FSFolder target);
+
+    public void copyFolder(String sourceId, String name, String targetID);
+
 }

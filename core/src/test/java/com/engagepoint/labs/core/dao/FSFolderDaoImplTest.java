@@ -11,6 +11,7 @@ package com.engagepoint.labs.core.dao;
 import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
 import org.apache.chemistry.opencmis.client.api.Folder;
+import org.apache.chemistry.opencmis.client.api.Session;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -23,15 +24,15 @@ import static org.junit.Assert.assertTrue;
 public class FSFolderDaoImplTest {
 
     private static FSFolderDaoImpl fsFolderDao;
-    private static ConnectionFactory connection;
     private FSFolder actual;
-
+    private static Session session;
     private FSFolder parent;
 
     @BeforeClass
     public static void setUPclass() throws Exception {
         fsFolderDao = new FSFolderDaoImpl();
-        fsFolderDao.setSession(ConnectionFactory.getSession());
+        session=ConnectionFactory.getSession();
+        fsFolderDao.setSession(session);
     }
 
     @Before
@@ -46,7 +47,7 @@ public class FSFolderDaoImplTest {
         FSFolder expected = new FSFolder();
         expected.setPath("/junit_test_folder");
         expected.setName("junit_test_folder");
-        expected.setType("Folder");
+        expected.setTypeId(actual.getTypeId());
         expected.setId(actual.getId());
         expected.setParent(parent);
         assertEquals(expected, actual);
@@ -68,12 +69,9 @@ public class FSFolderDaoImplTest {
         FSFolder expected = new FSFolder();
         expected.setPath("/junit_test_folder/test");
         expected.setId(cmisTest.getId());
-        expected.setType("Folder");
+        expected.setTypeId(test.getTypeId());
         expected.setParent(actual);
         expected.setName("test");
-
-        System.out.println("name: " + expected.getName() + " type: " + expected.getType() + " path: " + expected.getPath()
-                + "\nparent name: " + expected.getParent().getName() + " id: " + expected.getId());
 
         List<FSObject> actualList = fsFolderDao.getChildren(actual);
         FSFolder act = (FSFolder) actualList.get(0);
@@ -97,6 +95,11 @@ public class FSFolderDaoImplTest {
         fsFolderDao.delete(actual);
     }
 
-
+//    @Test
+//    public void testCopyFolder() throws Exception {
+//        Folder source = (Folder) session.getObject("101");
+//        Folder target = (Folder) session.getObject("117");
+//        fsFolderDao.copyFolder(source.getId(),target.getId());
+//        fsFolderDao.delete(actual);
+//    }
 }
-

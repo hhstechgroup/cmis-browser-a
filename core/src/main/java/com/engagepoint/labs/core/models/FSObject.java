@@ -1,35 +1,90 @@
 package com.engagepoint.labs.core.models;
 
+import java.util.Date;
+
 /**
  * User: vitaliy.vasilenko
  * Date: 6/17/13
  * Time: 12:42 PM
  */
-public abstract class FSObject {
+public class FSObject {
 
-    private String type;
+    private String typeId;
     private String path;
     private FSFolder parent;
     private String name;
     private String id;
-    private String absolutePath;
     private String icon;
+    private String createdBy;
+    private Date creationTime;
+    private String lastModifiedBy;
+    private Date lastModifiedTime;
+    private String mimetype;
+    private String size;
+    private String parentTypeId;
 
-
-    public String getAbsolutePath() {
-        return absolutePath;
+    public String getTypeId() {
+        return typeId;
     }
 
-    public void setAbsolutePath(String absolutePath) {
-        this.absolutePath = absolutePath;
+    public void setTypeId(String typeId) {
+        this.typeId = typeId;
     }
 
-    public String getType() {
-        return type;
+    public String getParentTypeId() {
+        return parentTypeId;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setParentTypeId(String parentTypeId) {
+        this.parentTypeId = parentTypeId;
+    }
+
+    public String getSize() {
+        return size;
+    }
+
+    public void setSize(String size) {
+        this.size = size;
+    }
+
+    public String getMimetype() {
+        return mimetype;
+    }
+
+    public void setMimetype(String mimetype) {
+        this.mimetype = mimetype;
+    }
+
+    public Date getCreationTime() {
+        return creationTime;
+    }
+
+    public void setCreationTime(Date creationTime) {
+        this.creationTime = creationTime;
+    }
+
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public Date getLastModifiedTime() {
+        return lastModifiedTime;
+    }
+
+    public void setLastModifiedTime(Date lastModifiedTime) {
+        this.lastModifiedTime = lastModifiedTime;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
     }
 
     public String getPath() {
@@ -74,17 +129,15 @@ public abstract class FSObject {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o){
+        if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()){
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
+
         FSObject fsObject = (FSObject) o;
 
-        if (absolutePath != null ? !absolutePath.equals(fsObject.absolutePath) : fsObject.absolutePath != null) {
-            return false;
-        }
         if (icon != null ? !icon.equals(fsObject.icon) : fsObject.icon != null) {
             return false;
         }
@@ -100,7 +153,7 @@ public abstract class FSObject {
         if (path != null ? !path.equals(fsObject.path) : fsObject.path != null) {
             return false;
         }
-        if (type != null ? !type.equals(fsObject.type) : fsObject.type != null) {
+        if (typeId != null ? !typeId.equals(fsObject.typeId) : fsObject.typeId != null) {
             return false;
         }
 
@@ -109,11 +162,12 @@ public abstract class FSObject {
 
     @Override
     public int hashCode() {
-        int result = type != null ? type.hashCode() : 0;
+        int result = typeId != null ? typeId.hashCode() : 0;
         result = 31 * result + (path != null ? path.hashCode() : 0);
         result = 31 * result + (parent != null ? parent.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (id != null ? id.hashCode() : 0);
+        result = 31 * result + (icon != null ? icon.hashCode() : 0);
         return result;
     }
 }

@@ -71,4 +71,11 @@ public interface FSFolderDao {
 
     public List<FSObject> getPage(FSFolder parent, int pageNumber, int numberOfRows);
 
+    public boolean hasChildFolder(FSFolder folder);
+
+    public boolean hasChildren(FSFolder folder);
+
+    public FSFolder move(FSFolder source, FSFolder target);
+
+    public void copyFolder(String sourceId, String name, String targetId);
 }

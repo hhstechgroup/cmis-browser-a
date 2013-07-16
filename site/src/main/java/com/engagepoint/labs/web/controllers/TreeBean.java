@@ -1,22 +1,24 @@
 package com.engagepoint.labs.web.controllers;
 
+import com.engagepoint.labs.core.models.FSFile;
 import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
 import com.engagepoint.labs.core.service.CMISService;
 import com.engagepoint.labs.core.service.CMISServiceImpl;
-import org.primefaces.event.SelectEvent;
+import org.primefaces.context.RequestContext;
+import org.primefaces.event.*;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 
-import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
+import javax.faces.model.SelectItem;
 import java.io.Serializable;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,9 +32,13 @@ import java.util.logging.Logger;
 @SessionScoped
 public class TreeBean implements Serializable {
 
+    @ManagedProperty(value = "#{fileActions}")
+    private FileActions fileActions;
+
     private TreeNode main;
     private TreeNode selectedNodes;
     private FSObject selectedFSObject;
+    private boolean checkThatSelected;
     private FSFolder parent = new FSFolder();
     private CMISService cmisService = CMISServiceImpl.getService();
     private static Logger logger = Logger.getLogger(TreeBean.class.getName());
@@ -43,7 +49,7 @@ public class TreeBean implements Serializable {
 
     private final int firstPage = 1;
     private int currentPage;
-    private int lastPage = 100;
+    private int lastPage = 1;
     private int amountOfRowsInPage = 5;
     private List<FSObject> tablePageList;
     private String testingCurrentPage;
@@ -52,24 +58,66 @@ public class TreeBean implements Serializable {
     private Boolean disableBackButton;
     private Boolean disableNextButton = false;
 
-    public TreeBean() {
 
+    private String folderType;
+    private Map<String, String> folderTypes = new HashMap<String, String>();
+
+    public String getFolderType() {
+        return folderType;
     }
 
-    @PostConstruct
-    public void updateTree() {
-        logger.log(Level.INFO, "UPDATING... TREEEE...");
+    public void setFolderType(String folderType) {
+        this.folderType = folderType;
+    }
+
+
+    public Map<String, String> getFolderTypes() {
+        return folderTypes;
+    }
+
+    public void setFolderTypes(Map<String, String> folderTypes) {
+        this.folderTypes = folderTypes;
+    }
+
+
+    public TreeBean() {
         FSFolder root = cmisService.getRootFolder();
         parent.setPath("/");
         main = new DefaultTreeNode("Main", null);
         TreeNode node0 = new DefaultTreeNode(root, main);
-        SubObjects(parent, node0);
-        //for paging
+        FSFolder fold = new FSFolder();
+        fold.setName("Empty Folder");
+        new DefaultTreeNode(fold, node0);
+        this.selectedNodes = node0;
         changedTableParentFolder();
+        folderTypes.put("CMIS Folder (cmis:folder)", "CMIS Folder (cmis:folder)");
+    }
+
+    public void updateTree(TreeNode parent) {
+//        logger.log(Level.INFO, "UPDATING... TREEEE...");
+        parent.getChildren().clear();
+
+        List<FSObject> children = cmisService.getChildren((FSFolder) parent.getData());
+
+        for (FSObject child : children) {
+            if (child instanceof FSFolder) {
+                TreeNode treeNode = new DefaultTreeNode(child, parent);
+                long start = System.currentTimeMillis();
+                if (cmisService.hasChildFolder((FSFolder) treeNode.getData())) {
+                    FSFolder fold = new FSFolder();
+                    fold.setName("Empty Folder");
+                    new DefaultTreeNode(fold, treeNode);
+//                    logger.log(Level.INFO, "FOLDER " + ((FSFolder) treeNode.getData()).getName() + " HAS CHILD FOLDER");
+                }
+                long end = System.currentTimeMillis();
+//                logger.log(Level.INFO, "TIME: " + (end - start) + "ms");
+            }
+        }
     }
 
     public void doBack() {
-        if (backHistory.size() == 0){
+        logger.log(Level.INFO, "doBack");
+        if (backHistory.size() == 0) {
             return;
         }
         for (int i = 0; i < backHistory.size(); i++) {
@@ -86,7 +134,7 @@ public class TreeBean implements Serializable {
     }
 
     public void doForward() {
-        if (forwardHistory.size() == 0){
+        if (forwardHistory.size() == 0) {
             return;
         }
         for (int i = 0; i < forwardHistory.size(); i++) {
@@ -119,16 +167,26 @@ public class TreeBean implements Serializable {
         this.selectedNodes = pageState.getSelectedNode();
         this.parent.setPath(pageState.getParentpath());
         this.selectedNodes.setSelected(true);
-        changedTableParentFolder();
+        updatetablePageList();
     }
 
-    private void SubObjects(FSFolder parent, TreeNode treenodeparent) {
-        List<FSObject> children = cmisService.getChildren(parent);
-        for (FSObject i : children) {
-            if (i instanceof FSFolder) {
-                TreeNode treeNode = new DefaultTreeNode(i, treenodeparent);
-                SubObjects((FSFolder) i, treeNode);
-            }
+    public void onNodeExpand(NodeExpandEvent event) {
+        updateTree(event.getTreeNode());
+    }
+
+    /**
+     * if files in our repository has changed when node collapse
+     * we clear all children and check if node has children
+     *
+     * @param event that is fired on NodeCollapse
+     */
+    public void onNodeCollapse(NodeCollapseEvent event) {
+        logger.log(Level.INFO, "onNodeCollapse");
+        event.getTreeNode().getChildren().clear();
+        if (cmisService.hasChildFolder((FSFolder) event.getTreeNode().getData())) {
+            FSFolder fold = new FSFolder();
+            fold.setName("Empty Folder");
+            new DefaultTreeNode(fold, event.getTreeNode());
         }
     }
 
@@ -164,10 +222,14 @@ public class TreeBean implements Serializable {
         }
     }
 
+    public void updatetablePageList() {
+        tablePageList = cmisService.getPage(parent, currentPage, amountOfRowsInPage);
+    }
 
     public void changedTableParentFolder() {
         currentPage = firstPage;
-        tablePageList = cmisService.getPage(parent, currentPage, amountOfRowsInPage);
+//        tablePageList = cmisService.getPage(parent, currentPage, amountOfRowsInPage);
+        updatetablePageList();
         lastPage = cmisService.getMaxNumberOfPage(parent, amountOfRowsInPage);
         testingCurrentPage = Integer.toString(currentPage);
         disableBackButton = true;
@@ -210,11 +272,10 @@ public class TreeBean implements Serializable {
             }
             if (lastPage != firstPage) {
                 FacesContext.getCurrentInstance().addMessage(messageForPaging.getClientId(),
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, "WRONG PAGE!", "it should be between  " + firstPage + " and " + lastPage));
-            }
-            else {
+                        new FacesMessage(FacesMessage.SEVERITY_INFO, "WRONG PAGE!", "it should be between  " + firstPage + " and " + lastPage));
+            } else {
                 FacesContext.getCurrentInstance().addMessage(messageForPaging.getClientId(),
-                     new FacesMessage(FacesMessage.SEVERITY_INFO, "WARNING", "here is only one page"));
+                        new FacesMessage(FacesMessage.SEVERITY_INFO, "WARNING", "here is only one page"));
             }
             tablePageList = cmisService.getPage(parent, currentPage, amountOfRowsInPage);
             testingCurrentPage = Integer.toString(currentPage);
@@ -291,14 +352,12 @@ public class TreeBean implements Serializable {
         }
         if (currentPage == firstPage) {
             disableBackButton = true;
-        }
-        else {
+        } else {
             disableBackButton = false;
         }
         if (currentPage == lastPage) {
             disableNextButton = true;
-        }
-        else {
+        } else {
             disableNextButton = false;
         }
 
@@ -308,28 +367,52 @@ public class TreeBean implements Serializable {
 
     public void setSelectedNode(TreeNode selectedNodes) {
         logger.log(Level.INFO, "setSelectedNode");
-        this.selectedNodes = selectedNodes;
-
-        setSelectedFSObject((FSObject) selectedNodes.getData());
-        if (selectedFSObject.getPath() == null) {
-            parent.setPath("/");
-            selectedFSObject.setPath("/");
-        } else {
-            parent.setPath(selectedFSObject.getPath());
+        if (selectedNodes != null) {
+            this.selectedNodes = selectedNodes;
+            setSelectedFSObject((FSObject) selectedNodes.getData());
+            if (selectedFSObject.getPath() == null) {
+                parent.setPath("/");
+                selectedFSObject.setPath("/");
+            } else {
+                parent.setPath(selectedFSObject.getPath());
+            }
+            changedTableParentFolder();
+            PageState state = new PageState();
+            state.setCurrentPage(currentPage);
+            state.setSelectedNode(selectedNodes);
+            state.setSelectedObject(selectedFSObject);
+            state.setParentpath(parent.getPath());
+            addToBack(state);
+            this.selectedNodes.setSelected(false);
         }
-        changedTableParentFolder();
-        PageState state = new PageState();
-        state.setCurrentPage(currentPage);
-        state.setSelectedNode(selectedNodes);
-        state.setSelectedObject(selectedFSObject);
-        state.setParentpath(parent.getPath());
-        addToBack(state);
-        this.selectedNodes.setSelected(false);
     }
 
     public void onRowSelect(SelectEvent event) {
-        this.selectedNodes.setSelected(false);
-        this.selectedFSObject = (FSObject) event.getObject();
+        if (selectedNodes != null) {
+            this.selectedNodes.setSelected(false);
+        }
+        setSelectedFSObject((FSObject) event.getObject());
+    }
+
+//    public void onDragDrop(TreeDragDropEvent event) {
+//        TreeNode dragNode = event.getDragNode();
+//        TreeNode dropNode = event.getDropNode();
+//        int dropIndex = event.getDropIndex();
+//        FSFolder fff = (FSFolder)dragNode.getData();
+//        FSFolder ddd = (FSFolder)dropNode.getData();
+//
+//        logger.log(Level.INFO, "DragNode data = "+fff.getPath());
+//        logger.log(Level.INFO, "DropNode data = "+ddd.getPath());
+//        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Dragged " + dragNode.getData(), "Dropped on " + dropNode.getData() + " at " + dropIndex);
+//        FacesContext.getCurrentInstance().addMessage(null, message);
+//        cmisService.move(fff,ddd);
+//        logger.log(Level.INFO, "MOVED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+//        updateTree(dragNode);
+//        updateTree(dropNode);
+//    }
+
+    public boolean isCheckThatSelected() {
+        return selectedFSObject != null ? true : false;
     }
 
     public TreeNode getRoot() {
@@ -346,7 +429,14 @@ public class TreeBean implements Serializable {
 
     public void setSelectedFSObject(FSObject sn) {
         if (sn != null) {
+            if (sn instanceof FSFile) {
+                fileActions.setSelectedIsFile(true);
+            } else {
+                fileActions.setSelectedIsFile(false);
+            }
+            fileActions.setSelectedName(sn.getName());
             this.selectedFSObject = sn;
+            logger.log(Level.INFO, "selectedObject: "+sn.getName());
         }
     }
 
@@ -420,5 +510,13 @@ public class TreeBean implements Serializable {
 
     public void setCurrentPage(int currentPage) {
         this.currentPage = currentPage;
+    }
+
+    public FileActions getFileActions() {
+        return fileActions;
+    }
+
+    public void setFileActions(FileActions fileActions) {
+        this.fileActions = fileActions;
     }
 }

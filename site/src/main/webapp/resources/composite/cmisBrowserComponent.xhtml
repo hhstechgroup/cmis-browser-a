@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:cc="http://java.sun.com/jsf/composite"
+      xml:lang="en" lang="en"
+      xmlns:ct="http://java.sun.com/jsf/composite/composite">
+
+<cc:interface>
+    <cc:attribute name="tableview" type="java.lang.Boolean" default="true"/>
+    <cc:attribute name="treeview" type="java.lang.Boolean" default="true"/>
+
+    <cc:attribute name="actionPanel" type="java.lang.Boolean" default="true"/>
+    <cc:attribute name="Name" type="java.lang.Boolean" default="true"/>
+    <cc:attribute name="TypeId" type="java.lang.Boolean" default="true"/>
+    <cc:attribute name="ParentTypeId" type="java.lang.Boolean" default="true"/>
+    <cc:attribute name="Id" type="java.lang.Boolean" default="true"/>
+    <cc:attribute name="Size" type="java.lang.Boolean" default="true"/>
+    <cc:attribute name="ContentType" type="java.lang.Boolean" default="true"/>
+    <cc:attribute name="Createdby" type="java.lang.Boolean" default="true"/>
+    <cc:attribute name="Creationdate" type="java.lang.Boolean" default="true"/>
+    <cc:attribute name="LastModifiedBy" type="java.lang.Boolean" default="true"/>
+    <cc:attribute name="LastModificationdate" type="java.lang.Boolean" default="true"/>
+
+</cc:interface>
+
+<cc:implementation>
+
+    <h:form id="treeForm">
+        <p:remoteCommand name="invokeBack" action="#{treeBean.doBack}" update=":#{cc.clientId}:treeForm"/>
+        <p:remoteCommand name="invokeForward" action="#{treeBean.doForward}" update=":#{cc.clientId}:treeForm" />
+        <p:panelGrid id="panel" columns="2" style="width: 100%; height: 400px;" styleClass="table">
+            <h:outputStylesheet library="style" name="style.css"/>
+
+            <ct:customTree id="tree" updateId=":#{cc.clientId}:treeForm:table:tablecomponent"
+                           rendered="#{cc.attrs.treeview}"/>
+
+            <ct:customFsTable id="table" actionPanel="#{cc.attrs.actionPanel}"
+                              Name="#{cc.attrs.Name}"
+                              TypeId="#{cc.attrs.TypeId}"
+                              ParentTypeId="true"
+                              Id="#{cc.attrs.Id}"
+                              Size="#{cc.attrs.Size}"
+                              ContentType="#{cc.attrs.ContentType}"
+                              Createdby="#{cc.attrs.Createdby}"
+                              Creationdate="#{cc.attrs.Creationdate}"
+                              LastModifiedBy="#{cc.attrs.LastModifiedBy}"
+                              LastModificationdate="#{cc.attrs.LastModificationdate}"
+                              rendered="#{cc.attrs.tableview}"/>
+
+        </p:panelGrid>
+    </h:form>
+
+    <ct:actionDialogs id="actiondialogs"/>
+</cc:implementation>
+</html>
