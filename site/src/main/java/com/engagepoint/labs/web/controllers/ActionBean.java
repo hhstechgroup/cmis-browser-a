@@ -3,6 +3,8 @@ package com.engagepoint.labs.web.controllers;
 import com.engagepoint.labs.core.models.FSFile;
 import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
+import com.engagepoint.labs.core.models.exceptions.FileAlreadyExistException;
+import com.engagepoint.labs.core.models.exceptions.FolderAlreadyExistException;
 import com.engagepoint.labs.core.service.CMISService;
 import com.engagepoint.labs.core.service.CMISServiceImpl;
 import org.primefaces.context.RequestContext;
@@ -46,6 +48,8 @@ public class ActionBean implements Serializable {
     private List<FSFile> history;
 
     private FSObject folderForCopy;
+
+    private String errorMsg;
 
     /**
      * Handling exception and create a message to show user om dialog page  and log the exception
@@ -101,11 +105,13 @@ public class ActionBean implements Serializable {
      *
      * @param parent folder to set as a parent for new folder
      */
-    public void createFolder(TreeNode parent) {
+    public void createFolder(FSFolder parentFolder, TreeNode parent) {
         try {
-            if (parent != null) {
-                cmisService.createFolder((FSFolder) parent.getData(), name);
-                treeBean.updateTree(parent);
+            if (parentFolder != null) {
+                cmisService.createFolder(parentFolder, name);
+                if (parent != null) {
+                    treeBean.updateTree(parent);
+                }
             }
             //TODO enable message when node is not selected       kozubal
             //parent not selected
@@ -119,7 +125,7 @@ public class ActionBean implements Serializable {
 
     public void edit(FSObject selected) {
         //TODO rename versionable files
-        logger.log(Level.INFO, "selected name: "+selected.getName());
+        logger.log(Level.INFO, "selected name: " + selected.getName());
         if (selected instanceof FSFile) {
             UploadedFile file = fileActions.getFile();
             String mimeType = null;
@@ -130,7 +136,13 @@ public class ActionBean implements Serializable {
             }
             cmisService.edit((FSFile) selected, content, mimeType);
         } else { //FSFolder
-            cmisService.renameFolder((FSFolder) selected, selected.getName());
+            try {
+                cmisService.renameFolder((FSFolder) selected, selected.getName());
+            }  catch (FolderAlreadyExistException ex) {
+                logger.log(Level.INFO, "catched: "+ex.getMessage());
+                FacesContext context = FacesContext.getCurrentInstance();
+                context.addMessage(null, new FacesMessage("Error", ex.getMessage()));
+            }
         }
         treeBean.updatetablePageList();
     }
@@ -257,5 +269,13 @@ public class ActionBean implements Serializable {
 
     public void setDefaultFolderName(String defaultFolderName) {
         this.defaultFolderName = defaultFolderName;
+    }
+
+    public String getErrorMsg() {
+        return errorMsg;
+    }
+
+    public void setErrorMsg(String errorMsg) {
+        this.errorMsg = errorMsg;
     }
 }

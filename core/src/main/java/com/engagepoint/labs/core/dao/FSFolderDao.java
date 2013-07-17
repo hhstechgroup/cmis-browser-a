@@ -8,6 +8,8 @@ package com.engagepoint.labs.core.dao;
 
 import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
+import com.engagepoint.labs.core.models.exceptions.FileAlreadyExistException;
+import com.engagepoint.labs.core.models.exceptions.FolderAlreadyExistException;
 import org.apache.chemistry.opencmis.client.api.Session;
 
 import java.util.List;
@@ -37,7 +39,7 @@ public interface FSFolderDao {
      * @param newName - new name of folder
      * @return renamed folder
      */
-    public FSFolder rename(FSFolder folder, String newName);
+    public FSFolder rename(FSFolder folder, String newName) throws FolderAlreadyExistException;
 
     /**
      * Get all children from parent folder

@@ -9,10 +9,14 @@ package com.engagepoint.labs.core.dao;
 import com.engagepoint.labs.core.models.FSFile;
 import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
+import com.engagepoint.labs.core.models.exceptions.FileAlreadyExistException;
+import com.engagepoint.labs.core.models.exceptions.FolderAlreadyExistException;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.client.runtime.ObjectIdImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.enums.UnfileObject;
+import org.apache.chemistry.opencmis.commons.exceptions.*;
+//        org.apache.chemistry.opencmis.commons.exceptions
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -60,13 +64,18 @@ public class FSFolderDaoImpl implements FSFolderDao {
     }
 
     @Override
-    public FSFolder rename(FSFolder folder, String newName) {
-        Folder cmisFolder = (Folder) session.getObjectByPath(folder.getPath());
-        Map<String, String> newFolderProps = new HashMap<String, String>();
-        newFolderProps.put(PropertyIds.NAME, newName);
-        cmisFolder.updateProperties(newFolderProps, true);
-        folder.setName(cmisFolder.getName());
-        folder.setPath(cmisFolder.getPath());
+    public FSFolder rename(FSFolder folder, String newName) throws FolderAlreadyExistException {
+        try {
+            Folder cmisFolder = (Folder) session.getObjectByPath(folder.getPath());
+            Map<String, String> newFolderProps = new HashMap<String, String>();
+            newFolderProps.put(PropertyIds.NAME, newName);
+            cmisFolder.updateProperties(newFolderProps, true);
+            folder.setName(cmisFolder.getName());
+            folder.setPath(cmisFolder.getPath());
+        } catch (CmisNameConstraintViolationException ex) {
+            throw new FolderAlreadyExistException("Folder already exist");
+        }
+
         return folder;
     }
 

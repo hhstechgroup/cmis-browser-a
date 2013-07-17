@@ -31,7 +31,7 @@
             style="width: 300px;">
 
 
-        <p:ajax event="select" update="#{cc.attrs.updateId}"/>
+        <p:ajax event="select" update="#{cc.attrs.updateId} :#{cc.parent.clientId}:actiondialogs:#{cc.parent.clientId}edit"/>
 
         <p:ajax event="expand" listener="#{treeBean.onNodeExpand}" />
 

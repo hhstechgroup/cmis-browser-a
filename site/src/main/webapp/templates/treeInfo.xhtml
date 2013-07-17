@@ -68,7 +68,8 @@
 
                     <f:facet name="header">
                         <p:tabMenu id="actiontabhistorymenu" activeIndex="1">
-                            <p:menuitem id="downloadhistorymenuitem" disabled="#{!fileActions.selectedIsFile}" value="Download"
+                            <p:menuitem id="downloadhistorymenuitem" disabled="#{!fileActions.selectedIsFile}"
+                                        value="Download"
                                         ajax="false"
                                         icon="ui-icon-triangle-1-s">
                                 <p:fileDownload value="#{fileActions.download(treeBean.selectedFSObject)}"/>
@@ -110,6 +111,7 @@
 
             <p:commandButton value="Cancel" type="button" onclick="TreeinDialog.hide()"/>
         </p:dialog>
+        <p:growl id="growl" showDetail="true" sticky="true" />
     </ui:composition>
 </h:body>
 </html>

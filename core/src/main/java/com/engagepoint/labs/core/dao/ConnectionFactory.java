@@ -31,7 +31,7 @@ public class ConnectionFactory {
         SessionFactory sessionFactory = SessionFactoryImpl.newInstance();
         Map<String, String> parameter = new HashMap<String, String>();
         parameter.put(SessionParameter.BINDING_TYPE, BindingType.ATOMPUB.value());
-        parameter.put(SessionParameter.USER,     "Rostik");
+        parameter.put(SessionParameter.USER,     "Rowestik");
         parameter.put(SessionParameter.PASSWORD, "Rostik");
         parameter.put(SessionParameter.BINDING_TYPE, BindingType.ATOMPUB.value());
         parameter.put(SessionParameter.ATOMPUB_URL, "http://lab5:8080/chemistry-opencmis-server-inmemory-0.9.0/atom11");

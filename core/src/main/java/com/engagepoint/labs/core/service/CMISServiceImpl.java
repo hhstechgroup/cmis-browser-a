@@ -6,6 +6,8 @@ import com.engagepoint.labs.core.dao.FSFolderDaoImpl;
 import com.engagepoint.labs.core.models.FSFile;
 import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
+import com.engagepoint.labs.core.models.exceptions.FileAlreadyExistException;
+import com.engagepoint.labs.core.models.exceptions.FolderAlreadyExistException;
 
 import java.io.InputStream;
 import java.util.List;
@@ -76,7 +78,7 @@ public class CMISServiceImpl implements CMISService {
      * {@inheritDoc}
      */
     @Override
-    public FSFolder renameFolder(FSFolder folder, String newName) {
+    public FSFolder renameFolder(FSFolder folder, String newName) throws FolderAlreadyExistException {
         return fsFolderDao.rename(folder, newName);
     }
 

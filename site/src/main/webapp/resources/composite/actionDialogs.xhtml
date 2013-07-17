@@ -35,7 +35,7 @@
             <br></br>
             <br></br>
             <p:commandButton value="Ok"
-                             actionListener="#{action.createFolder(treeBean.selectedNode)}"
+                             actionListener="#{action.createFolder(treeBean.parent, treeBean.selectedNode)}"
                              process="@form"
 
                              update="@form :#{cc.parent.clientId}:treeForm"
