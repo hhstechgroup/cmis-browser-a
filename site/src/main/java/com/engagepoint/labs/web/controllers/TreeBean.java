@@ -40,6 +40,7 @@ public class TreeBean implements Serializable {
 
     private TreeNode main;
     private TreeNode selectedNodes;
+    private TreeNode cachedNode;
     private FSObject selectedFSObject;
     private boolean checkThatSelected;
     private FSFolder parent = new FSFolder();
@@ -390,12 +391,14 @@ public class TreeBean implements Serializable {
             state.setSelectedObject(selectedFSObject);
             state.setParentpath(parent.getPath());
             addToBack(state);
+            this.cachedNode = selectedNodes.getParent();
             this.selectedNodes.setSelected(false);
         }
     }
 
     public void onRowSelect(SelectEvent event) {
         if (selectedNodes != null) {
+            this.cachedNode = selectedNodes.getParent();
             this.selectedNodes.setSelected(false);
         }
         setSelectedFSObject((FSObject) event.getObject());
@@ -526,5 +529,13 @@ public class TreeBean implements Serializable {
 
     public void setFileActions(FileActions fileActions) {
         this.fileActions = fileActions;
+    }
+
+    public TreeNode getCachedNode() {
+        return cachedNode;
+    }
+
+    public void setCachedNode(TreeNode cachedNode) {
+        this.cachedNode = cachedNode;
     }
 }

@@ -113,7 +113,7 @@
             <br></br>
             <p:commandButton value="OK"
                              process="@form"
-                             actionListener="#{action.edit(treeBean.selectedFSObject)}"
+                             actionListener="#{action.edit(treeBean.selectedFSObject, treeBean.cachedNode)}"
                              ajax="false"
                              oncomplete="if (!args.validationFailed) #{cc.attrs.edit}.hide()"/>
 

@@ -16,7 +16,6 @@ import org.apache.chemistry.opencmis.client.runtime.ObjectIdImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.enums.UnfileObject;
 import org.apache.chemistry.opencmis.commons.exceptions.*;
-//        org.apache.chemistry.opencmis.commons.exceptions
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -69,7 +68,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
             Folder cmisFolder = (Folder) session.getObjectByPath(folder.getPath());
             Map<String, String> newFolderProps = new HashMap<String, String>();
             newFolderProps.put(PropertyIds.NAME, newName);
-            cmisFolder.updateProperties(newFolderProps, true);
+            cmisFolder.updateProperties(newFolderProps);
             folder.setName(cmisFolder.getName());
             folder.setPath(cmisFolder.getPath());
         } catch (CmisNameConstraintViolationException ex) {

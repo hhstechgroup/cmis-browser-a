@@ -123,8 +123,9 @@ public class ActionBean implements Serializable {
         treeBean.updatetablePageList();
     }
 
-    public void edit(FSObject selected) {
+    public void edit(FSObject selected, TreeNode parent) {
         //TODO rename versionable files
+
         logger.log(Level.INFO, "selected name: " + selected.getName());
         if (selected instanceof FSFile) {
             UploadedFile file = fileActions.getFile();
@@ -143,6 +144,10 @@ public class ActionBean implements Serializable {
                 FacesContext context = FacesContext.getCurrentInstance();
                 context.addMessage(null, new FacesMessage("Error", ex.getMessage()));
             }
+        }
+        if (parent != null) {
+            logger.log(Level.INFO, "NE NULL SIKA");
+            treeBean.updateTree(parent);
         }
         treeBean.updatetablePageList();
     }
