@@ -1,6 +1,7 @@
 package com.engagepoint.labs.core.service;
 
 import com.engagepoint.labs.core.dao.ConnectionFactory;
+import com.engagepoint.labs.core.dao.FSFileDao;
 import com.engagepoint.labs.core.dao.FSFolderDao;
 import com.engagepoint.labs.core.dao.FSFolderDaoImpl;
 import com.engagepoint.labs.core.models.FSFile;
@@ -60,7 +61,7 @@ public class CMISServiceImpl implements CMISService {
     }
 
     @Override
-    public FSFile edit(FSFile file, byte[] content, String mimeType){
+    public FSFile edit(FSFile file, byte[] content, String mimeType) {
         return fsFolderDao.getFsFileDao().edit(file, content, mimeType);
     }
 
@@ -129,16 +130,22 @@ public class CMISServiceImpl implements CMISService {
     }
 
     @Override
-    public InputStream getInputStream(FSFile file){
+    public InputStream getInputStream(FSFile file) {
         return fsFolderDao.getFsFileDao().getInputStream(file);
     }
+
     @Override
-    public FSFolder move(FSFolder source, FSFolder target){
-        return fsFolderDao.move(source,target);
+    public FSFolder move(FSFolder source, FSFolder target) {
+        return fsFolderDao.move(source, target);
     }
 
     @Override
     public void copyFolder(FSFolder folder, String name, String targetID) {
         fsFolderDao.copyFolder(folder, name, targetID);
+    }
+
+    @Override
+    public void copyFile(String fileId, String name, String targetId) {
+        fsFolderDao.getFsFileDao().copy(fileId, name, targetId);
     }
 }

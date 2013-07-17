@@ -64,16 +64,31 @@ public class ActionBean implements Serializable {
     }
 
     public void copyFolder(FSObject target) {
-        try {
-            logger.log(Level.INFO, "folder name: " + folderForCopy.getName() + " def name: " + defaultFolderName);
-            if (!folderForCopy.getName().equals(getDefaultFolderName())) {
-                folderForCopy.setName(getDefaultFolderName());
-            }
-            cmisService.copyFolder((FSFolder) folderForCopy, folderForCopy.getName(), target.getId());
-        } catch (NullPointerException ex) {
+        if (folderForCopy instanceof FSFile) {
+            try {
+                logger.log(Level.INFO, "file name: " + folderForCopy.getName() + " def name: " + defaultFolderName);
+                if (!folderForCopy.getName().equals(getDefaultFolderName())) {
+                    folderForCopy.setName(getDefaultFolderName());
+                }
+                cmisService.copyFile(folderForCopy.getId(), folderForCopy.getName(), target.getId());
+            } catch (NullPointerException ex) {
 
+            }
+            defaultFolderName = "Copy_";
         }
-        defaultFolderName = "Copy_";
+
+        if (folderForCopy instanceof FSFolder) {
+            try {
+                logger.log(Level.INFO, "folder name: " + folderForCopy.getName() + " def name: " + defaultFolderName);
+                if (!folderForCopy.getName().equals(getDefaultFolderName())) {
+                    folderForCopy.setName(getDefaultFolderName());
+                }
+                cmisService.copyFolder((FSFolder) folderForCopy, folderForCopy.getName(), target.getId());
+            } catch (NullPointerException ex) {
+
+            }
+            defaultFolderName = "Copy_";
+        }
     }
 
     public ActionBean() {
@@ -83,7 +98,12 @@ public class ActionBean implements Serializable {
     }
 
     public void markFolder(FSObject folderForCopy) {
-        logger.log(Level.INFO, "folderForCopy: " + folderForCopy.getName());
+        if (folderForCopy instanceof FSFile) {
+            logger.log(Level.INFO, "FILE For Copy: " + folderForCopy.getName());
+        }
+        if (folderForCopy instanceof FSFolder) {
+            logger.log(Level.INFO, "FOLDER For Copy: " + folderForCopy.getName());
+        }
         this.folderForCopy = folderForCopy;
     }
 
@@ -245,10 +265,10 @@ public class ActionBean implements Serializable {
     public String getDefaultFolderName() {
         if (folderForCopy != null) {
             if (defaultFolderName.equals("Copy_")) {
-                logger.log(Level.INFO, "if: "+folderForCopy.getName());
+                logger.log(Level.INFO, "if: " + folderForCopy.getName());
                 defaultFolderName += folderForCopy.getName();
             } else {
-                logger.log(Level.INFO, "else: "+folderForCopy.getName());
+                logger.log(Level.INFO, "else: " + folderForCopy.getName());
                 defaultFolderName = "Copy_" + folderForCopy.getName();
             }
         }

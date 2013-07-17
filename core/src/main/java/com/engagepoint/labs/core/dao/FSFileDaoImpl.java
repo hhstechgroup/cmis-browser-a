@@ -2,10 +2,8 @@ package com.engagepoint.labs.core.dao;
 
 import com.engagepoint.labs.core.models.FSFile;
 import com.engagepoint.labs.core.models.FSFolder;
-import org.apache.chemistry.opencmis.client.api.Document;
-import org.apache.chemistry.opencmis.client.api.Folder;
-import org.apache.chemistry.opencmis.client.api.ObjectId;
-import org.apache.chemistry.opencmis.client.api.Session;
+import com.engagepoint.labs.core.models.FSObject;
+import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.client.runtime.ObjectIdImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
@@ -83,8 +81,7 @@ public class FSFileDaoImpl implements FSFileDao {
     @Override
     public FSFile edit(FSFile file, byte[] content, String mimeType) {
         Document cmisFile = (Document) session.getObject(file.getId());
-        if(content == null)
-        {
+        if (content == null) {
             content = new byte[0];
         }
         InputStream input = new ByteArrayInputStream(content);
@@ -115,10 +112,28 @@ public class FSFileDaoImpl implements FSFileDao {
     }
 
     @Override
-    public void copy(String id, String targetId) {
-        Document doc = (Document) session.getObject(id);
-        ObjectId targetObjId = new ObjectIdImpl(targetId);
-        doc.copy(targetObjId);
-    }
+    public boolean copy(String id, String newName, String targetId) {
+        Document document = (Document) session.getObject(id);
+        Folder folder = (Folder) session.getObject(targetId);
+        String defaultName = document.getName();
+        if (folder.equals(document.getParents().get(0))) {
+            System.out.println("Document is in this folder");
+            System.out.println(document.getId());
+            System.out.println("We cant copy this document into such folder, please copy in another folder");
+            return false;
+        } else {
+            ObjectId targetObjId = new ObjectIdImpl(targetId);
+            Map<String, String> newDocumentProperties = new HashMap<String, String>();
+            newDocumentProperties.put(PropertyIds.NAME, newName);
+            document.updateProperties(newDocumentProperties);
+            Document copiedDocument = document.copy(targetObjId);
+            newDocumentProperties.put(PropertyIds.NAME, defaultName);
+            document.updateProperties(newDocumentProperties);
 
+            System.out.println("Documents ID which we are copy is " + document.getId());
+            System.out.println("Copied document ID is " + copiedDocument.getId());
+            System.out.println("Document is copied successfully");
+            return true;
+        }
+    }
 }

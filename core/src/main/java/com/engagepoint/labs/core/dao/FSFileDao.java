@@ -51,5 +51,13 @@ public interface FSFileDao {
 
     public InputStream getInputStream(FSFile file);
 
-    public void copy(String id, String targetId);
+    /**
+     * Method that will copy file
+     *
+     * @param id       - file which you want to copy
+     * @param newName  - new name of file
+     * @param targetId - id of folder in which we want to copy
+     * @return <b>true</b> if copied
+     */
+    public boolean copy(String id, String newName, String targetId);
 }
