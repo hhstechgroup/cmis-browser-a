@@ -68,14 +68,6 @@ public class CMISServiceImpl implements CMISService {
      * {@inheritDoc}
      */
     @Override
-    public FSFile renameFile(FSFile file, String newName) {
-        return fsFolderDao.getFsFileDao().rename(file, newName);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public boolean deleteFile(FSFile file) {
         return fsFolderDao.getFsFileDao().delete(file);
     }

@@ -118,17 +118,21 @@ public class ActionBean implements Serializable {
     }
 
     public void edit(FSObject selected) {
-        if (!selected.getName().equals(fileActions.getSelectedName())) {
-            rename(selected);
-        }
+        //TODO rename versionable files
+        logger.log(Level.INFO, "selected name: "+selected.getName());
         if (selected instanceof FSFile) {
             UploadedFile file = fileActions.getFile();
+            String mimeType = null;
+            byte[] content = null;
             if (file != null) {
-                byte[] content = file.getContents();
-                String mimeType = file.getContentType();
-                cmisService.edit((FSFile) selected, content, mimeType);
+                content = file.getContents();
+                mimeType = file.getContentType();
             }
+            cmisService.edit((FSFile) selected, content, mimeType);
+        } else { //FSFolder
+            cmisService.renameFolder((FSFolder) selected, selected.getName());
         }
+        treeBean.updatetablePageList();
     }
 
     /**
@@ -157,31 +161,12 @@ public class ActionBean implements Serializable {
 //        treeBean.updateTree(treeBean.getSelectedNode().getParent());
     }
 
-    /**
-     * Rename folder or file with name {@link TreeBean#selectedFSObject}
-     * in {@link TreeBean#parent} parent directory
-     *
-     * @param fsObject object(file or folder) to rename
-     */
-    private void rename(FSObject fsObject) {
-        try {
-            if (fsObject instanceof FSFolder) {
-                cmisService.renameFolder((FSFolder) fsObject, fsObject.getName());
-
-            } else if (fsObject instanceof FSFile) {
-                cmisService.renameFile((FSFile) fsObject, fsObject.getName());
-            }
-        } catch (Exception ex) {
-            catchException(ex, renamecomponent);
-        }
-        //TODO   java.lang.NullPointerException      kozubal
-       /* if (treeBean.getSelectedNode().getParent() != null) {
-            treeBean.updateTree(treeBean.getSelectedNode().getParent());
-        }*/
-    }
-
     public void fillHistory(FSFile fsFile) {
-        this.history = cmisService.getHistory(fsFile).getAllVersions();
+        try {
+            this.history = cmisService.getHistory(fsFile).getAllVersions();
+        } catch (NullPointerException ex) {
+            logger.log(Level.WARNING, ex.getMessage());
+        }
     }
 
     public List<FSFile> getHistory() {

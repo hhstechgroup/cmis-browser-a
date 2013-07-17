@@ -33,10 +33,6 @@ public class FSFileDaoImpl implements FSFileDao {
         this.session = session;
     }
 
-    public Session getSession() {
-        return session;
-    }
-
     @Override
     public FSFile create(FSFolder parent, String fileName, byte[] content, String mimeType) {
         String notRootFolder = parent.getPath().equals("/") ? "" : parent.getPath();
@@ -70,22 +66,21 @@ public class FSFileDaoImpl implements FSFileDao {
     }
 
     @Override
-    public FSFile rename(FSFile file, String newName) {
-        Document cmisFile = (Document) session.getObjectByPath(file.getAbsolutePath());
-        Map<String, String> properties = new HashMap<String, String>();
-        properties.put(PropertyIds.NAME, newName);
-        cmisFile.updateProperties(properties, true);
-        file.setName(cmisFile.getName());
-        file.setAbsolutePath(cmisFile.getPaths().get(0));
-        file.setLastModifiedBy(cmisFile.getLastModifiedBy());
-        file.setLastModifiedTime(cmisFile.getLastModificationDate().getTime());
-        file.setParentTypeId(cmisFile.getType().getParentTypeId());
-        return file;
-    }
-
-    @Override
     public FSFile edit(FSFile file, byte[] content, String mimeType) {
         Document cmisFile = (Document) session.getObject(file.getId());
+        Map<String, String> properties = null;
+        logger.log(Level.INFO, "file name: "+file.getName()+" cmisfile name: "+cmisFile.getName());
+        if (!file.getName().equals(cmisFile.getName())) {
+            logger.log(Level.INFO, "renaming-- old name: "+cmisFile.getName()+" new name: "+file.getName());
+            properties = new HashMap<String, String>();
+            properties.put(PropertyIds.NAME, file.getName());
+        }
+        if (content == null) {
+            content = new byte[0];
+        }
+        if (mimeType == null) {
+            mimeType = "text/plain";
+        }
         if (((DocumentType) (cmisFile.getType())).isVersionable()) {
             logger.log(Level.INFO, "isVersionable");
             Document pwc = (Document) session.getObject(cmisFile.checkOut());
@@ -94,25 +89,28 @@ public class FSFileDaoImpl implements FSFileDao {
                     content.length, mimeType, input);
             // Check in the pwc
             try {
-                pwc.checkIn(false, null, contentStream, "minor version");
+                logger.log(Level.INFO, "properties null ?" + (properties == null));
+                pwc.checkIn(false, properties, contentStream, "minor version");
             } catch (CmisBaseException e) {
                 System.out.println("checkin failed, trying to cancel the checkout");
                 pwc.cancelCheckOut();
             }
         } else {
-            if (content == null) {
-                content = new byte[0];
-            }
             InputStream input = new ByteArrayInputStream(content);
             ContentStream contentStream = session.getObjectFactory().createContentStream(file.getName(),
                     content.length, mimeType, input);
             cmisFile.setContentStream(contentStream, true, true);
+            if (properties != null) {
+                cmisFile.updateProperties(properties, true);
+            }
             file.setMimetype(mimeType);
             file.setLastModifiedBy(cmisFile.getLastModifiedBy());
             file.setLastModifiedTime(cmisFile.getLastModificationDate().getTime());
             file.setTypeId(cmisFile.getBaseType().getDisplayName());
             file.setSize(String.valueOf(contentStream.getLength() / 1024));
             file.setParentTypeId(cmisFile.getType().getParentTypeId());
+            file.setName(cmisFile.getName());
+            file.setAbsolutePath(cmisFile.getPaths().get(0));
         }
         return file;
     }
@@ -152,6 +150,11 @@ public class FSFileDaoImpl implements FSFileDao {
                 versionFile.setLastModifiedTime(version.getLastModificationDate().getTime());
                 versionFile.setSize(String.valueOf(version.getContentStreamLength() / 1024));
                 versionFile.setId(version.getId());
+                versionFile.setVersionable(true);
+                versionFile.setMimetype(version.getContentStreamMimeType());
+                versionFile.setTypeId(version.getBaseType().getDisplayName());
+                versionFile.setParentTypeId(version.getType().getParentTypeId());
+                versionFile.setAbsolutePath(version.getPaths().get(0));
                 fileVersions.add(versionFile);
             }
             file.setAllVersions(fileVersions);

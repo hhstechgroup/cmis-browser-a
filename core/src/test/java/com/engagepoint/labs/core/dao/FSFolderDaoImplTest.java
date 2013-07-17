@@ -1,14 +1,12 @@
-/*
 package com.engagepoint.labs.core.dao;
 
-*/
-/**
+/*
  * Created with IntelliJ IDEA.
  * User: r.reznichenko
  * Date: 6/18/13
  * Time: 12:15 PM
  * To change this template use File | Settings | File Templates.
- *//*
+*/
 
 
 import com.engagepoint.labs.core.models.FSFolder;
@@ -105,4 +103,4 @@ public class FSFolderDaoImplTest {
 //        fsFolderDao.copyFolder(source.getId(),target.getId());
 //        fsFolderDao.delete(actual);
 //    }
-}*/
+}

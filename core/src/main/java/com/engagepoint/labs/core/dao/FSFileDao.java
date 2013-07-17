@@ -31,15 +31,6 @@ public interface FSFileDao {
     public FSFile create(FSFolder parent, String fileName, byte[] content, String mimeType);
 
     /**
-     * Method that will rename file
-     *
-     * @param file    - file which you want rename
-     * @param newName - new name of file
-     * @return renamed file
-     */
-    public FSFile rename(FSFile file, String newName);
-
-    /**
      * Method that will delete file from repository
      *
      * @param file - file which you want to delete

@@ -48,7 +48,7 @@
                   resizable="false"
                   dynamic="true"
                   appendToBody="true"
-                  header="History" widgetVar="historyDialog">
+                  header="#{treeBean.selectedFSObject.name} history" widgetVar="historyDialog">
             <h:form id="historyForm">
                 <p:dataTable id="historyTable"
                              var="fsFile"
@@ -56,19 +56,22 @@
                              value="#{action.history}"
                              emptyMessage="No history"
                              scrollHeight="400" style="width: 770px;"
-                             rowKey="#{fsFile.name}"
+                             rowKey="#{fsFile}"
                              selection="#{treeBean.selectedFSObject}"
                              selectionMode="single"
+                             paginator="true" rows="5"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15"
                         >
                     <p:ajax event="rowSelect" listener="#{treeBean.onRowSelect}"
-                            update=""/>
+                            update=":historyForm:historyTable"/>
 
                     <f:facet name="header">
                         <p:tabMenu id="actiontabhistorymenu" activeIndex="1">
                             <p:menuitem id="downloadhistorymenuitem" disabled="#{!fileActions.selectedIsFile}" value="Download"
                                         ajax="false"
                                         icon="ui-icon-triangle-1-s">
-                                <p:fileDownload value="#{fileActions.download(fsFile)}"/>
+                                <p:fileDownload value="#{fileActions.download(treeBean.selectedFSObject)}"/>
                             </p:menuitem>
                         </p:tabMenu>
                     </f:facet>
@@ -78,9 +81,8 @@
                     <p:column style="width: 100px;" headerText="Version label">
                         <h:outputText value="#{fsFile.versionLabel}"/>
                     </p:column>
-                    <p:column style="width: 300px;" headerText="Name">
-                        <p:graphicImage value="/resources/images/#{fsFile.icon}" width="16" height="16"/>
-                        <h:outputText value="#{fsFile.name}"/>
+                    <p:column style="width: 150px;" headerText="Content Type">
+                        <h:outputText value="#{fsFile.mimetype}"/>
                     </p:column>
                     <p:column style="width: 100px;" headerText="Size, KB">
                         <h:outputText value="#{fsFile.size}"/>

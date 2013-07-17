@@ -38,7 +38,7 @@
                  value="#{treeBean.tablePageList}"
                  scrollHeight="400" style="width: 770px;"
                  emptyMessage="This folder is empty"
-                 rowKey="#{fsObject.name}"
+                 rowKey="#{fsObject}"
                  selection="#{treeBean.selectedFSObject}"
                  selectionMode="single">
 
@@ -71,7 +71,7 @@
                 <p:menuitem id="editmenuitem" value="Edit" disabled="#{!treeBean.checkThatSelected}"
                             onclick="#{cc.attrs.edit}.show();" icon="ui-icon-arrowrefresh-1-w"/>
 
-                <p:menuitem id="historymenuitem" value="History" disabled="#{!fileActions.selectedIsFile}"
+                <p:menuitem id="historymenuitem" value="History" disabled="#{!fileActions.versionable}"
                             action="#{action.fillHistory(treeBean.selectedFSObject)}"
                             oncomplete="historyDialog.show();" icon="ui-icon-arrowrefresh-1-w"/>
 

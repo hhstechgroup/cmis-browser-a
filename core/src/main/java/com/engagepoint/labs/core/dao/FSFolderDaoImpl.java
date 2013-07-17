@@ -84,6 +84,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
             } else {
                 fsObject = new FSFile();
                 fsObject.setMimetype(((Document) o).getContentStreamMimeType());
+                ((FSFile) fsObject).setVersionable(((DocumentType) (o.getType())).isVersionable());
                 fsObject.setPath(notRootFolder);
                 fsObject.setSize(String.valueOf(((Document) o).getContentStreamLength() / 1024));
                 ((FSFile) fsObject).setAbsolutePath(notRootFolder + "/" + o.getName());
@@ -147,6 +148,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
                 fsObject = new FSFile();
                 fsObject.setMimetype(((Document) o).getContentStreamMimeType());
                 fsObject.setPath(notRootFolder);
+                ((FSFile) fsObject).setVersionable(((DocumentType) (o.getType())).isVersionable());
                 fsObject.setSize(String.valueOf(((Document) o).getContentStreamLength() / 1024));
                 ((FSFile) fsObject).setAbsolutePath(notRootFolder + "/" + o.getName());
             }

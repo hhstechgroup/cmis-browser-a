@@ -4,6 +4,7 @@ import com.engagepoint.labs.core.models.FSFile;
 import com.engagepoint.labs.core.models.MimeTypes;
 import com.engagepoint.labs.core.service.CMISService;
 import com.engagepoint.labs.core.service.CMISServiceImpl;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.UploadedFile;
@@ -31,7 +32,7 @@ public class FileActions implements Serializable {
     private static Logger logger;
     private boolean selectedIsFile;
     private String selectedName;
-
+    private boolean versionable;
     private UploadedFile file;
 
     public FileActions() {
@@ -41,10 +42,16 @@ public class FileActions implements Serializable {
     }
 
     public StreamedContent download(FSFile file) throws IllegalArgumentException {
+        logger.log(Level.INFO, "download: "+file.getName());
+        String fileName = file.getName();
+        if (file.isVersionable()) {
+            logger.log(Level.INFO, "file is versinable: "+file.getVersionLabel());
+            fileName += (file.getVersionLabel() == null) ? "" : file.getVersionLabel();
+        }
         logger.log(Level.INFO, "id: "+file.getId());
         InputStream inputStream = cmisService.getInputStream(file);
         String extension = MimeTypes.getExtension(file.getMimetype());
-        return new DefaultStreamedContent(inputStream, file.getMimetype(), file.getName()+extension);
+        return new DefaultStreamedContent(inputStream, file.getMimetype(), fileName+extension);
     }
 
     public boolean isSelectedIsFile() {
@@ -69,5 +76,13 @@ public class FileActions implements Serializable {
 
     public void setSelectedName(String selectedName) {
         this.selectedName = selectedName;
+    }
+
+    public boolean isVersionable() {
+        return versionable;
+    }
+
+    public void setVersionable(boolean versionable) {
+        this.versionable = versionable;
     }
 }

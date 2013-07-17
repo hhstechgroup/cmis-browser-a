@@ -56,8 +56,6 @@ public interface CMISService {
 
     public FSFile createFile(FSFolder parent, String fileName, byte[] content, String mimeType);
 
-    public FSFile renameFile(FSFile file, String newName)throws Exception;
-
     public FSFile edit(FSFile file, byte[] content, String mimeType);
 
     public boolean deleteFile(FSFile file);
