@@ -139,6 +139,7 @@ public class ActionBean implements Serializable {
         if (object instanceof FSFolder) {
             deleteAllTree(object);
         } else {
+            logger.log(Level.INFO, "deleteSelect++++++" + object.getName());
             cmisService.deleteFile((FSFile) object);
         }
        //===============paging====================== treeBean.updatetablePageList();
@@ -151,6 +152,7 @@ public class ActionBean implements Serializable {
      * @param object folder that is supposed to delete
      */
     public void deleteAllTree(FSObject object) {
+
         cmisService.deleteAllTree((FSFolder) object);
 //        treeBean.updateTree(treeBean.getSelectedNode().getParent());
     }

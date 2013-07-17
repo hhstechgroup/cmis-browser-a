@@ -143,6 +143,7 @@ public class FSFileDaoImpl implements FSFileDao {
             fsFile.setCreationTime(doc.getCreationDate().getTime());
             fsFile.setLastModifiedBy(doc.getLastModifiedBy());
             fsFile.setLastModifiedTime(doc.getLastModificationDate().getTime());
+            fsFile.setAbsolutePath(doc.getPaths().get(0));
             files.add(fsFile) ;
         }
         myType = "cmis:folder";
