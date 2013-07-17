@@ -2,18 +2,19 @@ package com.engagepoint.labs.core.dao;
 
 import com.engagepoint.labs.core.models.FSFile;
 import com.engagepoint.labs.core.models.FSFolder;
-import org.apache.chemistry.opencmis.client.api.Document;
-import org.apache.chemistry.opencmis.client.api.Folder;
-import org.apache.chemistry.opencmis.client.api.ObjectId;
-import org.apache.chemistry.opencmis.client.api.Session;
+import com.engagepoint.labs.core.models.FSObject;
+import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.client.runtime.ObjectIdImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
+import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
 import org.apache.chemistry.opencmis.commons.enums.VersioningState;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -119,6 +120,49 @@ public class FSFileDaoImpl implements FSFileDao {
         Document doc = (Document) session.getObject(id);
         ObjectId targetObjId = new ObjectIdImpl(targetId);
         doc.copy(targetObjId);
+    }
+
+    @Override
+    public List<FSObject> find(String query) {
+        List<FSObject> files = new LinkedList<FSObject>();
+        String myType = "cmis:document";
+        ObjectType type = session.getTypeDefinition(myType);
+        PropertyDefinition<?> objectIdPropDef = type.getPropertyDefinitions().get(PropertyIds.OBJECT_ID);
+        String objectIdQueryName = objectIdPropDef.getQueryName();
+        String queryString = "SELECT " + "*" + " FROM " + type.getQueryName() +" WHERE cmis:name LIKE '%" + query + "%'";
+        ItemIterable<QueryResult> fileResult = session.query(queryString, false);
+        for (QueryResult qResult : fileResult) {
+            FSFile fsFile = new FSFile();
+            String objectId = qResult.getPropertyValueByQueryName(objectIdQueryName);
+            Document doc = (Document) session.getObject(session.createObjectId(objectId));
+            fsFile.setName(doc.getName());
+            fsFile.setId(doc.getId());
+            fsFile.setTypeId(doc.getType().getId());
+            fsFile.setParentTypeId(doc.getType().getParentTypeId());
+            fsFile.setCreatedBy(doc.getCreatedBy());
+            fsFile.setCreationTime(doc.getCreationDate().getTime());
+            fsFile.setLastModifiedBy(doc.getLastModifiedBy());
+            fsFile.setLastModifiedTime(doc.getLastModificationDate().getTime());
+            files.add(fsFile) ;
+        }
+        myType = "cmis:folder";
+        type = session.getTypeDefinition(myType);
+        objectIdPropDef = type.getPropertyDefinitions().get(PropertyIds.OBJECT_ID);
+        objectIdQueryName = objectIdPropDef.getQueryName();
+        queryString = "SELECT " + "*" + " FROM " + type.getQueryName() +" WHERE cmis:name LIKE '%" + query + "%'";
+        ItemIterable<QueryResult> folderResults = session.query(queryString, false);
+        for (QueryResult qResult : folderResults) {
+            FSFolder fsFolder = new FSFolder();
+            String objectId = qResult.getPropertyValueByQueryName(objectIdQueryName);
+            Folder folder = (Folder) session.getObject(session.createObjectId(objectId));
+            fsFolder.setPath(folder.getPath());
+            fsFolder.setName(folder.getName());
+            fsFolder.setId(folder.getId());
+            fsFolder.setTypeId(folder.getType().getDisplayName());
+            fsFolder.setParentTypeId(folder.getType().getParentTypeId());
+            files.add(fsFolder) ;
+        }
+        return files;
     }
 
 }

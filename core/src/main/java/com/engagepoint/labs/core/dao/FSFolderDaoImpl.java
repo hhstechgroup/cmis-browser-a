@@ -129,19 +129,31 @@ public class FSFolderDaoImpl implements FSFolderDao {
     }
 
     @Override
-    public int getMaxNumberOfRows(FSFolder parent, int numberOfRows){
+    public int getMaxNumberOfRows(FSFolder parent){
         Folder cmisParent = (Folder) session.getObjectByPath(parent.getPath());
         ItemIterable<CmisObject> cmisChildren = cmisParent.getChildren();
 
         int total = (int) cmisChildren.getTotalNumItems();
         return total;
     }
+
+    @Override
+    public int getMaxNumberOfRowsByQuery(String query){
+        int total = (int) fsFileDao.find(query).size();
+        return total;
+    }
+
+    @Override
+    public List<FSObject> getPageForLazySearchQuery(int first, int pageSize, String query) {
+
+        return (List<FSObject>)fsFileDao.find(query).subList(first, first + pageSize );
+    }
+
     @Override
     public List<FSObject> getPageForLazy(FSFolder parent, int first, int pageSize){
         String notRootFolder = parent.getPath().equals("/") ? "" : parent.getPath();
         List<FSObject> children = new ArrayList<FSObject>();
         Folder cmisParent = (Folder) session.getObjectByPath(parent.getPath());
-
         OperationContext operationContext = session.createOperationContext();
         operationContext.setMaxItemsPerPage(pageSize);
         ItemIterable<CmisObject> childrenCmis = cmisParent.getChildren(operationContext);

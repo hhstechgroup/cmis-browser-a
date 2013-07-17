@@ -1,8 +1,6 @@
 package com.engagepoint.labs.core.service;
 
-import com.engagepoint.labs.core.dao.ConnectionFactory;
-import com.engagepoint.labs.core.dao.FSFolderDao;
-import com.engagepoint.labs.core.dao.FSFolderDaoImpl;
+import com.engagepoint.labs.core.dao.*;
 import com.engagepoint.labs.core.models.FSFile;
 import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
@@ -18,13 +16,16 @@ import java.util.logging.Logger;
 public class CMISServiceImpl implements CMISService {
 
     private FSFolderDao fsFolderDao;
+    private FSFileDao fsFileDao;
     private static Logger logger = Logger.getLogger(CMISServiceImpl.class.getName());
 
     private static CMISServiceImpl service = null;
 
     private CMISServiceImpl() {
         fsFolderDao = new FSFolderDaoImpl();
+        fsFileDao = new FSFileDaoImpl();
         fsFolderDao.setSession(ConnectionFactory.getSession());
+        fsFileDao.setSession(ConnectionFactory.getSession());
     }
 
     /**
@@ -114,8 +115,18 @@ public class CMISServiceImpl implements CMISService {
     }
 
     @Override
-    public int getMaxNumberOfRows(FSFolder parent, int numberOfRows){
-        return fsFolderDao.getMaxNumberOfRows(parent, numberOfRows);
+    public int getMaxNumberOfRows(FSFolder parent){
+        return fsFolderDao.getMaxNumberOfRows(parent);
+    }
+
+    @Override
+    public int getMaxNumberOfRowsByQuery(String query){
+        return fsFolderDao.getMaxNumberOfRowsByQuery(query);
+    }
+
+    @Override
+    public List<FSObject> getPageForLazySearchQuery(int first, int pageSize, String query) {
+        return fsFolderDao.getPageForLazySearchQuery(first, pageSize, query);
     }
 
     @Override
@@ -140,5 +151,10 @@ public class CMISServiceImpl implements CMISService {
     @Override
     public void copyFolder(FSFolder folder, String name, String targetID) {
         fsFolderDao.copyFolder(folder, name, targetID);
+    }
+
+    @Override
+    public List<FSObject> find(String query) {
+        return fsFileDao.find(query);
     }
 }

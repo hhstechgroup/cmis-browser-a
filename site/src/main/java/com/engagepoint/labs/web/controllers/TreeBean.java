@@ -6,21 +6,20 @@ import com.engagepoint.labs.core.models.FSObject;
 import com.engagepoint.labs.core.service.CMISService;
 import com.engagepoint.labs.core.service.CMISServiceImpl;
 import com.engagepoint.labs.web.models.LazyFSObjectDataModel;
-import org.primefaces.context.RequestContext;
-import org.primefaces.event.*;
+import org.primefaces.event.NodeCollapseEvent;
+import org.primefaces.event.NodeExpandEvent;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultTreeNode;
-import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.TreeNode;
 
-import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
-import javax.faces.component.UIComponent;
-import javax.faces.context.FacesContext;
-import javax.faces.model.SelectItem;
 import java.io.Serializable;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -49,7 +48,7 @@ public class TreeBean implements Serializable {
     private List<PageState> forwardHistory = new LinkedList<PageState>();
     private PageState currentPageState;
 
-    private LazyDataModel<FSObject> lazyModel;
+    private LazyFSObjectDataModel lazyModel;
 
     private boolean first = true;
 
@@ -287,11 +286,11 @@ public class TreeBean implements Serializable {
         this.fileActions = fileActions;
     }
 
-    public LazyDataModel<FSObject> getLazyModel() {
+    public LazyFSObjectDataModel getLazyModel() {
         return lazyModel;
     }
 
-    public void setLazyModel(LazyDataModel<FSObject> lazyModel) {
+    public void setLazyModel(LazyFSObjectDataModel lazyModel) {
         this.lazyModel = lazyModel;
     }
 }

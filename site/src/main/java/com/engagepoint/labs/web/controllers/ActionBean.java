@@ -43,6 +43,7 @@ public class ActionBean implements Serializable {
     private final CMISService cmisService;
 
     private FSObject folderForCopy;
+    private String findQuery;
 
     /**
      * Handling exception and create a message to show user om dialog page  and log the exception
@@ -258,4 +259,29 @@ public class ActionBean implements Serializable {
     public void setDefaultFolderName(String defaultFolderName) {
         this.defaultFolderName = defaultFolderName;
     }
+
+    public void findObjects(){
+        logger.log(Level.INFO, "find=" + cmisService.find(findQuery).get(0).getName());
+       // treeBean.updatetablePageList(cmisService.find(findQuery));
+    }
+
+    public String getFindQuery() {
+        logger.log(Level.INFO, "get=" + findQuery);
+        return findQuery;
+    }
+
+    public void setFindQuery(String findQuery) {
+        if (findQuery==null){
+            this.findQuery = "";
+            treeBean.getLazyModel().setSearchQuery(findQuery);
+            logger.log(Level.INFO, "set=++++++++++++++" + findQuery);
+        } else{
+        logger.log(Level.INFO, "set=------------- " + findQuery);
+        this.findQuery = findQuery;
+        treeBean.getLazyModel().setSearchQuery(findQuery);
+            logger.log(Level.INFO, "set________ " + treeBean.getLazyModel().getSearchQuery());
+        }
+    }
+
+
 }

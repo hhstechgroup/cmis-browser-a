@@ -1,19 +1,16 @@
 package com.engagepoint.labs.core.dao;
 
-import com.engagepoint.labs.core.models.FSFile;
-import org.apache.chemistry.opencmis.client.api.Document;
-import org.apache.chemistry.opencmis.client.api.ObjectId;
+import com.engagepoint.labs.core.models.FSObject;
 import org.apache.chemistry.opencmis.client.api.Session;
-import org.apache.chemistry.opencmis.client.runtime.ObjectIdImpl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.logging.Logger;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Created with IntelliJ IDEA.
@@ -25,13 +22,17 @@ import static org.junit.Assert.assertTrue;
 public class FSFileDaoImplTest {
 
     private static FSFolderDao fsFolderDao;
+    private static FSFileDao fsFileDao;
     private static Session session;
+    private static Logger logger = Logger.getLogger(FSFileDaoImplTest.class.getName());
 
     @BeforeClass
     public static void setUPclass() throws Exception {
         fsFolderDao = new FSFolderDaoImpl();
+        fsFileDao = new FSFileDaoImpl();
         session = ConnectionFactory.getSession();
         fsFolderDao.setSession(session);
+        fsFileDao.setSession(session);
     }
 
     @Before
@@ -55,6 +56,16 @@ public class FSFileDaoImplTest {
 //                    +" Latest Major: " + o.isLatestMajorVersion() + " Major: " + o.isMajorVersion());
 //        }
 //    }
+
+    @Test
+    public void testFind() throws Exception{
+        List<FSObject> fsFiles = fsFileDao.find("d");
+        System.out.println(fsFiles.size());
+        for (FSObject fsObject : fsFiles){
+            System.out.println(fsObject.getName());
+        }
+        assertNotNull(fsFiles);
+    }
 
 //    @org.junit.Test
 //         public void testCopy() throws Exception {

@@ -17,7 +17,11 @@ public interface CMISService {
      * @param parent parent object, pageNumber, numbersOfRows for right pagination
      * @return List of FSObjects on the page
      */
-    public int getMaxNumberOfRows(FSFolder parent, int numberOfRows);
+    public int getMaxNumberOfRows(FSFolder parent);
+
+    public int getMaxNumberOfRowsByQuery(String query);
+
+    public List<FSObject> getPageForLazySearchQuery(int first,int pageSize, String query);
 
 
     /**
@@ -88,4 +92,5 @@ public interface CMISService {
 
     public void copyFolder(FSFolder folder, String name, String targetID);
 
+    public List<FSObject> find(String query);
 }

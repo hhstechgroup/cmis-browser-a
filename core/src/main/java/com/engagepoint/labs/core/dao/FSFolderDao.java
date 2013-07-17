@@ -67,7 +67,11 @@ public interface FSFolderDao {
      */
     public FSFileDao getFsFileDao();
 
-    public int getMaxNumberOfRows(FSFolder parent, int numberOfRows);
+    public int getMaxNumberOfRows(FSFolder parent);
+
+    public int getMaxNumberOfRowsByQuery(String query);
+
+    public List<FSObject> getPageForLazySearchQuery(int first,int pageSize, String query);
 
     public List<FSObject> getPageForLazy(FSFolder parent, int first, int pageSize);
 

@@ -38,7 +38,7 @@
                  value="#{treeBean.lazyModel}"
                  scrollHeight="400" style="width: 770px;"
                  emptyMessage="This folder is empty"
-                 rowKey="#{fsObject.name}"
+                 rowKey="#{fsObject}"
                  selection="#{treeBean.selectedFSObject}"
                  selectionMode="single"
 
@@ -57,6 +57,11 @@
             <h:inputText value="#{treeBean.parent.path}"
                          style="border-radius: 11px;font-size: 16px; margin-bottom: 5px; color: #000000;" size="90"
                          disabled="true"/>
+
+
+            <p:inputText id="finditem" value="#{action.findQuery}" />
+            <p:commandButton value="Search" process="tablecomponent"
+                             update=":#{cc.parent.clientId}:treeForm:table:tablecomponent"/>
 
             <p:tabMenu id="actiontabmenu" activeIndex="5" rendered="#{cc.attrs.actionPanel}">
                 <p:menuitem>

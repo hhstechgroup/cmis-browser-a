@@ -25,10 +25,12 @@ public class LazyFSObjectDataModel extends LazyDataModel<FSObject> {
 
     private FSFolder parent;
     private CMISService cmisService;
+    private String searchQuery;
 
     public LazyFSObjectDataModel(CMISService cmisService, FSFolder parent) {
         this.cmisService = cmisService;
         this.parent = parent;
+        this.searchQuery="";
         logger.log(Level.INFO, "===============================LazyFSObjectDataModel(CMISService cmisService, FSFolder parent) ========");
     }
 
@@ -45,7 +47,7 @@ public class LazyFSObjectDataModel extends LazyDataModel<FSObject> {
     }
 
     @Override
-    public List<FSObject> load(int first, int pageSize, List<SortMeta> multiSortMeta, Map<String,String> filters) {
+    public List<FSObject> load(int first, int pageSize, List<SortMeta> multiSortMeta, Map<String, String> filters) {
         logger.log(Level.INFO, "===============================List<FSObject> load fake ========");
         return null;
     }
@@ -53,7 +55,7 @@ public class LazyFSObjectDataModel extends LazyDataModel<FSObject> {
     @Override
     public List<FSObject> load(int first, int pageSize, String sortField, org.primefaces.model.SortOrder sortOrder, Map<String, String> filters) {
         List<FSObject> data = new ArrayList<FSObject>();
-        logger.log(Level.INFO, "===============================List<FSObject> load   first= " + first + "===pagesize = " + pageSize + "======");
+        // logger.log(Level.INFO, "===============================List<FSObject> load   first= " + first + "===pagesize = " + pageSize + "======");
         //filter
 //        for(FSObject fsObject : datasource) {
 //            boolean match = true;
@@ -89,20 +91,48 @@ public class LazyFSObjectDataModel extends LazyDataModel<FSObject> {
 //        //rowCount
 //        int dataSize = data.size();
 //        this.setRowCount(dataSize);
+        if (searchQuery.equals("")) {
+            int dataSize = cmisService.getMaxNumberOfRows(parent);
+            this.setRowCount(dataSize);
+            logger.log(Level.INFO, "============DATASIZE==========" + dataSize + "========");
 
-        int dataSize = cmisService.getMaxNumberOfRows(parent, pageSize);
-        this.setRowCount(dataSize);
-        logger.log(Level.INFO, "============DATASIZE==========" + dataSize + "========");
+            if (dataSize > pageSize) {
+                data = cmisService.getPageForLazy(parent, first, pageSize);
+                return data;
+            } else {
+                data = cmisService.getPageForLazy(parent, 0, pageSize);
+                return data;
+            }
+        } else {
 
-        if (dataSize > pageSize) {
-            data = cmisService.getPageForLazy(parent, first, pageSize);
-            return data;
-        }
-        else {
-            data = cmisService.getPageForLazy(parent, 0 , pageSize);
-            return data;
+
+            int dataSize = cmisService.getMaxNumberOfRowsByQuery(searchQuery);
+            this.setRowCount(dataSize);
+            logger.log(Level.INFO, "============DATASIZE_Query==========" + dataSize + "========");
+
+            if (dataSize > pageSize) {
+                if ((first + pageSize) > dataSize) {
+                    logger.log(Level.INFO, "============if((first + pageSize) > dataSize)==========" + dataSize + "========");
+                    data = cmisService.getPageForLazySearchQuery(first, dataSize - first, searchQuery);
+                    return data;
+                } else {
+                    data = cmisService.getPageForLazySearchQuery(first, pageSize, searchQuery);
+                    return data;
+                }
+            } else {
+                logger.log(Level.INFO, "============DATASIZE_Query from==========" + pageSize + "========");
+                data = cmisService.find(searchQuery);
+                logger.log(Level.INFO, "============DATASIZE_Query to==========" + pageSize + "========");
+                return data;
+            }
         }
     }
 
+    public String getSearchQuery() {
+        return searchQuery;
+    }
 
+    public void setSearchQuery(String searchQuery) {
+        this.searchQuery = searchQuery;
+    }
 }
