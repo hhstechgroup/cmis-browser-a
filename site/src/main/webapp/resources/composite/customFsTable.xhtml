@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:cc="http://java.sun.com/jsf/composite"
+      xmlns:ct="http://java.sun.com/jsf/composite/composite"
+      xml:lang="en" lang="en">
+<cc:interface>
+    <cc:attribute name="actionPanel" type="java.lang.Boolean" default="true"/>
+
+    <cc:attribute name="create" default="#{cc.parent.id}Create"/>
+    <cc:attribute name="copy" default="#{cc.parent.id}Copy"/>
+    <cc:attribute name="edit" default="#{cc.parent.id}Edit"/>
+    <cc:attribute name="delete" default="#{cc.parent.id}Delete"/>
+    <cc:attribute name="createfile" default="#{cc.parent.id}Createfile"/>
+    <cc:attribute name="createDoc222" default="#{cc.parent.id}createDoc222"/>
+
+    <cc:attribute name="Name" type="java.lang.Boolean" default="true"/>
+    <cc:attribute name="TypeId" type="java.lang.Boolean" default="true"/>
+    <cc:attribute name="ParentTypeId" type="java.lang.Boolean" default="true"/>
+    <cc:attribute name="Id" type="java.lang.Boolean" default="true"/>
+    <cc:attribute name="Size" type="java.lang.Boolean" default="true"/>
+    <cc:attribute name="ContentType" type="java.lang.Boolean" default="true"/>
+    <cc:attribute name="Createdby" type="java.lang.Boolean" default="true"/>
+    <cc:attribute name="Creationdate" type="java.lang.Boolean" default="true"/>
+    <cc:attribute name="LastModifiedBy" type="java.lang.Boolean" default="true"/>
+    <cc:attribute name="LastModificationdate" type="java.lang.Boolean" default="true"/>
+</cc:interface>
+
+<cc:implementation>
+    <p:dataTable id="tablecomponent"
+                 var="fsObject"
+                 scrollable="true"
+                 value="#{treeBean.lazyModel}"
+                 scrollHeight="400" style="width: 770px;"
+                 emptyMessage="This folder is empty"
+                 rowKey="#{fsObject}"
+                 selection="#{treeBean.selectedFSObject}"
+                 selectionMode="single"
+
+                 paginator="true" rows="10" lazy="true"
+                 paginatorTemplate="{CurrentPageReport} {RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                 rowsPerPageTemplate="3,5,10,15"
+                 onRowSelectUpdate="display"
+                 currentPageReportTemplate="1"
+
+
+            >
+
+        <p:ajax event="rowSelect" listener="#{treeBean.onRowSelect}"
+                update="@form :#{cc.parent.clientId}:actiondialogs:#{cc.parent.clientId}edit"/>
+        <f:facet name="header">
+            <h:inputText value="#{treeBean.parent.path}"
+                         style="border-radius: 11px;font-size: 16px; margin-bottom: 5px; color: #000000;" size="90"
+                         disabled="true"/>
+
+
+            <p:inputText id="finditem" value="#{action.findQuery}"/>
+            <p:commandButton value="Search" process="tablecomponent"
+                             update=":#{cc.parent.clientId}:treeForm:table:tablecomponent"/>
+
+
+            <p:accordionPanel activeIndex="-1" id="advancedSearch">
+                <p:tab title="Advanced search">
+                    <p:inputText id="findadvanceditem0" value="#{action.findName}"/>
+                    <p:watermark value="findName" for="findadvanceditem0"/>
+                     <br/>
+                    <p:inputText id="findadvanceditem1" value="#{action.findContentType}"/>
+                    <p:watermark value="findContentType" for="findadvanceditem1"/>
+                    <br/>
+                    <h:outputText value="From "/>
+                    <p:calendar id="calendarFrom" value="#{action.calendarFrom}"/>
+                    <h:outputText value=" to "/>
+                    <p:calendar id="calendarTo" value="#{action.calendarTo}"/>
+                    <br/>
+                    <p:inputText id="findadvanceditem2" value="#{action.findDate}"/>
+                    <p:watermark value="findDate" for="findadvanceditem2"/>
+                    <br/>
+                    <p:inputText id="findadvanceditem3" value="#{action.findType}"/>
+                    <p:watermark value="findType" for="findadvanceditem3"/>
+                    <br/>
+                    <p:inputText id="findadvanceditem4" value="#{action.findSize}"/>
+                    <p:watermark value="findSize" for="findadvanceditem4"/>
+                    <br/>
+                    <p:inputText id="findadvanceditem5" value="#{action.findSnippet}"/>
+                    <p:watermark value="findSnippet" for="findadvanceditem5"/>
+                    <br/>
+                    <p:commandButton value="Search3" actionListener="#{action.findAdvanced}" process=":cmisbrowser:treeForm:table:tablecomponent:advancedSearch"
+                                     update=":#{cc.parent.clientId}:treeForm:table:tablecomponent"/>
+                </p:tab>
+            </p:accordionPanel>
+
+
+            <p:tabMenu id="actiontabmenu" activeIndex="5" rendered="#{cc.attrs.actionPanel}">
+                <p:menuitem>
+                    <p:menuButton value="New">
+                        <p:menuitem icon="ui-icon-folder-collapsed" value="Folder"
+                                    onclick="#{cc.attrs.create}.show();"/>
+                        <p:menuitem icon="ui-icon-document" value="Document" onclick="#{cc.attrs.createfile}.show();"/>
+                    </p:menuButton>
+                </p:menuitem>
+                <p:menuitem id="copymenuitem" value="Copy" oncomplete="copyDialog.show();"
+                            action="#{action.markFolder(treeBean.selectedFSObject)}"
+                            process="@this"
+                            disabled="#{fileActions.selectedIsFile}"/>
+
+                <p:menuitem id="downloadmenuitem" disabled="#{!fileActions.selectedIsFile}" value="Download"
+                            ajax="false"
+                            icon="ui-icon-triangle-1-s">
+                    <p:fileDownload value="#{fileActions.download(treeBean.selectedFSObject)}"/>
+                </p:menuitem>
+
+                <p:menuitem id="editmenuitem" value="Edit" disabled="#{!treeBean.checkThatSelected}"
+                            onclick="#{cc.attrs.edit}.show();" icon="ui-icon-arrowrefresh-1-w"/>
+
+                <p:menuitem id="deletemenuitem" value="Delete" disabled="#{!treeBean.checkThatSelected}"
+                            onclick="#{cc.attrs.delete}.show();"
+                            icon="ui-icon-trash"/>
+
+            </p:tabMenu>
+        </f:facet>
+
+        <p:column style="width: 300px;" headerText="Name" rendered="#{cc.attrs.Name}">
+            <p:graphicImage value="/resources/images/#{fsObject.icon}" width="16" height="16"/>
+            <h:outputText value="#{fsObject.name}"/>
+        </p:column>
+        <p:column style="width: 300px;" headerText="Type Id" rendered="#{cc.attrs.TypeId}">
+            <h:outputText value="#{fsObject.typeId}"/>
+        </p:column>
+        <p:column style="width: 300px;" headerText="Parent Type Id" rendered="#{cc.attrs.ParentTypeId}">
+            <h:outputText value="#{fsObject.parentTypeId}"/>
+        </p:column>
+        <p:column style="width: 300px;" headerText="Id" rendered="#{cc.attrs.Id}">
+            <h:outputText value="#{fsObject.id}"/>
+        </p:column>
+        <p:column style="width: 300px;" headerText="Size, Kb" rendered="#{cc.attrs.Size}">
+            <h:outputText value="#{fsObject.size}"/>
+        </p:column>
+        <p:column style="width: 300px;" headerText="Content Type" rendered="#{cc.attrs.ContentType}">
+            <h:outputText value="#{fsObject.mimetype}"/>
+        </p:column>
+        <p:column style="width: 300px;" headerText="Created by" rendered="#{cc.attrs.Createdby}">
+            <h:outputText value="#{fsObject.createdBy}"/>
+        </p:column>
+        <p:column style="width: 300px;" headerText="Creation date" rendered="#{cc.attrs.Creationdate}">
+            <h:outputText value="#{fsObject.creationTime}"/>
+        </p:column>
+        <p:column style="width: 300px;" headerText="Last Modified By" rendered="#{cc.attrs.LastModifiedBy}">
+            <h:outputText value="#{fsObject.lastModifiedBy}"/>
+        </p:column>
+        <p:column style="width: 300px;" headerText="Last Modification date" rendered="#{cc.attrs.LastModificationdate}">
+            <h:outputText value="#{fsObject.lastModifiedTime}"/>
+        </p:column>
+
+
+    </p:dataTable>
+</cc:implementation>
+</html>
