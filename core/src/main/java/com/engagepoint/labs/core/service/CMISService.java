@@ -21,7 +21,11 @@ public interface CMISService {
 
     public int getMaxNumberOfRowsByQuery(String query);
 
+    public int getMaxNumberOfRowsByQuery(List<String> query);
+
     public List<FSObject> getPageForLazySearchQuery(int first,int pageSize, String query);
+
+    public List<FSObject> getPageForLazySearchQuery(int first,int pageSize, List<String> query);
 
 
     /**
@@ -93,4 +97,5 @@ public interface CMISService {
     public void copyFolder(FSFolder folder, String name, String targetID);
 
     public List<FSObject> find(String query);
+
 }

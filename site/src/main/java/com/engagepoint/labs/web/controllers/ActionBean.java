@@ -16,6 +16,8 @@ import javax.faces.bean.SessionScoped;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -44,6 +46,13 @@ public class ActionBean implements Serializable {
 
     private FSObject folderForCopy;
     private String findQuery;
+    private List<String> searchQueryAdvanced;
+    private String findName;
+    private String findType;
+    private String findContentType;
+    private String findDate;
+    private String findSize;
+    private String findSnippet;
 
     /**
      * Handling exception and create a message to show user om dialog page  and log the exception
@@ -267,6 +276,23 @@ public class ActionBean implements Serializable {
        // treeBean.updatetablePageList(cmisService.find(findQuery));
     }
 
+    public void findAdvanced(){
+
+        logger.log(Level.INFO, "==___________findAdvanced()____" );
+        searchQueryAdvanced = new ArrayList<String>();
+
+        searchQueryAdvanced.add(findName);
+        searchQueryAdvanced.add(findType);
+        searchQueryAdvanced.add(findContentType);
+        searchQueryAdvanced.add(findDate);
+        searchQueryAdvanced.add(findSize);
+        searchQueryAdvanced.add(findSnippet);
+
+        treeBean.getLazyModel().setSearchQueryAdvanced(searchQueryAdvanced);
+
+
+    }
+
     public String getFindQuery() {
         logger.log(Level.INFO, "get=" + findQuery);
         return findQuery;
@@ -285,5 +311,93 @@ public class ActionBean implements Serializable {
         }
     }
 
+    public String getFindSize() {
+        return findSize;
+    }
 
+    public void setFindSize(String findSize) {
+
+        if(findSnippet != null) {
+            this.findSize = findSize;
+        }
+        else{
+            this.findSize = "";
+        }
+    }
+
+    public String getFindDate() {
+        return findDate;
+    }
+
+    public void setFindDate(String findDate) {
+
+        if(findSnippet != null) {
+            this.findDate = findDate;
+        }
+        else{
+            this.findDate = "";
+        }
+    }
+
+    public String getFindContentType() {
+        return findContentType;
+    }
+
+    public void setFindContentType(String findContentType) {
+        logger.log(Level.INFO, "==findContentType__ActionBean___(this)= <" + this.findContentType + ">");
+        if(findSnippet != null) {
+            this.findContentType = findContentType;
+            logger.log(Level.INFO, "==findContentType__ActionBean___(this)= <" + this.findContentType + ">");
+        }
+        else{
+            this.findContentType = "";
+            logger.log(Level.INFO, "==findContentType__ActionBean___= <" + findContentType + ">");
+        }
+    }
+
+    public String getFindType() {
+        return findType;
+    }
+
+    public void setFindType(String findType) {
+        this.findType = findType;
+        if(findSnippet != null) {
+            this.findType = findType;
+        }
+        else{
+            this.findType = "";
+        }
+    }
+
+    public String getFindName() {
+        return findName;
+    }
+
+    public void setFindName(String findName) {
+        this.findName = findName;
+        if(findSnippet != null) {
+            this.findName = findName;
+        }
+        else{
+            this.findName = "";
+        }
+    }
+
+    public String getFindSnippet() {
+        return findSnippet;
+    }
+
+    public void setFindSnippet(String findSnippet) {
+        if(findSnippet != null) {
+            this.findSnippet = findSnippet;
+        }
+        else{
+            this.findSnippet = "";
+        }
+
+    }
+
+    public List<String> getSearchQueryAdvanced() {
+        return searchQueryAdvanced;
+    }
 }

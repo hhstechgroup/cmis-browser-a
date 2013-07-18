@@ -137,17 +137,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
         return total;
     }
 
-    @Override
-    public int getMaxNumberOfRowsByQuery(String query){
-        int total = (int) fsFileDao.find(query).size();
-        return total;
-    }
 
-    @Override
-    public List<FSObject> getPageForLazySearchQuery(int first, int pageSize, String query) {
-
-        return (List<FSObject>)fsFileDao.find(query).subList(first, first + pageSize );
-    }
 
     @Override
     public List<FSObject> getPageForLazy(FSFolder parent, int first, int pageSize){

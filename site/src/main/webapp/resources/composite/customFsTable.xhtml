@@ -59,9 +59,36 @@
                          disabled="true"/>
 
 
-            <p:inputText id="finditem" value="#{action.findQuery}" />
+            <p:inputText id="finditem" value="#{action.findQuery}"/>
             <p:commandButton value="Search" process="tablecomponent"
                              update=":#{cc.parent.clientId}:treeForm:table:tablecomponent"/>
+
+
+            <p:accordionPanel activeIndex="-1" id="advancedSearch">
+                <p:tab title="Advanced search">
+                    <p:inputText id="findadvanceditem0" value="#{action.findName}"/>
+                    <p:watermark value="findName" for="findadvanceditem0"/>
+
+                    <p:inputText id="findadvanceditem1" value="#{action.findContentType}"/>
+                    <p:watermark value="findContentType" for="findadvanceditem1"/>
+
+                    <p:inputText id="findadvanceditem2" value="#{action.findDate}"/>
+                    <p:watermark value="findDate" for="findadvanceditem2"/>
+
+                    <p:inputText id="findadvanceditem3" value="#{action.findType}"/>
+                    <p:watermark value="findType" for="findadvanceditem3"/>
+
+                    <p:inputText id="findadvanceditem4" value="#{action.findSize}"/>
+                    <p:watermark value="findSize" for="findadvanceditem4"/>
+
+                    <p:inputText id="findadvanceditem5" value="#{action.findSnippet}"/>
+                    <p:watermark value="findSnippet" for="findadvanceditem5"/>
+
+                    <p:commandButton value="Search3" actionListener="#{action.findAdvanced}" process=":cmisbrowser:treeForm:table:tablecomponent:advancedSearch"
+                                     update=":#{cc.parent.clientId}:treeForm:table:tablecomponent"/>
+                </p:tab>
+            </p:accordionPanel>
+
 
             <p:tabMenu id="actiontabmenu" activeIndex="5" rendered="#{cc.attrs.actionPanel}">
                 <p:menuitem>
@@ -123,7 +150,6 @@
         <p:column style="width: 300px;" headerText="Last Modification date" rendered="#{cc.attrs.LastModificationdate}">
             <h:outputText value="#{fsObject.lastModifiedTime}"/>
         </p:column>
-
 
 
     </p:dataTable>

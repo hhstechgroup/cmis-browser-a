@@ -56,4 +56,7 @@ public interface FSFileDao {
     public void copy(String id, String targetId);
 
     public List<FSObject> find(String query);
+
+    public List<FSObject> find(List<String> query);
+
 }

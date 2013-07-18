@@ -121,12 +121,25 @@ public class CMISServiceImpl implements CMISService {
 
     @Override
     public int getMaxNumberOfRowsByQuery(String query){
-        return fsFolderDao.getMaxNumberOfRowsByQuery(query);
+        int total = (int) fsFileDao.find(query).size();
+        return total;
     }
 
     @Override
     public List<FSObject> getPageForLazySearchQuery(int first, int pageSize, String query) {
-        return fsFolderDao.getPageForLazySearchQuery(first, pageSize, query);
+        return (List<FSObject>)fsFileDao.find(query).subList(first, first + pageSize );
+    }
+
+    @Override
+    public int getMaxNumberOfRowsByQuery(List<String> query){
+        int total = (int) fsFileDao.find(query).size();
+        return total;
+    }
+
+    @Override
+    public List<FSObject> getPageForLazySearchQuery(int first, int pageSize, List<String> query) {
+
+        return (List<FSObject>)fsFileDao.find(query).subList(first, first + pageSize );
     }
 
     @Override
@@ -157,4 +170,5 @@ public class CMISServiceImpl implements CMISService {
     public List<FSObject> find(String query) {
         return fsFileDao.find(query);
     }
+
 }

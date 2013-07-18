@@ -26,11 +26,13 @@ public class LazyFSObjectDataModel extends LazyDataModel<FSObject> {
     private FSFolder parent;
     private CMISService cmisService;
     private String searchQuery;
+    private List<String> searchQueryAdvanced;
 
     public LazyFSObjectDataModel(CMISService cmisService, FSFolder parent) {
         this.cmisService = cmisService;
         this.parent = parent;
-        this.searchQuery="";
+        this.searchQuery = "";
+        searchQueryAdvanced = new ArrayList<String>();
         logger.log(Level.INFO, "===============================LazyFSObjectDataModel(CMISService cmisService, FSFolder parent) ========");
     }
 
@@ -91,39 +93,80 @@ public class LazyFSObjectDataModel extends LazyDataModel<FSObject> {
 //        //rowCount
 //        int dataSize = data.size();
 //        this.setRowCount(dataSize);
-        if (searchQuery.equals("")) {
-            int dataSize = cmisService.getMaxNumberOfRows(parent);
-            this.setRowCount(dataSize);
-            logger.log(Level.INFO, "============DATASIZE==========" + dataSize + "========");
+        if (searchQueryAdvanced.isEmpty()) {
+            if (searchQuery.equals("")) {
+                int dataSize = cmisService.getMaxNumberOfRows(parent);
+                this.setRowCount(dataSize);
+                logger.log(Level.INFO, "============DATASIZE==========" + dataSize + "========");
 
-            if (dataSize > pageSize) {
-                data = cmisService.getPageForLazy(parent, first, pageSize);
-                return data;
-            } else {
-                data = cmisService.getPageForLazy(parent, 0, pageSize);
-                return data;
-            }
-        } else {
-
-
-            int dataSize = cmisService.getMaxNumberOfRowsByQuery(searchQuery);
-            this.setRowCount(dataSize);
-            logger.log(Level.INFO, "============DATASIZE_Query==========" + dataSize + "========");
-
-            if (dataSize > pageSize) {
-                if ((first + pageSize) > dataSize) {
-                    logger.log(Level.INFO, "============if((first + pageSize) > dataSize)==========" + dataSize + "========");
-                    data = cmisService.getPageForLazySearchQuery(first, dataSize - first, searchQuery);
+                if (dataSize > pageSize) {
+                    data = cmisService.getPageForLazy(parent, first, pageSize);
                     return data;
                 } else {
-                    data = cmisService.getPageForLazySearchQuery(first, pageSize, searchQuery);
+                    data = cmisService.getPageForLazy(parent, 0, pageSize);
                     return data;
                 }
             } else {
-                logger.log(Level.INFO, "============DATASIZE_Query from==========" + pageSize + "========");
-                data = cmisService.find(searchQuery);
-                logger.log(Level.INFO, "============DATASIZE_Query to==========" + pageSize + "========");
-                return data;
+
+
+                int dataSize = cmisService.getMaxNumberOfRowsByQuery(searchQuery);
+                this.setRowCount(dataSize);
+                logger.log(Level.INFO, "============DATASIZE_Query==========" + dataSize + "========");
+
+                if (dataSize > pageSize) {
+                    if ((first + pageSize) > dataSize) {
+                        logger.log(Level.INFO, "============if((first + pageSize) > dataSize)==========" + dataSize + "========");
+                        data = cmisService.getPageForLazySearchQuery(first, dataSize - first, searchQuery);
+                        return data;
+                    } else {
+                        data = cmisService.getPageForLazySearchQuery(first, pageSize, searchQuery);
+                        return data;
+                    }
+                } else {
+                    logger.log(Level.INFO, "============DATASIZE_Query from==========" + pageSize + "========");
+                    data = cmisService.find(searchQuery);
+                    logger.log(Level.INFO, "============DATASIZE_Query to==========" + pageSize + "========");
+                    return data;
+                }
+            }
+        }
+        // for advaced search
+        else{
+            if ((searchQueryAdvanced.get(0)+searchQueryAdvanced.get(1)+searchQueryAdvanced.get(2)+searchQueryAdvanced.get(3) +
+            searchQueryAdvanced.get(4)+searchQueryAdvanced.get(5)).equals("")) {
+                int dataSize = cmisService.getMaxNumberOfRows(parent);
+                this.setRowCount(dataSize);
+                logger.log(Level.INFO, "============DATASIZE==========" + dataSize + "========");
+
+                if (dataSize > pageSize) {
+                    data = cmisService.getPageForLazy(parent, first, pageSize);
+                    return data;
+                } else {
+                    data = cmisService.getPageForLazy(parent, 0, pageSize);
+                    return data;
+                }
+            } else {
+
+
+                int dataSize = cmisService.getMaxNumberOfRowsByQuery(searchQueryAdvanced);
+                this.setRowCount(dataSize);
+                logger.log(Level.INFO, "============DATASIZE_Query==========" + dataSize + "========");
+
+                if (dataSize > pageSize) {
+                    if ((first + pageSize) > dataSize) {
+                        logger.log(Level.INFO, "============if((first + pageSize) > dataSize)==========" + dataSize + "========");
+                        data = cmisService.getPageForLazySearchQuery(first, dataSize - first, searchQueryAdvanced);
+                        return data;
+                    } else {
+                        data = cmisService.getPageForLazySearchQuery(first, pageSize, searchQueryAdvanced);
+                        return data;
+                    }
+                } else {
+                    logger.log(Level.INFO, "============DATASIZE_Query from==========" + pageSize + "========");
+                    data = cmisService.find(searchQuery);
+                    logger.log(Level.INFO, "============DATASIZE_Query to==========" + pageSize + "========");
+                    return data;
+                }
             }
         }
     }
@@ -134,5 +177,13 @@ public class LazyFSObjectDataModel extends LazyDataModel<FSObject> {
 
     public void setSearchQuery(String searchQuery) {
         this.searchQuery = searchQuery;
+    }
+
+    public List<String> getSearchQueryAdvanced() {
+        return searchQueryAdvanced;
+    }
+
+    public void setSearchQueryAdvanced(List<String> searchQueryAdvanced) {
+        this.searchQueryAdvanced = searchQueryAdvanced;
     }
 }
