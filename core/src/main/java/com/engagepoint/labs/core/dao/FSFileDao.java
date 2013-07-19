@@ -2,11 +2,9 @@ package com.engagepoint.labs.core.dao;
 
 import com.engagepoint.labs.core.models.FSFile;
 import com.engagepoint.labs.core.models.FSFolder;
-import com.engagepoint.labs.core.models.FSObject;
 import org.apache.chemistry.opencmis.client.api.Session;
 
 import java.io.InputStream;
-import java.util.List;
 
 /**
  * User: r.reznichenko
@@ -55,5 +53,4 @@ public interface FSFileDao {
 
     public void copy(String id, String targetId);
 
-    public List<FSObject> find(String query);
 }

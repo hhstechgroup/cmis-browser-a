@@ -55,6 +55,10 @@ public class TreeBean implements Serializable {
     private String folderType;
     private Map<String, String> folderTypes = new HashMap<String, String>();
 
+
+    private String findQuery;
+
+
     public String getFolderType() {
         return folderType;
     }
@@ -187,12 +191,9 @@ public class TreeBean implements Serializable {
     }
 
 
-
-
     public void changedTableParentFolder() {
         lazyModel = new LazyFSObjectDataModel(cmisService, parent);
     }
-
 
 
     public void setSelectedNode(TreeNode selectedNodes) {
@@ -206,7 +207,9 @@ public class TreeBean implements Serializable {
             } else {
                 parent.setPath(selectedFSObject.getPath());
             }
-            changedTableParentFolder();
+            if (findQuery.isEmpty()) {
+                changedTableParentFolder();
+            }
             PageState state = new PageState();
 //            state.setCurrentPage(currentPage);
             state.setSelectedNode(selectedNodes);
@@ -292,5 +295,23 @@ public class TreeBean implements Serializable {
 
     public void setLazyModel(LazyFSObjectDataModel lazyModel) {
         this.lazyModel = lazyModel;
+    }
+
+    public String getFindQuery() {
+        logger.log(Level.INFO, "get=" + findQuery);
+        return findQuery;
+    }
+
+    public void setFindQuery(String findQuery) {
+        if (findQuery == null) {
+            this.findQuery = "";
+            getLazyModel().setSearchQuery(findQuery);
+            logger.log(Level.INFO, "setFIndQuery=nulllll" + findQuery);
+        } else {
+            this.findQuery = findQuery;
+            getLazyModel().setSearchQuery(findQuery);
+            logger.log(Level.INFO, "setFindQuery=-------------- " + getLazyModel().getSearchQuery());
+
+        }
     }
 }

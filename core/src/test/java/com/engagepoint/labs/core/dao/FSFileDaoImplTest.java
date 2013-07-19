@@ -59,7 +59,7 @@ public class FSFileDaoImplTest {
 
     @Test
     public void testFind() throws Exception{
-        List<FSObject> fsFiles = fsFileDao.find("d");
+        List<FSObject> fsFiles = fsFolderDao.find("d");
         System.out.println(fsFiles.size());
         for (FSObject fsObject : fsFiles){
             System.out.println(fsObject.getName());

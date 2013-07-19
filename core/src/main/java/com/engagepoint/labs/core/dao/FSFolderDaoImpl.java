@@ -12,12 +12,14 @@ import com.engagepoint.labs.core.models.FSObject;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.client.runtime.ObjectIdImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
+import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
 import org.apache.chemistry.opencmis.commons.enums.UnfileObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class FSFolderDaoImpl implements FSFolderDao {
@@ -139,14 +141,17 @@ public class FSFolderDaoImpl implements FSFolderDao {
 
     @Override
     public int getMaxNumberOfRowsByQuery(String query){
-        int total = (int) fsFileDao.find(query).size();
+        if (!find(query).isEmpty()) {
+        logger.log(Level.INFO, find(query).get(0).getName());
+        }
+        int total = (int) find(query).size();
         return total;
     }
 
     @Override
     public List<FSObject> getPageForLazySearchQuery(int first, int pageSize, String query) {
 
-        return (List<FSObject>)fsFileDao.find(query).subList(first, first + pageSize );
+        return (List<FSObject>)find(query).subList(first, first + pageSize );
     }
 
     @Override
@@ -234,5 +239,53 @@ public class FSFolderDaoImpl implements FSFolderDao {
                 ((Document) o).copy(new ObjectIdImpl(copySourceFolder.getId()));
             }
         }
+    }
+
+    @Override
+    public List<FSObject> find(String query) {
+        List<FSObject> files = new ArrayList<FSObject>();
+        String myType = "cmis:document";
+        ObjectType type = session.getTypeDefinition(myType);
+        PropertyDefinition<?> objectIdPropDef = type.getPropertyDefinitions().get(PropertyIds.OBJECT_ID);
+        String objectIdQueryName = objectIdPropDef.getQueryName();
+        String queryString = "SELECT " + "*" + " FROM " + type.getQueryName() +" WHERE cmis:name LIKE '%" + query + "%'";
+        ItemIterable<QueryResult> fileResult = session.query(queryString, false);
+        for (QueryResult qResult : fileResult) {
+            FSFile fsFile = new FSFile();
+            String objectId = qResult.getPropertyValueByQueryName(objectIdQueryName);
+            Document doc = (Document) session.getObject(session.createObjectId(objectId));
+            fsFile.setName(doc.getName());
+            fsFile.setId(doc.getId());
+            fsFile.setTypeId(doc.getType().getId());
+            fsFile.setParentTypeId(doc.getType().getParentTypeId());
+            fsFile.setCreatedBy(doc.getCreatedBy());
+            fsFile.setCreationTime(doc.getCreationDate().getTime());
+            fsFile.setLastModifiedBy(doc.getLastModifiedBy());
+            fsFile.setLastModifiedTime(doc.getLastModificationDate().getTime());
+            fsFile.setAbsolutePath(doc.getPaths().get(0));
+            files.add(fsFile) ;
+        }
+        myType = "cmis:folder";
+        type = session.getTypeDefinition(myType);
+        objectIdPropDef = type.getPropertyDefinitions().get(PropertyIds.OBJECT_ID);
+        objectIdQueryName = objectIdPropDef.getQueryName();
+        logger.log(Level.INFO, "before SELECT query " + query);
+        queryString = "SELECT " + "*" + " FROM " + type.getQueryName() +" WHERE cmis:name LIKE '%" + query + "%'";
+        ItemIterable<QueryResult> folderResults = session.query(queryString, false);
+        logger.log(Level.INFO, "after SELECT query " + queryString);
+        for (QueryResult qResult : folderResults) {
+            FSFolder fsFolder = new FSFolder();
+            String objectId = qResult.getPropertyValueByQueryName(objectIdQueryName);
+            Folder folder = (Folder) session.getObject(session.createObjectId(objectId));
+            fsFolder.setPath(folder.getPath());
+            fsFolder.setName(folder.getName());
+            logger.log(Level.INFO, "folder get name " + folder.getName());
+            fsFolder.setId(folder.getId());
+            fsFolder.setTypeId(folder.getType().getDisplayName());
+            fsFolder.setParentTypeId(folder.getType().getParentTypeId());
+            files.add(fsFolder);
+            logger.log(Level.INFO, "Result from query:______________" + fsFolder.getName());
+        }
+        return files;
     }
 }

@@ -82,4 +82,7 @@ public interface FSFolderDao {
     public FSFolder move(FSFolder source, FSFolder target);
 
     public void copyFolder(FSFolder folder, String name, String targetId);
+
+    public List<FSObject> find(String query);
+
 }

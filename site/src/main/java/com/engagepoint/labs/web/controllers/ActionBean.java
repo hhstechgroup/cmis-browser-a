@@ -138,6 +138,7 @@ public class ActionBean implements Serializable {
     public void delete(FSObject object) {
         if (object instanceof FSFolder) {
             deleteAllTree(object);
+            treeBean.getParent().setPath("/");
         } else {
             logger.log(Level.INFO, "deleteSelect++++++" + object.getName());
             cmisService.deleteFile((FSFile) object);
@@ -154,6 +155,7 @@ public class ActionBean implements Serializable {
     public void deleteAllTree(FSObject object) {
 
         cmisService.deleteAllTree((FSFolder) object);
+        treeBean.getParent().setPath("/");
 //        treeBean.updateTree(treeBean.getSelectedNode().getParent());
     }
 
@@ -262,28 +264,7 @@ public class ActionBean implements Serializable {
         this.defaultFolderName = defaultFolderName;
     }
 
-    public void findObjects(){
-        logger.log(Level.INFO, "find=" + cmisService.find(findQuery).get(0).getName());
-       // treeBean.updatetablePageList(cmisService.find(findQuery));
-    }
 
-    public String getFindQuery() {
-        logger.log(Level.INFO, "get=" + findQuery);
-        return findQuery;
-    }
-
-    public void setFindQuery(String findQuery) {
-        if (findQuery==null){
-            this.findQuery = "";
-            treeBean.getLazyModel().setSearchQuery(findQuery);
-            logger.log(Level.INFO, "set=++++++++++++++" + findQuery);
-        } else{
-        logger.log(Level.INFO, "set=------------- " + findQuery);
-        this.findQuery = findQuery;
-        treeBean.getLazyModel().setSearchQuery(findQuery);
-            logger.log(Level.INFO, "set________ " + treeBean.getLazyModel().getSearchQuery());
-        }
-    }
 
 
 }

@@ -16,16 +16,14 @@ import java.util.logging.Logger;
 public class CMISServiceImpl implements CMISService {
 
     private FSFolderDao fsFolderDao;
-    private FSFileDao fsFileDao;
+
     private static Logger logger = Logger.getLogger(CMISServiceImpl.class.getName());
 
     private static CMISServiceImpl service = null;
 
     private CMISServiceImpl() {
         fsFolderDao = new FSFolderDaoImpl();
-        fsFileDao = new FSFileDaoImpl();
         fsFolderDao.setSession(ConnectionFactory.getSession());
-        fsFileDao.setSession(ConnectionFactory.getSession());
     }
 
     /**
@@ -155,6 +153,6 @@ public class CMISServiceImpl implements CMISService {
 
     @Override
     public List<FSObject> find(String query) {
-        return fsFileDao.find(query);
+        return fsFolderDao.find(query);
     }
 }

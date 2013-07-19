@@ -59,7 +59,7 @@
                          disabled="true"/>
 
 
-            <p:inputText id="finditem" value="#{action.findQuery}" />
+            <p:inputText id="finditem" value="#{treeBean.findQuery}" />
             <p:commandButton value="Search" process="tablecomponent"
                              update=":#{cc.parent.clientId}:treeForm:table:tablecomponent"/>
 
