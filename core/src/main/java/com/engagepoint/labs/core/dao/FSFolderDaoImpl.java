@@ -131,7 +131,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
     }
 
     @Override
-    public int getMaxNumberOfRows(FSFolder parent){
+    public int getMaxNumberOfRows(FSFolder parent) {
         Folder cmisParent = (Folder) session.getObjectByPath(parent.getPath());
         ItemIterable<CmisObject> cmisChildren = cmisParent.getChildren();
 
@@ -140,9 +140,9 @@ public class FSFolderDaoImpl implements FSFolderDao {
     }
 
     @Override
-    public int getMaxNumberOfRowsByQuery(String query){
+    public int getMaxNumberOfRowsByQuery(String query) {
         if (!find(query).isEmpty()) {
-        logger.log(Level.INFO, find(query).get(0).getName());
+            logger.log(Level.INFO, find(query).get(0).getName());
         }
         int total = (int) find(query).size();
         return total;
@@ -151,11 +151,11 @@ public class FSFolderDaoImpl implements FSFolderDao {
     @Override
     public List<FSObject> getPageForLazySearchQuery(int first, int pageSize, String query) {
 
-        return (List<FSObject>)find(query).subList(first, first + pageSize );
+        return (List<FSObject>) find(query).subList(first, first + pageSize);
     }
 
     @Override
-    public List<FSObject> getPageForLazy(FSFolder parent, int first, int pageSize){
+    public List<FSObject> getPageForLazy(FSFolder parent, int first, int pageSize) {
         String notRootFolder = parent.getPath().equals("/") ? "" : parent.getPath();
         List<FSObject> children = new ArrayList<FSObject>();
         Folder cmisParent = (Folder) session.getObjectByPath(parent.getPath());
@@ -241,47 +241,69 @@ public class FSFolderDaoImpl implements FSFolderDao {
         }
     }
 
+    /**
+     * Return all results from searching in repository by query
+     *
+     * @param query - part of searching word for query
+     * @return List files
+     */
     @Override
     public List<FSObject> find(String query) {
         List<FSObject> files = new ArrayList<FSObject>();
-        String myType = "cmis:document";
-        ObjectType type = session.getTypeDefinition(myType);
-        PropertyDefinition<?> objectIdPropDef = type.getPropertyDefinitions().get(PropertyIds.OBJECT_ID);
-        String objectIdQueryName = objectIdPropDef.getQueryName();
-        parseFSFile(query, files, type, objectIdQueryName);
-        String queryString;
-        myType = "cmis:folder";
-        type = session.getTypeDefinition(myType);
-        objectIdPropDef = type.getPropertyDefinitions().get(PropertyIds.OBJECT_ID);
-        objectIdQueryName = objectIdPropDef.getQueryName();
-        logger.log(Level.INFO, "before SELECT query " + query);
-        parseFSFolder(query, files, type, objectIdQueryName);
+        parseFSFile(query, files);
+        parseFSFolder(query, files);
         return files;
     }
 
-    private void parseFSFolder(String query, List<FSObject> files, ObjectType type, String objectIdQueryName) {
-        String queryString;
-        queryString = "SELECT " + "*" + " FROM " + type.getQueryName() +" WHERE cmis:name LIKE '%" + query + "%'";
+    /**
+     * Find all cmis folders from searching in repository by query
+     *
+     * @param query - part of searching word for query
+     * @param files - List for results
+     * @return List files
+     */
+    public void parseFSFolder(String query, List<FSObject> files) {
+        ObjectType type = session.getTypeDefinition("cmis:folder");
+        PropertyDefinition<?> objectIdPropDef = type.getPropertyDefinitions().get(PropertyIds.OBJECT_ID);
+        String objectIdQueryName = objectIdPropDef.getQueryName();
+        String queryString = getFullQuery(query, type);
         ItemIterable<QueryResult> folderResults = session.query(queryString, false);
-        logger.log(Level.INFO, "after SELECT query " + queryString);
         for (QueryResult qResult : folderResults) {
             FSFolder fsFolder = new FSFolder();
             String objectId = qResult.getPropertyValueByQueryName(objectIdQueryName);
             Folder folder = (Folder) session.getObject(session.createObjectId(objectId));
             fsFolder.setPath(folder.getPath());
             fsFolder.setName(folder.getName());
-            logger.log(Level.INFO, "folder get name " + folder.getName());
             fsFolder.setId(folder.getId());
             fsFolder.setTypeId(folder.getType().getDisplayName());
             fsFolder.setParentTypeId(folder.getType().getParentTypeId());
             files.add(fsFolder);
-            logger.log(Level.INFO, "Result from query:______________" + fsFolder.getName());
         }
     }
 
-    private void parseFSFile(String query, List<FSObject> files, ObjectType type, String objectIdQueryName) {
-        String queryString = "SELECT " + "*" + " FROM " + type.getQueryName() +" WHERE cmis:name LIKE '%" + query + "%'";
+    /**
+     * Collects complex full query for search in repository
+     *
+     * @param query - part of searching word for query
+     * @return full query
+     */
+    public String getFullQuery(String query, ObjectType type) {
+        return "SELECT " + "*" + " FROM " + type.getQueryName() + " WHERE cmis:name LIKE '%" + query + "%'";
+    }
+
+    /**
+     * Find all cmis documents from searching in repository by query
+     *
+     * @param query - part of searching word for query
+     * @param files - List for results
+     * @return List files
+     */
+    public void parseFSFile(String query, List<FSObject> files) {
+        ObjectType type = session.getTypeDefinition("cmis:document");
+        PropertyDefinition<?> objectIdPropDef = type.getPropertyDefinitions().get(PropertyIds.OBJECT_ID);
+        String queryString = getFullQuery(query, type);
         ItemIterable<QueryResult> fileResult = session.query(queryString, false);
+        String objectIdQueryName = objectIdPropDef.getQueryName();
         for (QueryResult qResult : fileResult) {
             FSFile fsFile = new FSFile();
             String objectId = qResult.getPropertyValueByQueryName(objectIdQueryName);
@@ -295,7 +317,9 @@ public class FSFolderDaoImpl implements FSFolderDao {
             fsFile.setLastModifiedBy(doc.getLastModifiedBy());
             fsFile.setLastModifiedTime(doc.getLastModificationDate().getTime());
             fsFile.setAbsolutePath(doc.getPaths().get(0));
-            files.add(fsFile) ;
+            files.add(fsFile);
         }
     }
+
+
 }
