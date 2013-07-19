@@ -62,7 +62,7 @@
             <p:inputText id="finditem" value="#{treeBean.findQuery}" />
             <p:commandButton value="Search" process="tablecomponent"
                              update=":#{cc.parent.clientId}:treeForm:table:tablecomponent"/>
-
+                             <p:watermark for="finditem"  value="name"/>
             <p:tabMenu id="actiontabmenu" activeIndex="5" rendered="#{cc.attrs.actionPanel}">
                 <p:menuitem>
                     <p:menuButton value="New">

@@ -248,6 +248,38 @@ public class FSFolderDaoImpl implements FSFolderDao {
         ObjectType type = session.getTypeDefinition(myType);
         PropertyDefinition<?> objectIdPropDef = type.getPropertyDefinitions().get(PropertyIds.OBJECT_ID);
         String objectIdQueryName = objectIdPropDef.getQueryName();
+        parseFSFile(query, files, type, objectIdQueryName);
+        String queryString;
+        myType = "cmis:folder";
+        type = session.getTypeDefinition(myType);
+        objectIdPropDef = type.getPropertyDefinitions().get(PropertyIds.OBJECT_ID);
+        objectIdQueryName = objectIdPropDef.getQueryName();
+        logger.log(Level.INFO, "before SELECT query " + query);
+        parseFSFolder(query, files, type, objectIdQueryName);
+        return files;
+    }
+
+    private void parseFSFolder(String query, List<FSObject> files, ObjectType type, String objectIdQueryName) {
+        String queryString;
+        queryString = "SELECT " + "*" + " FROM " + type.getQueryName() +" WHERE cmis:name LIKE '%" + query + "%'";
+        ItemIterable<QueryResult> folderResults = session.query(queryString, false);
+        logger.log(Level.INFO, "after SELECT query " + queryString);
+        for (QueryResult qResult : folderResults) {
+            FSFolder fsFolder = new FSFolder();
+            String objectId = qResult.getPropertyValueByQueryName(objectIdQueryName);
+            Folder folder = (Folder) session.getObject(session.createObjectId(objectId));
+            fsFolder.setPath(folder.getPath());
+            fsFolder.setName(folder.getName());
+            logger.log(Level.INFO, "folder get name " + folder.getName());
+            fsFolder.setId(folder.getId());
+            fsFolder.setTypeId(folder.getType().getDisplayName());
+            fsFolder.setParentTypeId(folder.getType().getParentTypeId());
+            files.add(fsFolder);
+            logger.log(Level.INFO, "Result from query:______________" + fsFolder.getName());
+        }
+    }
+
+    private void parseFSFile(String query, List<FSObject> files, ObjectType type, String objectIdQueryName) {
         String queryString = "SELECT " + "*" + " FROM " + type.getQueryName() +" WHERE cmis:name LIKE '%" + query + "%'";
         ItemIterable<QueryResult> fileResult = session.query(queryString, false);
         for (QueryResult qResult : fileResult) {
@@ -265,27 +297,5 @@ public class FSFolderDaoImpl implements FSFolderDao {
             fsFile.setAbsolutePath(doc.getPaths().get(0));
             files.add(fsFile) ;
         }
-        myType = "cmis:folder";
-        type = session.getTypeDefinition(myType);
-        objectIdPropDef = type.getPropertyDefinitions().get(PropertyIds.OBJECT_ID);
-        objectIdQueryName = objectIdPropDef.getQueryName();
-        logger.log(Level.INFO, "before SELECT query " + query);
-        queryString = "SELECT " + "*" + " FROM " + type.getQueryName() +" WHERE cmis:name LIKE '%" + query + "%'";
-        ItemIterable<QueryResult> folderResults = session.query(queryString, false);
-        logger.log(Level.INFO, "after SELECT query " + queryString);
-        for (QueryResult qResult : folderResults) {
-            FSFolder fsFolder = new FSFolder();
-            String objectId = qResult.getPropertyValueByQueryName(objectIdQueryName);
-            Folder folder = (Folder) session.getObject(session.createObjectId(objectId));
-            fsFolder.setPath(folder.getPath());
-            fsFolder.setName(folder.getName());
-            logger.log(Level.INFO, "folder get name " + folder.getName());
-            fsFolder.setId(folder.getId());
-            fsFolder.setTypeId(folder.getType().getDisplayName());
-            fsFolder.setParentTypeId(folder.getType().getParentTypeId());
-            files.add(fsFolder);
-            logger.log(Level.INFO, "Result from query:______________" + fsFolder.getName());
-        }
-        return files;
     }
 }
