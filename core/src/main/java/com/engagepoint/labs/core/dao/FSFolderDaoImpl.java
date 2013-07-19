@@ -9,11 +9,17 @@ package com.engagepoint.labs.core.dao;
 import com.engagepoint.labs.core.models.FSFile;
 import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
+import com.engagepoint.labs.core.models.exceptions.BaseException;
+import com.engagepoint.labs.core.models.exceptions.ConnectionException;
+import com.engagepoint.labs.core.models.exceptions.FolderAlreadyExistException;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.client.runtime.ObjectIdImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
 import org.apache.chemistry.opencmis.commons.enums.UnfileObject;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisBaseException;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisNameConstraintViolationException;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,61 +51,82 @@ public class FSFolderDaoImpl implements FSFolderDao {
     }
 
     @Override
-    public FSFolder create(FSFolder parent, String folderName) {
-        Map<String, String> newFolderProps = new HashMap<String, String>();
-        Folder cmisParent = (Folder) session.getObjectByPath(parent.getPath());
-        newFolderProps.put(PropertyIds.OBJECT_TYPE_ID, "cmis:folder");
-        newFolderProps.put(PropertyIds.NAME, folderName);
-        Folder newFolder = cmisParent.createFolder(newFolderProps);
-        FSFolder folder = new FSFolder();
-        folder.setPath(newFolder.getPath());
-        folder.setName(newFolder.getName());
-        folder.setParent(parent);
-        folder.setId(newFolder.getId());
-        folder.setTypeId(newFolder.getType().getDisplayName());
-        folder.setParentTypeId(newFolder.getType().getParentTypeId());
+    public FSFolder create(FSFolder parent, String folderName) throws BaseException {
+        FSFolder folder = null;
+        try {
+            Map<String, String> newFolderProps = new HashMap<String, String>();
+            Folder cmisParent = (Folder) session.getObjectByPath(parent.getPath());
+            newFolderProps.put(PropertyIds.OBJECT_TYPE_ID, "cmis:folder");
+            newFolderProps.put(PropertyIds.NAME, folderName);
+            Folder newFolder = cmisParent.createFolder(newFolderProps);
+            folder = new FSFolder();
+            folder.setPath(newFolder.getPath());
+            folder.setName(newFolder.getName());
+            folder.setParent(parent);
+            folder.setId(newFolder.getId());
+            folder.setTypeId(newFolder.getType().getDisplayName());
+            folder.setParentTypeId(newFolder.getType().getParentTypeId());
+        } catch (CmisNameConstraintViolationException ex) {
+            throw new FolderAlreadyExistException(ex.getMessage());
+        } catch (CmisBaseException e) {
+            throw new BaseException(e.getMessage());
+        }
         return folder;
     }
 
     @Override
-    public FSFolder rename(FSFolder folder, String newName) {
-        Folder cmisFolder = (Folder) session.getObjectByPath(folder.getPath());
-        Map<String, String> newFolderProps = new HashMap<String, String>();
-        newFolderProps.put(PropertyIds.NAME, newName);
-        cmisFolder.updateProperties(newFolderProps, true);
-        folder.setName(cmisFolder.getName());
-        folder.setPath(cmisFolder.getPath());
+    public FSFolder rename(FSFolder folder, String newName) throws BaseException {
+        try {
+            Folder cmisFolder = (Folder) session.getObjectByPath(folder.getPath());
+            Map<String, String> newFolderProps = new HashMap<String, String>();
+            newFolderProps.put(PropertyIds.NAME, newName);
+            cmisFolder.updateProperties(newFolderProps);
+            folder.setName(cmisFolder.getName());
+            folder.setPath(cmisFolder.getPath());
+        } catch (CmisNameConstraintViolationException ex) {
+            throw new FolderAlreadyExistException("Folder already exist");
+        } catch (CmisBaseException e) {
+            throw new BaseException(e.getMessage());
+        }
+
         return folder;
     }
 
     @Override
-    public List<FSObject> getChildren(FSFolder parent) {
+    public List<FSObject> getChildren(FSFolder parent) throws BaseException {
         String notRootFolder = parent.getPath().equals("/") ? "" : parent.getPath();
         List<FSObject> children = new ArrayList<FSObject>();
         Folder cmisParent = (Folder) session.getObjectByPath(parent.getPath());
         ItemIterable<CmisObject> cmisChildren = cmisParent.getChildren();
-        for (CmisObject o : cmisChildren) {
-            FSObject fsObject;
-            if (o instanceof Folder) {
-                fsObject = new FSFolder();
-                fsObject.setPath(((Folder) o).getPath());
-            } else {
-                fsObject = new FSFile();
-                fsObject.setMimetype(((Document) o).getContentStreamMimeType());
-                fsObject.setPath(notRootFolder);
-                fsObject.setSize(String.valueOf(((Document) o).getContentStreamLength() / 1024));
-                ((FSFile) fsObject).setAbsolutePath(notRootFolder + "/" + o.getName());
+        try {
+            for (CmisObject o : cmisChildren) {
+                FSObject fsObject;
+                if (o instanceof Folder) {
+                    fsObject = new FSFolder();
+                    fsObject.setPath(((Folder) o).getPath());
+                } else {
+                    fsObject = new FSFile();
+                    fsObject.setMimetype(((Document) o).getContentStreamMimeType());
+                    ((FSFile) fsObject).setVersionable(((DocumentType) (o.getType())).isVersionable());
+                    fsObject.setPath(notRootFolder);
+                    fsObject.setSize(String.valueOf(((Document) o).getContentStreamLength() / 1024));
+                    ((FSFile) fsObject).setAbsolutePath(notRootFolder + "/" + o.getName());
+                }
+                fsObject.setParentTypeId(o.getType().getParentTypeId());
+                fsObject.setCreatedBy(o.getCreatedBy());
+                fsObject.setCreationTime(o.getCreationDate().getTime());
+                fsObject.setLastModifiedBy(o.getLastModifiedBy());
+                fsObject.setLastModifiedTime(o.getLastModificationDate().getTime());
+                fsObject.setTypeId(o.getBaseType().getDisplayName());
+                fsObject.setName(o.getName());
+                fsObject.setId(o.getId());
+                fsObject.setParent(parent);
+                children.add(fsObject);
             }
-            fsObject.setParentTypeId(o.getType().getParentTypeId());
-            fsObject.setCreatedBy(o.getCreatedBy());
-            fsObject.setCreationTime(o.getCreationDate().getTime());
-            fsObject.setLastModifiedBy(o.getLastModifiedBy());
-            fsObject.setLastModifiedTime(o.getLastModificationDate().getTime());
-            fsObject.setTypeId(o.getBaseType().getDisplayName());
-            fsObject.setName(o.getName());
-            fsObject.setId(o.getId());
-            fsObject.setParent(parent);
-            children.add(fsObject);
+        } catch (CmisObjectNotFoundException e) {
+            throw new ConnectionException(e.getMessage());
+        } catch (CmisBaseException e) {
+            throw new BaseException(e.getMessage());
         }
         return children;
     }
@@ -190,8 +217,15 @@ public class FSFolderDaoImpl implements FSFolderDao {
     }
 
     @Override
-    public boolean hasChildFolder(FSFolder folder) {
-        List<FSObject> children = getChildren(folder);
+    public boolean hasChildFolder(FSFolder folder) throws BaseException {
+        List<FSObject> children = null;
+        try {
+            children = getChildren(folder);
+        } catch (ConnectionException e) {
+            throw new ConnectionException(e.getMessage());
+        } catch (CmisBaseException e) {
+            throw new BaseException(e.getMessage());
+        }
         if (!children.isEmpty()) {
             for (FSObject iterator : children) {
                 if (iterator instanceof FSFolder) {
@@ -203,8 +237,15 @@ public class FSFolderDaoImpl implements FSFolderDao {
     }
 
     @Override
-    public boolean hasChildren(FSFolder folder) {
-        List<FSObject> children = getChildren(folder);
+    public boolean hasChildren(FSFolder folder) throws BaseException {
+        List<FSObject> children = null;
+        try {
+            children = getChildren(folder);
+        } catch (ConnectionException e) {
+            throw new ConnectionException(e.getMessage());
+        } catch (CmisBaseException e) {
+            throw new BaseException(e.getMessage());
+        }
         return !children.isEmpty();
     }
 
