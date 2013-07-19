@@ -64,32 +64,52 @@
                              update=":#{cc.parent.clientId}:treeForm:table:tablecomponent"/>
 
 
-            <p:accordionPanel activeIndex="-1" id="advancedSearch">
-                <p:tab title="Advanced search">
-                    <p:inputText id="findadvanceditem0" value="#{action.findName}"/>
-                    <p:watermark value="findName" for="findadvanceditem0"/>
+            <p:accordionPanel activeIndex="-1">
+                <p:tab title="Advanced search" >
+                    <p:inputText id="findName" value="#{action.findName}"/>
+                    <p:watermark value="findName" for="findName"/>
                      <br/>
-                    <p:inputText id="findadvanceditem1" value="#{action.findContentType}"/>
-                    <p:watermark value="findContentType" for="findadvanceditem1"/>
+                    <p:inputText id="cmisType" value="#{action.cmisType}"/>
+                    <p:watermark value="Doc or Folder" for="cmisType"/>
                     <br/>
+
+                    <!--metadata-->
+                    <p:inputText id="metaDataType" value="#{action.metaDataType}"/>
+                    <p:watermark value="metaDataType" for="metaDataType"/>
+                    <br/>
+
+                    <!--format-->
+                    <p:inputText id="docType" value="#{action.docType}"/>
+                    <p:watermark value="metaDataType" for="docType"/>
+                    <br/>
+
+                     <!--date-->
                     <h:outputText value="From "/>
                     <p:calendar id="calendarFrom" value="#{action.calendarFrom}"/>
+                    <p:watermark value="First date" for="calendarFrom"/>
                     <h:outputText value=" to "/>
                     <p:calendar id="calendarTo" value="#{action.calendarTo}"/>
+                    <p:watermark value="Second date" for="calendarTo"/>
                     <br/>
-                    <p:inputText id="findadvanceditem2" value="#{action.findDate}"/>
-                    <p:watermark value="findDate" for="findadvanceditem2"/>
+
+                     <!--Metadata-->
+                    <p:inputText id="contentType" value="#{action.contentType}"/>
+                    <p:watermark value="findType" for="contentType"/>
                     <br/>
-                    <p:inputText id="findadvanceditem3" value="#{action.findType}"/>
-                    <p:watermark value="findType" for="findadvanceditem3"/>
+
+                    <!--size -->
+                    <h:outputText value="From "/>
+                    <p:inputText id="sizeFrom" value="#{action.sizeFrom}"/>
+                    <p:watermark value="min size" for="sizeFrom"/>
+                    <h:outputText value=" to "/>
+                    <p:inputText id="sizeTo" value="#{action.sizeTo}"/>
+                    <p:watermark value="max size" for="sizeTo"/>
                     <br/>
-                    <p:inputText id="findadvanceditem4" value="#{action.findSize}"/>
-                    <p:watermark value="findSize" for="findadvanceditem4"/>
+
+                    <p:inputText id="snippet" value="#{action.snippet}"/>
+                    <p:watermark value="snippet for search" for="snippet"/>
                     <br/>
-                    <p:inputText id="findadvanceditem5" value="#{action.findSnippet}"/>
-                    <p:watermark value="findSnippet" for="findadvanceditem5"/>
-                    <br/>
-                    <p:commandButton value="Search3" actionListener="#{action.findAdvanced}" process=":cmisbrowser:treeForm:table:tablecomponent:advancedSearch"
+                    <p:commandButton value="Search3" actionListener="#{action.findAdvanced}" process=":#{cc.parent.clientId}:treeForm:table:tablecomponent"
                                      update=":#{cc.parent.clientId}:treeForm:table:tablecomponent"/>
                 </p:tab>
             </p:accordionPanel>

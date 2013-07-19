@@ -7,6 +7,7 @@ import com.engagepoint.labs.core.models.FSObject;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -131,13 +132,14 @@ public class CMISServiceImpl implements CMISService {
     }
 
     @Override
-    public int getMaxNumberOfRowsByQuery(List<String> query){
+    public int getMaxNumberOfRowsByQuery(List<Object> query){
+        logger.log(Level.INFO, "============BEFORE FIND======");
         int total = (int) fsFileDao.find(query).size();
         return total;
     }
 
     @Override
-    public List<FSObject> getPageForLazySearchQuery(int first, int pageSize, List<String> query) {
+    public List<FSObject> getPageForLazySearchQuery(int first, int pageSize, List<Object> query) {
 
         return (List<FSObject>)fsFileDao.find(query).subList(first, first + pageSize );
     }

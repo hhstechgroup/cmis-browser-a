@@ -57,6 +57,6 @@ public interface FSFileDao {
 
     public List<FSObject> find(String query);
 
-    public List<FSObject> find(List<String> query);
+    public List<FSObject> find(List<Object> query);
 
 }

@@ -46,16 +46,19 @@ public class ActionBean implements Serializable {
     private final CMISService cmisService;
 
     private FSObject folderForCopy;
+
     private String findQuery;
-    private List<String> searchQueryAdvanced;
+    private List<Object> searchQueryAdvanced;
     private String findName;
-    private String findType;
-    private String findContentType;
-    private String findDate;
-    private String findSize;
-    private String findSnippet;
+    private String cmisType;
+    private String metaDataType;
+    private String docType;
     private Date calendarFrom;
     private Date calendarTo;
+    private String contentType;
+    private String sizeFrom;
+    private String sizeTo;
+    private String snippet;
 
 
     /**
@@ -283,18 +286,20 @@ public class ActionBean implements Serializable {
     public void findAdvanced(){
 
         logger.log(Level.INFO, "==___________findAdvanced()____" );
-        searchQueryAdvanced = new ArrayList<String>();
+        searchQueryAdvanced = new ArrayList<Object>();
 
         searchQueryAdvanced.add(findName);
-        searchQueryAdvanced.add(findType);
-        searchQueryAdvanced.add(findContentType);
-        searchQueryAdvanced.add(findDate);
-        searchQueryAdvanced.add(findSize);
-        searchQueryAdvanced.add(findSnippet);
+        searchQueryAdvanced.add(cmisType);
+        searchQueryAdvanced.add(metaDataType);
+        searchQueryAdvanced.add(docType);
+        searchQueryAdvanced.add(calendarFrom);
+        searchQueryAdvanced.add(calendarTo);
+        searchQueryAdvanced.add(contentType);
+        searchQueryAdvanced.add(sizeFrom);
+        searchQueryAdvanced.add(sizeTo);
+        searchQueryAdvanced.add(snippet);
 
         treeBean.getLazyModel().setSearchQueryAdvanced(searchQueryAdvanced);
-
-
     }
 
     public String getFindQuery() {
@@ -315,71 +320,14 @@ public class ActionBean implements Serializable {
         }
     }
 
-    public String getFindSize() {
-        return findSize;
-    }
-
-    public void setFindSize(String findSize) {
-
-        if(findSnippet != null) {
-            this.findSize = findSize;
-        }
-        else{
-            this.findSize = "";
-        }
-    }
-
-    public String getFindDate() {
-        return findDate;
-    }
-
-    public void setFindDate(String findDate) {
-
-        if(findSnippet != null) {
-            this.findDate = findDate;
-        }
-        else{
-            this.findDate = "";
-        }
-    }
-
-    public String getFindContentType() {
-        return findContentType;
-    }
-
-    public void setFindContentType(String findContentType) {
-        logger.log(Level.INFO, "==findContentType__ActionBean___(this)= <" + this.findContentType + ">");
-        if(findSnippet != null) {
-            this.findContentType = findContentType;
-            logger.log(Level.INFO, "==findContentType__ActionBean___(this)= <" + this.findContentType + ">");
-        }
-        else{
-            this.findContentType = "";
-            logger.log(Level.INFO, "==findContentType__ActionBean___= <" + findContentType + ">");
-        }
-    }
-
-    public String getFindType() {
-        return findType;
-    }
-
-    public void setFindType(String findType) {
-        this.findType = findType;
-        if(findSnippet != null) {
-            this.findType = findType;
-        }
-        else{
-            this.findType = "";
-        }
-    }
-
     public String getFindName() {
         return findName;
     }
 
     public void setFindName(String findName) {
-        this.findName = findName;
-        if(findSnippet != null) {
+
+        logger.log(Level.INFO, "___________________________________Name___" + findName + "______________");
+        if(findName != null) {
             this.findName = findName;
         }
         else{
@@ -387,21 +335,7 @@ public class ActionBean implements Serializable {
         }
     }
 
-    public String getFindSnippet() {
-        return findSnippet;
-    }
-
-    public void setFindSnippet(String findSnippet) {
-        if(findSnippet != null) {
-            this.findSnippet = findSnippet;
-        }
-        else{
-            this.findSnippet = "";
-        }
-
-    }
-
-    public List<String> getSearchQueryAdvanced() {
+    public List<Object> getSearchQueryAdvanced() {
         return searchQueryAdvanced;
     }
 
@@ -411,7 +345,7 @@ public class ActionBean implements Serializable {
 
     public void setCalendarTo(Date calendarTo) {
         this.calendarTo = calendarTo;
-        logger.log(Level.INFO, "___________calendar format___" + this.calendarFrom.getClass(). + ">");
+        logger.log(Level.INFO, "___________calendar format___" + this.calendarFrom + ">");
 
     }
 
@@ -423,5 +357,96 @@ public class ActionBean implements Serializable {
         this.calendarFrom = calendarFrom;
 
         logger.log(Level.INFO, "___________calendar format___" + this.calendarFrom + ">");
+    }
+
+    public String getSnippet() {
+        return snippet;
+    }
+
+    public void setSnippet(String snippet) {
+        if(snippet != null) {
+            this.snippet = snippet;
+        }
+        else{
+            this.snippet = "";
+        }
+    }
+
+    public String getSizeTo() {
+        return sizeTo;
+    }
+
+    public void setSizeTo(String sizeTo) {
+        if(sizeTo != null) {
+            this.sizeTo = sizeTo;
+        }
+        else{
+            this.sizeTo = "";
+        }
+    }
+
+    public String getSizeFrom() {
+        return sizeFrom;
+    }
+
+    public void setSizeFrom(String sizeFrom) {
+        if(sizeFrom != null) {
+            this.sizeFrom = sizeFrom;
+        }
+        else{
+            this.sizeFrom = "";
+        }
+    }
+
+    public String getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(String contentType) {
+        if(contentType != null) {
+            this.contentType = contentType;
+        }
+        else{
+            this.contentType = "";
+        }
+    }
+
+    public String getDocType() {
+        return docType;
+    }
+
+    public void setDocType(String docType) {
+        if(docType != null) {
+            this.docType = docType;
+        }
+        else{
+            this.docType = "";
+        }
+    }
+
+    public String getMetaDataType() {
+        return metaDataType;
+    }
+
+    public void setMetaDataType(String metaDataType) {
+        if(metaDataType != null) {
+            this.metaDataType = metaDataType;
+        }
+        else{
+            this.metaDataType = "";
+        }
+    }
+
+    public String getCmisType() {
+        return cmisType;
+    }
+
+    public void setCmisType(String cmisType) {
+        if(cmisType != null) {
+            this.cmisType = cmisType;
+        }
+        else{
+            this.cmisType = "";
+        }
     }
 }

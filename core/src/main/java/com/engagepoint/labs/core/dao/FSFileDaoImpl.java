@@ -5,6 +5,7 @@ import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.client.runtime.ObjectIdImpl;
+import org.apache.chemistry.opencmis.client.runtime.QueryStatementImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
@@ -12,10 +13,7 @@ import org.apache.chemistry.opencmis.commons.enums.VersioningState;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,7 +26,7 @@ public class FSFileDaoImpl implements FSFileDao {
 
     private Session session;
 
-    private static Logger logger = Logger.getLogger(FSFileDaoImpl.class.getName());
+    private static Logger logger = Logger.getLogger(FSFileDao.class.getName());
 
     @Override
     public void setSession(Session session) {
@@ -146,7 +144,7 @@ public class FSFileDaoImpl implements FSFileDao {
     }
 
     @Override
-    public List<FSObject> find(List<String> query) {
+    public List<FSObject> find(List<Object> query) {
         List<FSObject> files = new LinkedList<FSObject>();
         String myType = "cmis:document";
         ObjectType type = session.getTypeDefinition(myType);
@@ -159,23 +157,33 @@ public class FSFileDaoImpl implements FSFileDao {
         type = session.getTypeDefinition(myType);
         objectIdPropDef = type.getPropertyDefinitions().get(PropertyIds.OBJECT_ID);
         objectIdQueryName = objectIdPropDef.getQueryName();
+//        logger.log(Level.INFO, "============DAOOOOOOO!======" );
         queryString = getQuery(query, type);
+//        logger.log(Level.INFO, "============DAOOOOOOO!!======" );
         ItemIterable<QueryResult> folderResults = session.query(queryString, false);
+//        logger.log(Level.INFO, "============DAOOOOOOO!!!======" );
         parseFSFolder(files, objectIdQueryName, folderResults);
+//        logger.log(Level.INFO, "============DAOOOOOOO!!!!======" );
         return files;
     }
 
     private void parseFSFolder(List<FSObject> files, String objectIdQueryName, ItemIterable<QueryResult> folderResults) {
+//        logger.log(Level.INFO, "============PARSE!======" );
         for (QueryResult qResult : folderResults) {
+//            logger.log(Level.INFO, "============PARSE!!======" );
             FSFolder fsFolder = new FSFolder();
             String objectId = qResult.getPropertyValueByQueryName(objectIdQueryName);
+//            logger.log(Level.INFO, "============PARSE!!!======" );
             Folder folder = (Folder) session.getObject(session.createObjectId(objectId));
+//            logger.log(Level.INFO, "============PARSE!!!!======" );
             fsFolder.setPath(folder.getPath());
             fsFolder.setName(folder.getName());
+
             fsFolder.setId(folder.getId());
             fsFolder.setTypeId(folder.getType().getDisplayName());
             fsFolder.setParentTypeId(folder.getType().getParentTypeId());
             files.add(fsFolder);
+//            logger.log(Level.INFO, "============PARSE!!!!======" );
         }
     }
 
@@ -184,49 +192,130 @@ public class FSFileDaoImpl implements FSFileDao {
         return "SELECT " + "*" + " FROM " + type.getQueryName() + " WHERE cmis:name LIKE '%" + query + "%'";
     }
 
-    private String getQuery(List<String> query, ObjectType type) {
+    private String getQuery(List<Object> query, ObjectType type) {
 
-        logger.log(Level.INFO, "===1_" + query.get(0) + "====2_" + query.get(1) + "===3_" + query.get(2) + "---------");
-        String queryFull;
+
+//        searchQueryAdvanced.add(findName);
+//        searchQueryAdvanced.add(cmisType);
+//        searchQueryAdvanced.add(metaDataType);
+//        searchQueryAdvanced.add(docType);
+//        searchQueryAdvanced.add(calendarFrom);
+//        searchQueryAdvanced.add(calendarTo);
+//        searchQueryAdvanced.add(contentType);
+//        searchQueryAdvanced.add(sizeFrom);
+//        searchQueryAdvanced.add(sizeTo);
+//        searchQueryAdvanced.add(snippet);
+
+        String plusQuery = "SELECT * FROM " + type.getQueryName() + " WHERE ";
         int count = 0;
-
-        logger.log(Level.INFO, "===Count " + query.get(0) + "====");
-
-        queryFull = "SELECT " + "*" + " FROM " + type.getQueryName() + " WHERE" ;
-
-        logger.log(Level.INFO, "===Count " + queryFull + "====");
-
-        for (String subQuery : query) {
+        for (Object subQuery : query) {
             if ((count == 0) && (subQuery != "")) {
 
-                queryFull += " cmis:name LIKE '%" + subQuery + "%'";
-                logger.log(Level.INFO, "===Count " + queryFull + "====");
+                plusQuery += " cmis:name LIKE '%" + (String)subQuery + "%'";
+                if(type.getQueryName() == "cmis:document")  {
+                    plusQuery += " AND " ;
+                }
+//                logger.log(Level.INFO, "===Count " + queryFull + "====");
             }
 
-            if ((count == 1) && (subQuery != "")) {
-//                queryFull += " AND cmis:objectTypeId LIKE '%" + subQuery + "%'";
+//            if ((count == 1) && ((String)subQuery != "")) {
+//                plusQuery += " AND cmis:objectTypeId LIKE '%" + subQuery + "%'";
+//            }
+//            if ((count == 2) && ((String)subQuery != "")) {
+////                plusQuery += " AND cmis:objectTypeId LIKE '%" + subQuery +"%'";
+//            }
+//            if ((count == 3) && ((String) subQuery != "") && (type.getQueryName() == "cmis:document")) {
+//                plusQuery += " AND cmis:contentStreamMimeType LIKE '%" + subQuery + "%'";
+//            }
+//            if ((count == 4) && ((Date)subQuery != null)) {
+//               plusQuery += " AND cmis:lastModificationDate > TIMESTAMP '?'";
+//            }
+//            if ((count == 5) && ((Date)subQuery != null)) {
+//                plusQuery += " AND cmis:lastModificationDate < TIMESTAMP '?'";
+//            }
+//            if ((count == 5) && ((String)subQuery != "")) {
+//
+//            }
+            if ((count == 7) && ((String) subQuery != "") && (type.getQueryName() == "cmis:document")) {
+                plusQuery += "  cmis:contentStreamLength > \"" + subQuery + "\"";
+                logger.log(Level.INFO, "___________sizejsdhflgsdh___________" + plusQuery + "__________________");
             }
-            if ((count == 2) && (subQuery != "")) {
-                queryFull += " AND cmis:objectTypeId LIKE '%" + subQuery +"%'";
-            }
-            if ((count == 3) && (subQuery != "")) {
+            if ((count == 8) && ((String) subQuery != "") && (type.getQueryName() == "cmis:document")) {
+                plusQuery += " AND cmis:contentStreamLength < \"" + subQuery + "\"";
+                logger.log(Level.INFO, "_________sizedebhshedbsgb_____________" + plusQuery + "__________________");
 
             }
-            if ((count == 4) && (subQuery != "")) {
+            if ((count == 9) && ((String)subQuery != "") && (type.getQueryName() == "cmis:document")) {
+                plusQuery += " AND CONTAINS('" + subQuery + "')";
 
             }
-            if ((count == 5) && (subQuery != "")) {
-
-            }
-            //SELECT * FROM cmis:document WHERE cmis:lastModificationDate < TIMESTAMP '2014-05-22T00:00:00.000+00:00'
-            // AND cmis:lastModificationDate > TIMESTAMP '2013-07-02T00:00:00.000+00:00'
+//            //SELECT * FROM cmis:document WHERE cmis:lastModificationDate < TIMESTAMP '2014-05-22T00:00:00.000+00:00'
+//            // AND cmis:lastModificationDate > TIMESTAMP '2013-07-02T00:00:00.000+00:00'
+            logger.log(Level.INFO, "__________|||||sizedebhshedbsgb|||||||_____________"+count +"_____"+subQuery +"_____"+ plusQuery+"____" +type.getQueryName()+ "__________________");
             ++count;
         }
-        if (queryFull == "SELECT " + "*" + " FROM " + type.getQueryName() + " WHERE ") {
-            return null;
-        } else {
-            return queryFull;
-        }
+
+        logger.log(Level.INFO, "______________________" + plusQuery + "__________________");
+
+
+
+        QueryStatement qs = session.createQueryStatement("SEL?ECT ?, ? FROM ? WHERE ? > TIMESTAMP ? AND IN_FOLDER(?) OR ? IN (?)");
+
+        qs.setProperty(1, "cmis:document", "cmis:name");
+        qs.setProperty(2, "cmis:document", "cmis:objectId");
+        qs.setType(3, "cmis:document");
+
+        qs.setProperty(4, "cmis:document", "cmis:creationDate");
+//        qs.setDateTime(5, (Date)query.get(4));
+
+
+        qs.setProperty(7, "cmis:document", "cmis:createdBy");
+        qs.setString(8, "bob", "tom", "lisa");
+
+        String statement = qs.toQueryString();
+
+
+
+
+//        queryFull = "SELECT " + "*" + " FROM " + type.getQueryName() + " WHERE" ;
+
+
+//        logger.log(Level.INFO, "===Count " + queryFull + "====");
+
+
+//        for (Object subQuery : query) {
+//            if ((count == 0) && (subQuery != "")) {
+//
+//                queryFull += " cmis:name LIKE '%" + (String)subQuery + "%'";
+//                logger.log(Level.INFO, "===Count " + queryFull + "====");
+//            }
+//
+//            if ((count == 1) && ((String)subQuery != "")) {
+////                queryFull += " AND cmis:objectTypeId LIKE '%" + subQuery + "%'";
+//            }
+//            if ((count == 2) && ((String)subQuery != "")) {
+////                queryFull += " AND cmis:objectTypeId LIKE '%" + subQuery +"%'";
+//            }
+//            if ((count == 3) && ((String)subQuery != "")) {
+//
+//            }
+//            if ((count == 4) && ((String)subQuery != "")) {
+//
+//            }
+//            if ((count == 5) && ((String)subQuery != "")) {
+//
+//            }
+//            //SELECT * FROM cmis:document WHERE cmis:lastModificationDate < TIMESTAMP '2014-05-22T00:00:00.000+00:00'
+//            // AND cmis:lastModificationDate > TIMESTAMP '2013-07-02T00:00:00.000+00:00'
+//            ++count;
+//        }
+//        if (queryFull == "SELECT " + "*" + " FROM " + type.getQueryName() + " WHERE ") {
+//            return null;
+//        } else {
+//            return queryFull;
+//        }
+//        return "SELECT * FROM " + type.getQueryName() +" WHERE cmis:name LIKE '%" + query.get(0) + "%'";
+        return plusQuery;
     }
 
     private void parseFSFile(List<FSObject> files, String objectIdQueryName, ItemIterable<QueryResult> fileResult) {
@@ -243,6 +332,7 @@ public class FSFileDaoImpl implements FSFileDao {
             fsFile.setLastModifiedBy(doc.getLastModifiedBy());
             fsFile.setLastModifiedTime(doc.getLastModificationDate().getTime());
             fsFile.setAbsolutePath(doc.getPaths().get(0));
+            fsFile.setSize(String.valueOf(doc.getContentStreamLength()));
             files.add(fsFile);
         }
     }

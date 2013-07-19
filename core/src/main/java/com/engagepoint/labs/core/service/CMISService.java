@@ -21,11 +21,11 @@ public interface CMISService {
 
     public int getMaxNumberOfRowsByQuery(String query);
 
-    public int getMaxNumberOfRowsByQuery(List<String> query);
+    public int getMaxNumberOfRowsByQuery(List<Object> query);
 
     public List<FSObject> getPageForLazySearchQuery(int first,int pageSize, String query);
 
-    public List<FSObject> getPageForLazySearchQuery(int first,int pageSize, List<String> query);
+    public List<FSObject> getPageForLazySearchQuery(int first,int pageSize, List<Object> query);
 
 
     /**

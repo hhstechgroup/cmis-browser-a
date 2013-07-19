@@ -26,13 +26,13 @@ public class LazyFSObjectDataModel extends LazyDataModel<FSObject> {
     private FSFolder parent;
     private CMISService cmisService;
     private String searchQuery;
-    private List<String> searchQueryAdvanced;
+    private List<Object> searchQueryAdvanced;
 
     public LazyFSObjectDataModel(CMISService cmisService, FSFolder parent) {
         this.cmisService = cmisService;
         this.parent = parent;
         this.searchQuery = "";
-        searchQueryAdvanced = new ArrayList<String>();
+        searchQueryAdvanced = new ArrayList<Object>();
         logger.log(Level.INFO, "===============================LazyFSObjectDataModel(CMISService cmisService, FSFolder parent) ========");
     }
 
@@ -132,11 +132,15 @@ public class LazyFSObjectDataModel extends LazyDataModel<FSObject> {
         }
         // for advaced search
         else{
-            if ((searchQueryAdvanced.get(0)+searchQueryAdvanced.get(1)+searchQueryAdvanced.get(2)+searchQueryAdvanced.get(3) +
-            searchQueryAdvanced.get(4)+searchQueryAdvanced.get(5)).equals("")) {
+//            if (((String)searchQueryAdvanced.get(0)+searchQueryAdvanced.get(1)+searchQueryAdvanced.get(2)+searchQueryAdvanced.get(3) +
+//            searchQueryAdvanced.get(4)+searchQueryAdvanced.get(5)).equals(""))
+
+            logger.log(Level.INFO, "============IN FIND==================");
+
+            if((String)searchQueryAdvanced.get(0) == ""){
                 int dataSize = cmisService.getMaxNumberOfRows(parent);
                 this.setRowCount(dataSize);
-                logger.log(Level.INFO, "============DATASIZE==========" + dataSize + "========");
+//                logger.log(Level.INFO, "============DATASIZE==========" + dataSize + "========");
 
                 if (dataSize > pageSize) {
                     data = cmisService.getPageForLazy(parent, first, pageSize);
@@ -147,24 +151,29 @@ public class LazyFSObjectDataModel extends LazyDataModel<FSObject> {
                 }
             } else {
 
-
+                logger.log(Level.INFO, "============IN FIND====1========size======" + searchQueryAdvanced.get(0));
                 int dataSize = cmisService.getMaxNumberOfRowsByQuery(searchQueryAdvanced);
+                logger.log(Level.INFO, "============IN FIND====1========size======" + dataSize);
                 this.setRowCount(dataSize);
-                logger.log(Level.INFO, "============DATASIZE_Query==========" + dataSize + "========");
+//                logger.log(Level.INFO, "============DATASIZE_Query==========" + dataSize + "========");
+                logger.log(Level.INFO, "============IN FIND====2==============");
 
                 if (dataSize > pageSize) {
                     if ((first + pageSize) > dataSize) {
-                        logger.log(Level.INFO, "============if((first + pageSize) > dataSize)==========" + dataSize + "========");
+//                        logger.log(Level.INFO, "============if((first + pageSize) > dataSize)==========" + dataSize + "========");
+                        logger.log(Level.INFO, "============IN FIND====31==============");
                         data = cmisService.getPageForLazySearchQuery(first, dataSize - first, searchQueryAdvanced);
                         return data;
                     } else {
+                        logger.log(Level.INFO, "============IN FIND====32==============");
                         data = cmisService.getPageForLazySearchQuery(first, pageSize, searchQueryAdvanced);
                         return data;
                     }
                 } else {
-                    logger.log(Level.INFO, "============DATASIZE_Query from==========" + pageSize + "========");
+//                    logger.log(Level.INFO, "============DATASIZE_Query from==========" + pageSize + "========");
+                    logger.log(Level.INFO, "============IN FIND====4==============");
                     data = cmisService.find(searchQuery);
-                    logger.log(Level.INFO, "============DATASIZE_Query to==========" + pageSize + "========");
+//                    logger.log(Level.INFO, "============DATASIZE_Query to==========" + pageSize + "========");
                     return data;
                 }
             }
@@ -179,11 +188,14 @@ public class LazyFSObjectDataModel extends LazyDataModel<FSObject> {
         this.searchQuery = searchQuery;
     }
 
-    public List<String> getSearchQueryAdvanced() {
+    public List<Object> getSearchQueryAdvanced() {
         return searchQueryAdvanced;
     }
 
-    public void setSearchQueryAdvanced(List<String> searchQueryAdvanced) {
+    public void setSearchQueryAdvanced(List<Object> searchQueryAdvanced) {
+        logger.log(Level.INFO, "============SET ===searchQueryAdvanced===========");
+
         this.searchQueryAdvanced = searchQueryAdvanced;
+        logger.log(Level.INFO, "============SET ===searchQueryAdvanced====" + searchQueryAdvanced + "=======");
     }
 }
