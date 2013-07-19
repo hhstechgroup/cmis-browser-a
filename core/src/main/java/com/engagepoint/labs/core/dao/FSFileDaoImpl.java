@@ -69,36 +69,31 @@ public class FSFileDaoImpl implements FSFileDao {
     public FSFile edit(FSFile file, byte[] content, String mimeType) {
         Document cmisFile = (Document) session.getObject(file.getId());
         Map<String, String> properties = null;
-        logger.log(Level.INFO, "file name: "+file.getName()+" cmisfile name: "+cmisFile.getName());
         if (!file.getName().equals(cmisFile.getName())) {
-            logger.log(Level.INFO, "renaming-- old name: "+cmisFile.getName()+" new name: "+file.getName());
             properties = new HashMap<String, String>();
             properties.put(PropertyIds.NAME, file.getName());
         }
-        if (content == null) {
-            content = new byte[0];
-        }
-        if (mimeType == null) {
-            mimeType = "text/plain";
-        }
-        if (((DocumentType) (cmisFile.getType())).isVersionable()) {
-            logger.log(Level.INFO, "isVersionable");
-            Document pwc = (Document) session.getObject(cmisFile.checkOut());
-            InputStream input = new ByteArrayInputStream(content);
-            ContentStream contentStream = session.getObjectFactory().createContentStream(file.getName(),
+        InputStream input;
+        ContentStream contentStream;
+        try {
+            input = new ByteArrayInputStream(content);
+            contentStream = session.getObjectFactory().createContentStream(file.getName(),
                     content.length, mimeType, input);
+        } catch (NullPointerException ex) {
+            contentStream = cmisFile.getContentStream();
+        }
+
+        if (((DocumentType) (cmisFile.getType())).isVersionable()) {
+            Document pwc = (Document) session.getObject(cmisFile.checkOut());
             // Check in the pwc
             try {
-                logger.log(Level.INFO, "properties null ?" + (properties == null));
                 pwc.checkIn(false, properties, contentStream, "minor version");
+                pwc.updateProperties(properties, true);
             } catch (CmisBaseException e) {
                 System.out.println("checkin failed, trying to cancel the checkout");
                 pwc.cancelCheckOut();
             }
         } else {
-            InputStream input = new ByteArrayInputStream(content);
-            ContentStream contentStream = session.getObjectFactory().createContentStream(file.getName(),
-                    content.length, mimeType, input);
             cmisFile.setContentStream(contentStream, true, true);
             if (properties != null) {
                 cmisFile.updateProperties(properties, true);

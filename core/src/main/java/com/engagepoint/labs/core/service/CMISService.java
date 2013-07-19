@@ -52,7 +52,7 @@ public interface CMISService {
      * @throws Exception if folder with this name exist in parent directory
      * or connection is fail
      */
-    public FSFolder createFolder(FSFolder parent, String folderName) throws Exception;
+    public FSFolder createFolder(FSFolder parent, String folderName);
 
     public FSFile createFile(FSFolder parent, String fileName, byte[] content, String mimeType);
 
@@ -65,7 +65,6 @@ public interface CMISService {
      * @param folder   folder that is supposed to rename
      * @param newName  new name to folder
      * @return  renamed {@link FSFolder} object
-     * @throws Exception
      */
 
     public FSFolder renameFolder(FSFolder folder, String newName);
