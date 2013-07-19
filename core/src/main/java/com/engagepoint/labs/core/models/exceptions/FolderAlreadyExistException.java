@@ -7,7 +7,7 @@ package com.engagepoint.labs.core.models.exceptions;
  * Time: 3:12 PM
  * To change this template use File | Settings | File Templates.
  */
-public class FolderAlreadyExistException extends Exception {
+public class FolderAlreadyExistException extends BaseException {
 
     public FolderAlreadyExistException() {
     }

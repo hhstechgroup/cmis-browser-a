@@ -6,8 +6,7 @@ import com.engagepoint.labs.core.dao.FSFolderDaoImpl;
 import com.engagepoint.labs.core.models.FSFile;
 import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
-import com.engagepoint.labs.core.models.exceptions.FileAlreadyExistException;
-import com.engagepoint.labs.core.models.exceptions.FolderAlreadyExistException;
+import com.engagepoint.labs.core.models.exceptions.*;
 
 import java.io.InputStream;
 import java.util.List;
@@ -24,7 +23,7 @@ public class CMISServiceImpl implements CMISService {
 
     private static CMISServiceImpl service = null;
 
-    private CMISServiceImpl() {
+    private CMISServiceImpl() throws BaseException {
         fsFolderDao = new FSFolderDaoImpl();
         fsFolderDao.setSession(ConnectionFactory.getSession());
     }
@@ -33,7 +32,7 @@ public class CMISServiceImpl implements CMISService {
      * {@inheritDoc}
      */
     @Override
-    public List<FSObject> getChildren(FSFolder fsFolder) {
+    public List<FSObject> getChildren(FSFolder fsFolder) throws BaseException {
         return fsFolderDao.getChildren(fsFolder);
     }
 
@@ -49,7 +48,7 @@ public class CMISServiceImpl implements CMISService {
      * {@inheritDoc}
      */
     @Override
-    public FSFolder createFolder(FSFolder parent, String folderName) {
+    public FSFolder createFolder(FSFolder parent, String folderName) throws BaseException {
         return fsFolderDao.create(parent, folderName);
     }
 
@@ -57,12 +56,12 @@ public class CMISServiceImpl implements CMISService {
      * {@inheritDoc}
      */
     @Override
-    public FSFile createFile(FSFolder parent, String fileName, byte[] content, String mimeType) {
+    public FSFile createFile(FSFolder parent, String fileName, byte[] content, String mimeType) throws BaseException {
         return fsFolderDao.getFsFileDao().create(parent, fileName, content, mimeType);
     }
 
     @Override
-    public FSFile edit(FSFile file, byte[] content, String mimeType){
+    public FSFile edit(FSFile file, byte[] content, String mimeType) throws BaseException {
         return fsFolderDao.getFsFileDao().edit(file, content, mimeType);
     }
 
@@ -78,7 +77,7 @@ public class CMISServiceImpl implements CMISService {
      * {@inheritDoc}
      */
     @Override
-    public FSFolder renameFolder(FSFolder folder, String newName) throws FolderAlreadyExistException {
+    public FSFolder renameFolder(FSFolder folder, String newName) throws BaseException {
         return fsFolderDao.rename(folder, newName);
     }
 
@@ -95,7 +94,7 @@ public class CMISServiceImpl implements CMISService {
         return fsFolderDao.deleteAllTree(folder);
     }
 
-    public static CMISServiceImpl getService() {
+    public static CMISServiceImpl getService() throws BaseException {
         if (service == null) {
             service = new CMISServiceImpl();
         }
@@ -103,31 +102,31 @@ public class CMISServiceImpl implements CMISService {
     }
 
     @Override
-    public List<FSObject> getPage(FSFolder parent, int pageNumber, int numberOfRows) {
+    public List<FSObject> getPage(FSFolder parent, int pageNumber, int numberOfRows) throws BaseException {
         return fsFolderDao.getPage(parent, pageNumber - 1, numberOfRows);
     }
 
     @Override
-    public int getMaxNumberOfPage(FSFolder parent, int numberOfRows) {
+    public int getMaxNumberOfPage(FSFolder parent, int numberOfRows) throws BaseException {
         return fsFolderDao.getMaxNumberOfPage(parent, numberOfRows);
     }
 
     @Override
-    public boolean hasChildFolder(FSFolder folder) {
+    public boolean hasChildFolder(FSFolder folder) throws BaseException {
         return fsFolderDao.hasChildFolder(folder);
     }
 
     @Override
-    public boolean hasChildren(FSFolder folder) {
+    public boolean hasChildren(FSFolder folder) throws BaseException {
         return fsFolderDao.hasChildFolder(folder);
     }
 
     @Override
-    public InputStream getInputStream(FSFile file){
+    public InputStream getInputStream(FSFile file) throws BaseException {
         return fsFolderDao.getFsFileDao().getInputStream(file);
     }
     @Override
-    public FSFolder move(FSFolder source, FSFolder target){
+    public FSFolder move(FSFolder source, FSFolder target) throws BrowserRuntimeException {
         return fsFolderDao.move(source, target);
     }
 
@@ -139,5 +138,9 @@ public class CMISServiceImpl implements CMISService {
     @Override
     public FSFile getHistory(FSFile file) {
         return fsFolderDao.getFsFileDao().getHistory(file);
+    }
+    @Override
+    public void copyFile(String fileId, String name, String targetId) throws BaseException {
+        fsFolderDao.getFsFileDao().copy(fileId, name, targetId);
     }
 }

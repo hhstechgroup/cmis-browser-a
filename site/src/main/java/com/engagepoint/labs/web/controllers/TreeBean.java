@@ -3,11 +3,15 @@ package com.engagepoint.labs.web.controllers;
 import com.engagepoint.labs.core.models.FSFile;
 import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
+import com.engagepoint.labs.core.models.exceptions.BaseException;
+import com.engagepoint.labs.core.models.exceptions.BrowserRuntimeException;
+import com.engagepoint.labs.core.models.exceptions.ConnectionException;
 import com.engagepoint.labs.core.service.CMISService;
 import com.engagepoint.labs.core.service.CMISServiceImpl;
 import org.primefaces.event.NodeCollapseEvent;
 import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.event.SelectEvent;
+import org.primefaces.event.TreeDragDropEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 
@@ -44,7 +48,7 @@ public class TreeBean implements Serializable {
     private FSObject selectedFSObject;
     private boolean checkThatSelected;
     private FSFolder parent = new FSFolder();
-    private CMISService cmisService = CMISServiceImpl.getService();
+    private CMISService cmisService;
     private static Logger logger = Logger.getLogger(TreeBean.class.getName());
 
     private List<PageState> backHistory = new LinkedList<PageState>();
@@ -67,25 +71,16 @@ public class TreeBean implements Serializable {
     private String folderType;
     private Map<String, String> folderTypes = new HashMap<String, String>();
 
-    public String getFolderType() {
-        return folderType;
-    }
-
-    public void setFolderType(String folderType) {
-        this.folderType = folderType;
-    }
-
-
-    public Map<String, String> getFolderTypes() {
-        return folderTypes;
-    }
-
-    public void setFolderTypes(Map<String, String> folderTypes) {
-        this.folderTypes = folderTypes;
-    }
-
-
     public TreeBean() {
+        try {
+            cmisService = CMISServiceImpl.getService();
+        } catch (ConnectionException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (BaseException e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    e.getMessage(),
+                    ""));
+        }
         FSFolder root = cmisService.getRootFolder();
         parent.setPath("/");
         main = new DefaultTreeNode("Main", null);
@@ -98,25 +93,53 @@ public class TreeBean implements Serializable {
         folderTypes.put("CMIS Folder (cmis:folder)", "CMIS Folder (cmis:folder)");
     }
 
+
+    public String getFolderType() {
+        return folderType;
+    }
+
+    public void setFolderType(String folderType) {
+        this.folderType = folderType;
+    }
+
+    public Map<String, String> getFolderTypes() {
+        return folderTypes;
+    }
+
+    public void setFolderTypes(Map<String, String> folderTypes) {
+        this.folderTypes = folderTypes;
+    }
+
     public void updateTree(TreeNode parent) {
-//        logger.log(Level.INFO, "UPDATING... TREEEE...");
+        logger.log(Level.INFO, "UPDATING TREE...."+((FSFolder)parent.getData()).getPath());
         parent.getChildren().clear();
+//        logger.log(Level.INFO, "Cast " + (String) parent.getData());
+        try {
+            List<FSObject> children = cmisService.getChildren((FSFolder) parent.getData());
 
-        List<FSObject> children = cmisService.getChildren((FSFolder) parent.getData());
-
-        for (FSObject child : children) {
-            if (child instanceof FSFolder) {
-                TreeNode treeNode = new DefaultTreeNode(child, parent);
-                long start = System.currentTimeMillis();
-                if (cmisService.hasChildFolder((FSFolder) treeNode.getData())) {
-                    FSFolder fold = new FSFolder();
-                    fold.setName("Empty Folder");
-                    new DefaultTreeNode(fold, treeNode);
-//                    logger.log(Level.INFO, "FOLDER " + ((FSFolder) treeNode.getData()).getName() + " HAS CHILD FOLDER");
+            for (FSObject child : children) {
+                if (child instanceof FSFolder) {
+                    TreeNode treeNode = new DefaultTreeNode(child, parent);
+                    long start = System.currentTimeMillis();
+                    if (cmisService.hasChildFolder((FSFolder) treeNode.getData())) {
+                        FSFolder fold = new FSFolder();
+                        fold.setName("Empty Folder");
+                        new DefaultTreeNode(fold, treeNode);
+                        //                    logger.log(Level.INFO, "FOLDER " + ((FSFolder) treeNode.getData()).getName() + " HAS CHILD FOLDER");
+                    }
+                    long end = System.currentTimeMillis();
+                    //                logger.log(Level.INFO, "TIME: " + (end - start) + "ms");
                 }
-                long end = System.currentTimeMillis();
-//                logger.log(Level.INFO, "TIME: " + (end - start) + "ms");
             }
+        } catch (ConnectionException e) {
+            logger.log(Level.INFO, "updateTree catched: " + e.getMessage());
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Connection error!",
+                    "Connection lost!"));
+        } catch (BaseException e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    e.getMessage(),
+                    ""));
         }
     }
 
@@ -191,10 +214,21 @@ public class TreeBean implements Serializable {
     public void onNodeCollapse(NodeCollapseEvent event) {
         logger.log(Level.INFO, "onNodeCollapse");
         event.getTreeNode().getChildren().clear();
-        if (cmisService.hasChildFolder((FSFolder) event.getTreeNode().getData())) {
-            FSFolder fold = new FSFolder();
-            fold.setName("Empty Folder");
-            new DefaultTreeNode(fold, event.getTreeNode());
+        try {
+            if (cmisService.hasChildFolder((FSFolder) event.getTreeNode().getData())) {
+                FSFolder fold = new FSFolder();
+                fold.setName("Empty Folder");
+                new DefaultTreeNode(fold, event.getTreeNode());
+            }
+        } catch (ConnectionException e) {
+            logger.log(Level.INFO, "onNodeCollapse catched: " + e.getMessage());
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Connection error!",
+                    "Connection lost!"));
+        } catch (BaseException e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    e.getMessage(),
+                    ""));
         }
     }
 
@@ -212,7 +246,18 @@ public class TreeBean implements Serializable {
         }
 
         int test = Integer.parseInt(testingCurrentPage);
-        lastPage = cmisService.getMaxNumberOfPage(parent, amountOfRowsInPage);
+        try {
+            lastPage = cmisService.getMaxNumberOfPage(parent, amountOfRowsInPage);
+        } catch (ConnectionException e) {
+            logger.log(Level.INFO, "setTestingCurrentPage catched: " + e.getMessage());
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Connection error!",
+                    "Connection lost!"));
+        } catch (BaseException e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    e.getMessage(),
+                    ""));
+        }
         if (lastPage == 0) {
             lastPage = 1;
             currentPage = 1;
@@ -231,14 +276,36 @@ public class TreeBean implements Serializable {
     }
 
     public void updatetablePageList() {
-        tablePageList = cmisService.getPage(parent, currentPage, amountOfRowsInPage);
+        try {
+            tablePageList = cmisService.getPage(parent, currentPage, amountOfRowsInPage);
+        } catch (ConnectionException e) {
+            logger.log(Level.INFO, "updatetablePageList catched: " + e.getMessage());
+        } catch (BaseException e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    e.getMessage(),
+                    ""));
+        }
     }
 
     public void changedTableParentFolder() {
         currentPage = firstPage;
 //        tablePageList = cmisService.getPage(parent, currentPage, amountOfRowsInPage);
         updatetablePageList();
-        lastPage = cmisService.getMaxNumberOfPage(parent, amountOfRowsInPage);
+        try {
+            lastPage = cmisService.getMaxNumberOfPage(parent, amountOfRowsInPage);
+        } catch (ConnectionException e) {
+            logger.log(Level.INFO, "changedTableParentFolder catched: " + e.getMessage());
+
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Connection error!",
+                    "Connection lost!"));
+
+            logger.log(Level.INFO, "changedTableParentFolder catched after: " + e.getMessage());
+        } catch (BaseException e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    e.getMessage(),
+                    ""));
+        }
         testingCurrentPage = Integer.toString(currentPage);
         disableBackButton = true;
         if (lastPage == 0) {
@@ -254,7 +321,18 @@ public class TreeBean implements Serializable {
     }
 
     public void nextPage() {
-        lastPage = cmisService.getMaxNumberOfPage(parent, amountOfRowsInPage);
+        try {
+            lastPage = cmisService.getMaxNumberOfPage(parent, amountOfRowsInPage);
+        } catch (ConnectionException e) {
+            logger.log(Level.INFO, "nextPage catched: " + e.getMessage());
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Connection error!",
+                    "Connection lost!"));
+        } catch (BaseException e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    e.getMessage(),
+                    ""));
+        }
         // All this IFs  for dynamic updating number of pages(so all situations are here)
         if (lastPage == 0) {
             lastPage = 1;
@@ -262,7 +340,18 @@ public class TreeBean implements Serializable {
             disableNextButton = true;
             disableBackButton = true;
 
-            tablePageList = cmisService.getPage(parent, currentPage, amountOfRowsInPage);
+            try {
+                tablePageList = cmisService.getPage(parent, currentPage, amountOfRowsInPage);
+            } catch (ConnectionException e) {
+                logger.log(Level.INFO, "nextPage catched: " + e.getMessage());
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Connection error!",
+                        "Connection lost!"));
+            } catch (BaseException e) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        e.getMessage(),
+                        ""));
+            }
             testingCurrentPage = Integer.toString(currentPage);
             return;
         }
@@ -285,13 +374,35 @@ public class TreeBean implements Serializable {
                 FacesContext.getCurrentInstance().addMessage(messageForPaging.getClientId(),
                         new FacesMessage(FacesMessage.SEVERITY_INFO, "WARNING", "here is only one page"));
             }
-            tablePageList = cmisService.getPage(parent, currentPage, amountOfRowsInPage);
+            try {
+                tablePageList = cmisService.getPage(parent, currentPage, amountOfRowsInPage);
+            } catch (ConnectionException e) {
+                logger.log(Level.INFO, "nextPage catched: " + e.getMessage());
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Connection error!",
+                        "Connection lost!"));
+            } catch (BaseException e) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        e.getMessage(),
+                        ""));
+            }
             testingCurrentPage = Integer.toString(currentPage);
             return;
         }
         if (currentPage < lastPage) {
             ++currentPage;
-            tablePageList = cmisService.getPage(parent, currentPage, amountOfRowsInPage);
+            try {
+                tablePageList = cmisService.getPage(parent, currentPage, amountOfRowsInPage);
+            } catch (ConnectionException e) {
+                logger.log(Level.INFO, "nextPage catched: " + e.getMessage());
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Connection error!",
+                        "Connection lost!"));
+            } catch (BaseException e) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        e.getMessage(),
+                        ""));
+            }
             testingCurrentPage = Integer.toString(currentPage);
             if (currentPage == lastPage) {
                 disableNextButton = true;
@@ -302,7 +413,18 @@ public class TreeBean implements Serializable {
     }
 
     public void previousPage() {
-        lastPage = cmisService.getMaxNumberOfPage(parent, amountOfRowsInPage);
+        try {
+            lastPage = cmisService.getMaxNumberOfPage(parent, amountOfRowsInPage);
+        } catch (ConnectionException e) {
+            logger.log(Level.INFO, "previousPage catched: " + e.getMessage());
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Connection error!",
+                    "Connection lost!"));
+        } catch (BaseException e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    e.getMessage(),
+                    ""));
+        }
 
         // All this IFs  for dynamic updating number of pages(so all situations are here)
         if (lastPage == 0) {
@@ -311,7 +433,18 @@ public class TreeBean implements Serializable {
             disableNextButton = true;
             disableBackButton = true;
 
-            tablePageList = cmisService.getPage(parent, currentPage, amountOfRowsInPage);
+            try {
+                tablePageList = cmisService.getPage(parent, currentPage, amountOfRowsInPage);
+            } catch (ConnectionException e) {
+                logger.log(Level.INFO, "previousPage catched: " + e.getMessage());
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Connection error!",
+                        "Connection lost!"));
+            } catch (BaseException e) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        e.getMessage(),
+                        ""));
+            }
             testingCurrentPage = Integer.toString(currentPage);
             return;
         }
@@ -320,7 +453,18 @@ public class TreeBean implements Serializable {
             disableNextButton = true;
             // FacesContext.getCurrentInstance().addMessage(messageForPaging.getClientId(), new FacesMessage(FacesMessage.SEVERITY_INFO, "UPDATING", "Somebody delete folders in this node"));
 
-            tablePageList = cmisService.getPage(parent, currentPage, amountOfRowsInPage);
+            try {
+                tablePageList = cmisService.getPage(parent, currentPage, amountOfRowsInPage);
+            } catch (ConnectionException e) {
+                logger.log(Level.INFO, "previousPage catched: " + e.getMessage());
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Connection error!",
+                        "Connection lost!"));
+            } catch (BaseException e) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        e.getMessage(),
+                        ""));
+            }
             testingCurrentPage = Integer.toString(currentPage);
             return;
         }
@@ -330,7 +474,18 @@ public class TreeBean implements Serializable {
             disableBackButton = true;
             // FacesContext.getCurrentInstance().addMessage(messageForPaging.getClientId(), new FacesMessage(FacesMessage.SEVERITY_INFO, "UPDATING", "Somebody delete folders in this node"));
 
-            tablePageList = cmisService.getPage(parent, currentPage, amountOfRowsInPage);
+            try {
+                tablePageList = cmisService.getPage(parent, currentPage, amountOfRowsInPage);
+            } catch (ConnectionException e) {
+                logger.log(Level.INFO, "previousPage catched: " + e.getMessage());
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Connection error!",
+                        "Connection lost!"));
+            } catch (BaseException e) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        e.getMessage(),
+                        ""));
+            }
             testingCurrentPage = Integer.toString(currentPage);
         }
         if (lastPage == currentPage) {
@@ -339,7 +494,18 @@ public class TreeBean implements Serializable {
         if (currentPage > firstPage) {
             --currentPage;
 
-            tablePageList = cmisService.getPage(parent, currentPage, amountOfRowsInPage);
+            try {
+                tablePageList = cmisService.getPage(parent, currentPage, amountOfRowsInPage);
+            } catch (ConnectionException e) {
+                logger.log(Level.INFO, "previousPage catched: " + e.getMessage());
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Connection error!",
+                        "Connection lost!"));
+            } catch (BaseException e) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        e.getMessage(),
+                        ""));
+            }
             testingCurrentPage = Integer.toString(currentPage);
 
             if (currentPage == firstPage) {
@@ -369,7 +535,18 @@ public class TreeBean implements Serializable {
             disableNextButton = false;
         }
 
-        tablePageList = cmisService.getPage(parent, currentPage, amountOfRowsInPage);
+        try {
+            tablePageList = cmisService.getPage(parent, currentPage, amountOfRowsInPage);
+        } catch (ConnectionException e) {
+            logger.log(Level.INFO, "currentPageToJSF catched: " + e.getMessage());
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Connection error!",
+                    "Connection lost!"));
+        } catch (BaseException e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    e.getMessage(),
+                    ""));
+        }
         testingCurrentPage = Integer.toString(currentPage);
     }
 
@@ -391,35 +568,67 @@ public class TreeBean implements Serializable {
             state.setSelectedObject(selectedFSObject);
             state.setParentpath(parent.getPath());
             addToBack(state);
-            this.cachedNode = selectedNodes.getParent();
+            this.cachedNode = selectedNodes;
             this.selectedNodes.setSelected(false);
         }
     }
 
     public void onRowSelect(SelectEvent event) {
         if (selectedNodes != null) {
-            this.cachedNode = selectedNodes.getParent();
+            this.cachedNode = selectedNodes;
             this.selectedNodes.setSelected(false);
         }
         setSelectedFSObject((FSObject) event.getObject());
     }
 
-//    public void onDragDrop(TreeDragDropEvent event) {
-//        TreeNode dragNode = event.getDragNode();
-//        TreeNode dropNode = event.getDropNode();
-//        int dropIndex = event.getDropIndex();
-//        FSFolder fff = (FSFolder)dragNode.getData();
-//        FSFolder ddd = (FSFolder)dropNode.getData();
-//
-//        logger.log(Level.INFO, "DragNode data = "+fff.getPath());
-//        logger.log(Level.INFO, "DropNode data = "+ddd.getPath());
-//        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Dragged " + dragNode.getData(), "Dropped on " + dropNode.getData() + " at " + dropIndex);
-//        FacesContext.getCurrentInstance().addMessage(null, message);
-//        cmisService.move(fff,ddd);
-//        logger.log(Level.INFO, "MOVED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-//        updateTree(dragNode);
-//        updateTree(dropNode);
-//    }
+    public void onDragDrop(TreeDragDropEvent event) {
+        TreeNode dragNode = event.getDragNode();
+        TreeNode dropNode = event.getDropNode();
+
+        TreeNode parentDragNode = dragNode.getParent();
+        logger.log(Level.INFO, "Rostik1: "+ ((FSFolder)parentDragNode.getData()).getPath());
+        FSFolder dragedFolder = (FSFolder) dragNode.getData();
+        FSFolder dropedFolder = (FSFolder) dropNode.getData();
+        TreeNode tempNode =  event.getDragNode().getParent();
+        FSFolder dropedFolder1 = (FSFolder) dropNode.getData();
+        logger.log(Level.INFO, "Before DragNode data = " + dragedFolder.getPath());
+        logger.log(Level.INFO, "Before DropNode data = " + dropedFolder.getPath());
+        logger.log(Level.INFO, "Before DropNode data = " + dropedFolder1.getPath());
+
+        try {
+            cmisService.move(dragedFolder, dropedFolder);
+        } catch (BrowserRuntimeException e) {
+            FSFolder drag = (FSFolder) dragNode.getData();
+            FSFolder drop = (FSFolder) dragNode.getData();
+            FSFolder temp = (FSFolder) tempNode.getData();
+            TreeNode d = event.getDragNode();
+            logger.log(Level.INFO, "After dragedFolder data = " + ((FSFolder)(d.getParent().getData())).getPath());
+            logger.log(Level.INFO, "After dragedFolder data = " + ((FSFolder)(d.getData())).getPath());
+
+            logger.log(Level.INFO, "After dragedFolder data = " + dragedFolder.getParent().getPath());
+            logger.log(Level.INFO, "After dragedFolder data = " + dropedFolder.getPath());
+            logger.log(Level.INFO, "After dragedFolder1 data = " + dropedFolder1.getPath());
+
+            logger.log(Level.INFO, "After dragedFolder1 data = " + drag.getParent().getPath());
+            logger.log(Level.INFO, "After DropNode data = " + drop.getParent().getPath());
+            logger.log(Level.INFO, "After dragedFolder1 data = " + temp.getParent().getPath());
+
+            logger.log(Level.INFO, "After DropNode data = " + ((FSFolder) dragNode.getData()).getParent().getName());
+            logger.log(Level.INFO, "After DropNode data = " + ((FSFolder) dropNode.getData()).getParent().getName());
+            logger.log(Level.INFO, "After DropNode data = " + ((FSFolder) tempNode.getData()).getParent().getPath());
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    e.getMessage(),
+                    "This name already exists in folder!"));
+            updateTree(parentDragNode);
+            logger.log(Level.INFO, "Rostik2: "+ ((FSFolder)parentDragNode.getData()).getPath());
+
+        } finally {
+            logger.log(Level.INFO, "MOVED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
+
+        }
+
+    }
 
     public boolean isCheckThatSelected() {
         return selectedFSObject != null ? true : false;
@@ -447,7 +656,7 @@ public class TreeBean implements Serializable {
             }
             fileActions.setSelectedName(sn.getName());
             this.selectedFSObject = sn;
-            logger.log(Level.INFO, "id: "+sn.getId());
+            logger.log(Level.INFO, "id: " + sn.getId());
         }
     }
 
@@ -536,6 +745,8 @@ public class TreeBean implements Serializable {
     }
 
     public void setCachedNode(TreeNode cachedNode) {
-        this.cachedNode = cachedNode;
+        logger.log(Level.INFO, "SetCachedNode");
+        if (cachedNode != null)
+            this.cachedNode = cachedNode;
     }
 }

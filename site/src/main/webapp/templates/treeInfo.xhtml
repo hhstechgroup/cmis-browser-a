@@ -14,6 +14,8 @@
         <h:outputStylesheet library="style" name="style.css"/>
         <h:outputScript library="js" name="native_but.js"/>
 
+        <p:messages id="erro" showDetail="true" autoUpdate="true"/>
+
         <ct:cmisBrowserComponent id="cmisbrowser"/>
 
         <p:dialog id="copyDialogId" header="Copy" widgetVar="copyDialog"
@@ -79,6 +81,9 @@
                     <p:column style="width: 100px;" headerText="Id">
                         <h:outputText value="#{fsFile.id}"/>
                     </p:column>
+                    <p:column style="width: 200px;" headerText="Name">
+                        <h:outputText value="#{fsFile.name}"/>
+                    </p:column>
                     <p:column style="width: 100px;" headerText="Version label">
                         <h:outputText value="#{fsFile.versionLabel}"/>
                     </p:column>
@@ -111,7 +116,9 @@
 
             <p:commandButton value="Cancel" type="button" onclick="TreeinDialog.hide()"/>
         </p:dialog>
-        <p:growl id="growl" showDetail="true" sticky="true" />
+
+
+
     </ui:composition>
 </h:body>
 </html>

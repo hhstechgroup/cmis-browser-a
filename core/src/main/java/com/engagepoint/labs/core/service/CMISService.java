@@ -3,8 +3,7 @@ package com.engagepoint.labs.core.service;
 import com.engagepoint.labs.core.models.FSFile;
 import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
-import com.engagepoint.labs.core.models.exceptions.FileAlreadyExistException;
-import com.engagepoint.labs.core.models.exceptions.FolderAlreadyExistException;
+import com.engagepoint.labs.core.models.exceptions.*;
 
 import java.io.InputStream;
 import java.util.List;
@@ -19,7 +18,7 @@ public interface CMISService {
      * @param parent parent object, pageNumber, numbersOfRows for right pagination
      * @return List of FSObjects on the page
      */
-    public int getMaxNumberOfPage(FSFolder parent, int numberOfRows);
+    public int getMaxNumberOfPage(FSFolder parent, int numberOfRows) throws BaseException;
 
     /**
      * Return a list children of our parent fsFolder folder
@@ -28,7 +27,7 @@ public interface CMISService {
      * @return a List of children objects of parent object
      * @see FSFolder
      */
-    public List<FSObject> getChildren(FSFolder fsFolder);
+    public List<FSObject> getChildren(FSFolder fsFolder) throws BaseException;
 
     /**
      * Return list of FSObject on actually page
@@ -36,7 +35,7 @@ public interface CMISService {
      * @param parent parent object, pageNumber, numbersOfRows for right pagination
      * @return List of FSObjects on the page
      */
-    public List<FSObject> getPage(FSFolder parent, int pageNumber, int numberOfRows);
+    public List<FSObject> getPage(FSFolder parent, int pageNumber, int numberOfRows) throws BaseException;
 
     /**
      * Return a root folder from our repository
@@ -54,11 +53,11 @@ public interface CMISService {
      * @throws Exception if folder with this name exist in parent directory
      * or connection is fail
      */
-    public FSFolder createFolder(FSFolder parent, String folderName) throws Exception;
+    public FSFolder createFolder(FSFolder parent, String folderName) throws BaseException;
 
-    public FSFile createFile(FSFolder parent, String fileName, byte[] content, String mimeType);
+    public FSFile createFile(FSFolder parent, String fileName, byte[] content, String mimeType) throws BaseException;
 
-    public FSFile edit(FSFile file, byte[] content, String mimeType);
+    public FSFile edit(FSFile file, byte[] content, String mimeType) throws BaseException;
 
     public boolean deleteFile(FSFile file);
 
@@ -70,23 +69,25 @@ public interface CMISService {
      * @throws Exception
      */
 
-    public FSFolder renameFolder(FSFolder folder, String newName) throws FolderAlreadyExistException;
+    public FSFolder renameFolder(FSFolder folder, String newName) throws BaseException;
 
     public boolean deleteFolder(FSFolder folder);
 
     public boolean deleteAllTree(FSFolder folder);
 
 
-    public boolean hasChildFolder(FSFolder folder);
+    public boolean hasChildFolder(FSFolder folder) throws BaseException;
 
-    public boolean hasChildren(FSFolder folder);
+    public boolean hasChildren(FSFolder folder) throws BaseException;
 
-    public InputStream getInputStream(FSFile file);
+    public InputStream getInputStream(FSFile file) throws BaseException;
 
-    public FSFolder move(FSFolder source, FSFolder target);
+    public FSFolder move(FSFolder source, FSFolder target) throws BrowserRuntimeException;
 
     public void copyFolder(FSFolder folder, String name, String targetID);
 
     public FSFile getHistory(FSFile file);
+
+    public void copyFile(String fileId,String name, String targetId) throws BaseException;
 
 }

@@ -2,6 +2,10 @@ package com.engagepoint.labs.core.dao;
 
 import com.engagepoint.labs.core.models.FSFile;
 import com.engagepoint.labs.core.models.FSFolder;
+import com.engagepoint.labs.core.models.exceptions.BaseException;
+import com.engagepoint.labs.core.models.exceptions.FileAlreadyExistException;
+import com.engagepoint.labs.core.models.exceptions.FileNotFoundException;
+import com.engagepoint.labs.core.models.exceptions.UnauthorizedException;
 import org.apache.chemistry.opencmis.client.api.Session;
 
 import java.io.InputStream;
@@ -28,7 +32,7 @@ public interface FSFileDao {
      * @param content  - content of file
      * @return created file, FSFile type
      */
-    public FSFile create(FSFolder parent, String fileName, byte[] content, String mimeType);
+    public FSFile create(FSFolder parent, String fileName, byte[] content, String mimeType) throws BaseException;
 
     /**
      * Method that will delete file from repository
@@ -38,11 +42,19 @@ public interface FSFileDao {
      */
     public boolean delete(FSFile file);
 
-    public FSFile edit(FSFile file, byte[] content, String mimeType);
+    public FSFile edit(FSFile file, byte[] content, String mimeType) throws BaseException;
 
-    public InputStream getInputStream(FSFile file);
+    public InputStream getInputStream(FSFile file) throws BaseException;
 
-    public void copy(String id, String targetId);
+    /**
+     * Method that will copy file
+     *
+     * @param id       - file which you want to copy
+     * @param newName  - new name of file
+     * @param targetId - id of folder in which we want to copy
+     * @return <b>true</b> if copied
+     */
+    public boolean copy(String id, String newName, String targetId) throws BaseException;
 
     public FSFile getHistory(FSFile file);
 }

@@ -60,7 +60,7 @@
                 <p:menuitem id="copymenuitem" value="Copy" oncomplete="copyDialog.show();"
                             action="#{action.markFolder(treeBean.selectedFSObject)}"
                             process="@this"
-                            disabled="#{fileActions.selectedIsFile}"/>
+                            disabled="#{!treeBean.checkThatSelected}"/>
 
                 <p:menuitem id="downloadmenuitem" disabled="#{!fileActions.selectedIsFile}" value="Download"
                             ajax="false"

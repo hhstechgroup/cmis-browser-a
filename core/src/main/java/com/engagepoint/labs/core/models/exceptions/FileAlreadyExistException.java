@@ -7,7 +7,7 @@ package com.engagepoint.labs.core.models.exceptions;
  * Time: 3:28 PM
  * To change this template use File | Settings | File Templates.
  */
-public class FileAlreadyExistException extends Exception {
+public class FileAlreadyExistException extends BaseException {
 
     public FileAlreadyExistException() {
     }

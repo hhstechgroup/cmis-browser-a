@@ -3,8 +3,7 @@ package com.engagepoint.labs.web.controllers;
 import com.engagepoint.labs.core.models.FSFile;
 import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
-import com.engagepoint.labs.core.models.exceptions.FileAlreadyExistException;
-import com.engagepoint.labs.core.models.exceptions.FolderAlreadyExistException;
+import com.engagepoint.labs.core.models.exceptions.*;
 import com.engagepoint.labs.core.service.CMISService;
 import com.engagepoint.labs.core.service.CMISServiceImpl;
 import org.primefaces.context.RequestContext;
@@ -44,7 +43,7 @@ public class ActionBean implements Serializable {
     private UIComponent renamecomponent;
     private UIComponent createcomponent;
     private static Logger logger;
-    private final CMISService cmisService;
+    private CMISService cmisService = null;
     private List<FSFile> history;
 
     private FSObject folderForCopy;
@@ -71,21 +70,57 @@ public class ActionBean implements Serializable {
     }
 
     public void copyFolder(FSObject target) {
-        try {
-            logger.log(Level.INFO, "folder name: " + folderForCopy.getName() + " def name: " + defaultFolderName);
-            if (!folderForCopy.getName().equals(getDefaultFolderName())) {
-                folderForCopy.setName(getDefaultFolderName());
-            }
-            cmisService.copyFolder((FSFolder) folderForCopy, folderForCopy.getName(), target.getId());
-        } catch (NullPointerException ex) {
+        if (folderForCopy instanceof FSFile) {
+            try {
+                logger.log(Level.INFO, "file name: " + folderForCopy.getName() + " def name: " + defaultFolderName);
+                if (!folderForCopy.getName().equals(getDefaultFolderName())) {
+                    folderForCopy.setName(getDefaultFolderName());
+                }
+                try {
+                    cmisService.copyFile(folderForCopy.getId(), folderForCopy.getName(), target.getId());
+                } catch (FileAlreadyExistException e) {
+                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            e.getMessage(),
+                            "Rename file, please!"));
+                } catch (BaseException e) {
+                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            e.getMessage(),
+                            ""));
+                }
+            } catch (NullPointerException ex) {
 
+            }
+            defaultFolderName = "Copy_";
         }
-        defaultFolderName = "Copy_";
+
+        if (folderForCopy instanceof FSFolder) {
+            try {
+                logger.log(Level.INFO, "folder name: " + folderForCopy.getName() + " def name: " + defaultFolderName);
+                if (!folderForCopy.getName().equals(getDefaultFolderName())) {
+                    folderForCopy.setName(getDefaultFolderName());
+                }
+                cmisService.copyFolder((FSFolder) folderForCopy, folderForCopy.getName(), target.getId());
+            } catch (NullPointerException ex) {
+
+            }
+            defaultFolderName = "Copy_";
+        }
     }
 
     public ActionBean() {
         logger = Logger.getLogger(ActionBean.class.getName());
-        cmisService = CMISServiceImpl.getService();
+        try {
+            cmisService = CMISServiceImpl.getService();
+        } catch (ConnectionException e) {
+            logger.log(Level.INFO, "catched ActionBean constructor: " + e.getMessage());
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    e.getMessage(),
+                    "PrimeFaces makes no mistakes"));
+        } catch (BaseException e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    e.getMessage(),
+                    ""));
+        }
         reqEx = "(.*[\\\\\\/]|^)(.*?)(?:[\\.]|$)([^\\.\\s]*$)";
     }
 
@@ -95,8 +130,21 @@ public class ActionBean implements Serializable {
     }
 
     public void createFile(FSFolder parent) {
-        cmisService.createFile(parent, name, fileActions.getFile().getContents(), fileActions.getFile().getContentType());
-        treeBean.updatetablePageList();
+        try {
+            cmisService.createFile(parent, name, fileActions.getFile().getContents(), fileActions.getFile().getContentType());
+            treeBean.updatetablePageList();
+        } catch (FileAlreadyExistException ex) {
+            logger.log(Level.INFO, "Folder create catched: " + ex.getMessage());
+            // RequestContext.getCurrentInstance().execute("copyDialog.show();");
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Cannot create file with such name!",
+                    "Name already exists in folder"));
+            logger.log(Level.INFO, "After Folder create catched: " + ex.getMessage());
+        } catch (BaseException e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    e.getMessage(),
+                    ""));
+        }
     }
 
     /**
@@ -108,15 +156,27 @@ public class ActionBean implements Serializable {
     public void createFolder(FSFolder parentFolder, TreeNode parent) {
         try {
             if (parentFolder != null) {
+                logger.log(Level.INFO, "First if");
                 cmisService.createFolder(parentFolder, name);
                 if (parent != null) {
+                    logger.log(Level.INFO, "Second if");
                     treeBean.updateTree(parent);
                 }
             }
             //TODO enable message when node is not selected       kozubal
             //parent not selected
-        } catch (Exception ex) {
-            catchException(ex, createcomponent);
+        } catch (FolderAlreadyExistException ex) {
+            treeBean.updateTree(parent);
+            logger.log(Level.INFO, "Folder create catched: " + ex.getMessage());
+            // RequestContext.getCurrentInstance().execute("copyDialog.show();");
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Folder error!",
+                    "Folder with such name already exist!"));
+            logger.log(Level.INFO, "After Folder create catched: " + ex.getMessage());
+        } catch (BaseException e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    e.getMessage(),
+                    ""));
         }
         this.name = "";
         this.type = "";
@@ -135,20 +195,42 @@ public class ActionBean implements Serializable {
                 content = file.getContents();
                 mimeType = file.getContentType();
             }
-            cmisService.edit((FSFile) selected, content, mimeType);
+            try {
+                cmisService.edit((FSFile) selected, content, mimeType);
+            } catch (FileAlreadyExistException e) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        e.getMessage(),
+                        "Choose another name!"));
+            } catch (UnauthorizedException e) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        e.getMessage(),
+                        "You must log in for change history"));
+                treeBean.updatetablePageList();
+            } catch (BaseException e) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        e.getMessage(),
+                        ""));
+            }
         } else { //FSFolder
             try {
                 cmisService.renameFolder((FSFolder) selected, selected.getName());
-            }  catch (FolderAlreadyExistException ex) {
-                logger.log(Level.INFO, "catched: "+ex.getMessage());
-                FacesContext context = FacesContext.getCurrentInstance();
-                context.addMessage(null, new FacesMessage("Error", ex.getMessage()));
+            } catch (FolderAlreadyExistException ex) {
+                logger.log(Level.INFO, "edit catched: " + ex.getMessage());
+
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Folder error!",
+                        "Folder with such name already exist!"));
+            } catch (BaseException e) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        e.getMessage(),
+                        ""));
+            }
+            if (parent != null) {
+                logger.log(Level.INFO, "NE NULL SIKA");
+                treeBean.updateTree(parent.getParent());
             }
         }
-        if (parent != null) {
-            logger.log(Level.INFO, "NE NULL SIKA");
-            treeBean.updateTree(parent);
-        }
+
         treeBean.updatetablePageList();
     }
 

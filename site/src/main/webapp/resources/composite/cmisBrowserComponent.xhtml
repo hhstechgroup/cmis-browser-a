@@ -29,6 +29,7 @@
 <cc:implementation>
 
     <h:form id="treeForm">
+
         <p:remoteCommand name="invokeBack" action="#{treeBean.doBack}" update=":cmisbrowser:treeForm"/>
         <p:remoteCommand name="invokeForward" action="#{treeBean.doForward}" update=":cmisbrowser:treeForm" />
         <p:panelGrid id="panel" columns="2" style="width: 100%; height: 400px;" styleClass="table">
