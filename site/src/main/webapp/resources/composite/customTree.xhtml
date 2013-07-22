@@ -26,17 +26,18 @@
             cache="false"
             dynamic="true"
             selectionMode="single"
+            draggable="true" droppable="true" dragdropScope="demo"
             selection="#{treeBean.selectedNode}"
             onNodeClick="doNav();"
             style="width: 300px;">
 
+        <p:ajax event="dragdrop" listener="#{treeBean.onDragDrop}" update=":cmisbrowser:treeForm"/>
+        <p:ajax event="select" update="#{cc.attrs.updateId} :#{cc.parent.clientId}:actiondialogs:#{cc.parent.clientId}edit"/>
 
-        <p:ajax event="select" update="#{cc.attrs.updateId}"/>
-
-        <p:ajax event="expand" listener="#{treeBean.onNodeExpand}" />
+        <p:ajax event="expand" listener="#{treeBean.onNodeExpand}"/>
 
         <p:ajax event="collapse"
-                listener="#{treeBean.onNodeCollapse}" update=":#{cc.parent.clientId}:treeForm" />
+                listener="#{treeBean.onNodeCollapse}" update=":#{cc.parent.clientId}:treeForm"/>
 
         <p:treeNode expandedIcon="ui-icon-folder-open"
                     collapsedIcon="ui-icon-folder-collapsed">
@@ -49,11 +50,13 @@
     <p:contextMenu for="treecomponent" rendered="#{cc.attrs.context}">
         <p:menuitem value="New Folder" onclick="#{cc.attrs.create}.show();" icon="ui-icon-document"/>
         <p:menuitem value="New Document" onclick="#{cc.attrs.createfile}.show();" icon="ui-icon-document"/>
-        <p:menuitem value="Copy" actionListener="#{action.markFolder(treeBean.selectedFSObject)}" icon="ui-icon-document"/>
-        <p:menuitem value="Paste" actionListener="#{action.copyFolder(treeBean.selectedFSObject)}" icon="ui-icon-document"/>
+        <p:menuitem value="Copy" actionListener="#{action.markFolder(treeBean.selectedFSObject)}"
+                    icon="ui-icon-document"/>
+        <p:menuitem value="Paste" actionListener="#{action.copyFolder(treeBean.selectedFSObject)}"
+                    icon="ui-icon-document"/>
         <p:menuitem value="Edit" onclick="#{cc.attrs.edit}.show();" icon="ui-icon-document"/>
         <p:menuitem value="Delete" onclick="#{cc.attrs.delete}.show();" icon="ui-icon-document"/>
     </p:contextMenu>
 
-    </cc:implementation>
+</cc:implementation>
 </html>

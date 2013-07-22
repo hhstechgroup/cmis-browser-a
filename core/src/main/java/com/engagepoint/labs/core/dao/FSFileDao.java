@@ -2,6 +2,7 @@ package com.engagepoint.labs.core.dao;
 
 import com.engagepoint.labs.core.models.FSFile;
 import com.engagepoint.labs.core.models.FSFolder;
+import com.engagepoint.labs.core.models.exceptions.BaseException;
 import org.apache.chemistry.opencmis.client.api.Session;
 
 import java.io.InputStream;
@@ -12,7 +13,6 @@ import java.io.InputStream;
  * Time: 2:52 PM
  */
 public interface FSFileDao {
-
     /**
      * Connect to repository
      *
@@ -28,16 +28,7 @@ public interface FSFileDao {
      * @param content  - content of file
      * @return created file, FSFile type
      */
-    public FSFile create(FSFolder parent, String fileName, byte[] content, String mimeType);
-
-    /**
-     * Method that will rename file
-     *
-     * @param file    - file which you want rename
-     * @param newName - new name of file
-     * @return renamed file
-     */
-    public FSFile rename(FSFile file, String newName);
+    public FSFile create(FSFolder parent, String fileName, byte[] content, String mimeType) throws BaseException;
 
     /**
      * Method that will delete file from repository
@@ -47,11 +38,11 @@ public interface FSFileDao {
      */
     public boolean delete(FSFile file);
 
-    public FSFile edit(FSFile file, byte[] content, String mimeType);
+    public FSFile edit(FSFile file, byte[] content, String mimeType) throws BaseException;
 
-    public InputStream getInputStream(FSFile file);
+    public InputStream getInputStream(FSFile file) throws BaseException;
 
-    public boolean copy(String id, String newName, String targetId);
+    public boolean copy(String id, String newName, String targetId) throws BaseException;
 
     public FSFile getHistory(FSFile file);
 

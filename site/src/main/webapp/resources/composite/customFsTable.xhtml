@@ -52,7 +52,7 @@
             >
 
         <p:ajax event="rowSelect" listener="#{treeBean.onRowSelect}"
-                update="@form :#{cc.parent.clientId}:actiondialogs:#{cc.parent.clientId}edit :historyDialogid"/>
+                update="@form :#{cc.parent.clientId}:actiondialogs:#{cc.parent.clientId}edit :historyDialogid :copyDialogId"/>
         <f:facet name="header">
             <h:inputText value="#{treeBean.parent.path}"
                          style="border-radius: 11px;font-size: 16px; margin-bottom: 5px; color: #000000;" size="90"
@@ -134,7 +134,7 @@
                 <p:menuitem id="copymenuitem" value="Copy" oncomplete="copyDialog.show();"
                             action="#{action.markFolder(treeBean.selectedFSObject)}"
                             process="@this"
-                            disabled="#{fileActions.selectedIsFile}"/>
+                            disabled="#{!treeBean.checkThatSelected}"/>
 
                 <p:menuitem id="downloadmenuitem" disabled="#{!fileActions.selectedIsFile}" value="Download"
                             ajax="false"

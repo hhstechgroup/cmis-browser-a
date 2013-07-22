@@ -3,18 +3,24 @@ package com.engagepoint.labs.web.controllers;
 import com.engagepoint.labs.core.models.FSFile;
 import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
+import com.engagepoint.labs.core.models.exceptions.BaseException;
+import com.engagepoint.labs.core.models.exceptions.BrowserRuntimeException;
+import com.engagepoint.labs.core.models.exceptions.ConnectionException;
 import com.engagepoint.labs.core.service.CMISService;
 import com.engagepoint.labs.core.service.CMISServiceImpl;
 import com.engagepoint.labs.web.models.LazyFSObjectDataModel;
 import org.primefaces.event.NodeCollapseEvent;
 import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.event.SelectEvent;
+import org.primefaces.event.TreeDragDropEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
+import javax.faces.context.FacesContext;
 import java.io.Serializable;
 import java.util.*;
 import java.util.logging.Level;
@@ -35,10 +41,11 @@ public class TreeBean implements Serializable {
 
     private TreeNode main;
     private TreeNode selectedNodes;
+    private TreeNode cachedNode;
     private FSObject selectedFSObject;
     private boolean checkThatSelected;
     private FSFolder parent = new FSFolder();
-    private CMISService cmisService = CMISServiceImpl.getService();
+    private CMISService cmisService;
     private static Logger logger = Logger.getLogger(TreeBean.class.getName());
 
     private List<PageState> backHistory = new LinkedList<PageState>();
@@ -88,6 +95,15 @@ public class TreeBean implements Serializable {
 
 
     public TreeBean() {
+        try {
+            cmisService = CMISServiceImpl.getService();
+        } catch (ConnectionException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (BaseException e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    e.getMessage(),
+                    ""));
+        }
         FSFolder root = cmisService.getRootFolder();
         parent.setPath("/");
         main = new DefaultTreeNode("Main", null);
@@ -105,24 +121,35 @@ public class TreeBean implements Serializable {
     }
 
     public void updateTree(TreeNode parent) {
-//        logger.log(Level.INFO, "UPDATING... TREEEE...");
+
         parent.getChildren().clear();
+//        logger.log(Level.INFO, "Cast " + (String) parent.getData());
+        try {
+            List<FSObject> children = cmisService.getChildren((FSFolder) parent.getData());
 
-        List<FSObject> children = cmisService.getChildren((FSFolder) parent.getData());
-
-        for (FSObject child : children) {
-            if (child instanceof FSFolder) {
-                TreeNode treeNode = new DefaultTreeNode(child, parent);
-                long start = System.currentTimeMillis();
-                if (cmisService.hasChildFolder((FSFolder) treeNode.getData())) {
-                    FSFolder fold = new FSFolder();
-                    fold.setName("Empty Folder");
-                    new DefaultTreeNode(fold, treeNode);
-//                    logger.log(Level.INFO, "FOLDER " + ((FSFolder) treeNode.getData()).getName() + " HAS CHILD FOLDER");
+            for (FSObject child : children) {
+                if (child instanceof FSFolder) {
+                    TreeNode treeNode = new DefaultTreeNode(child, parent);
+                    long start = System.currentTimeMillis();
+                    if (cmisService.hasChildFolder((FSFolder) treeNode.getData())) {
+                        FSFolder fold = new FSFolder();
+                        fold.setName("Empty Folder");
+                        new DefaultTreeNode(fold, treeNode);
+                        //                    logger.log(Level.INFO, "FOLDER " + ((FSFolder) treeNode.getData()).getName() + " HAS CHILD FOLDER");
+                    }
+                    long end = System.currentTimeMillis();
+                    //                logger.log(Level.INFO, "TIME: " + (end - start) + "ms");
                 }
-                long end = System.currentTimeMillis();
-//                logger.log(Level.INFO, "TIME: " + (end - start) + "ms");
             }
+        } catch (ConnectionException e) {
+            logger.log(Level.INFO, "updateTree catched: " + e.getMessage());
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Connection error!",
+                    "Connection lost!"));
+        } catch (BaseException e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    e.getMessage(),
+                    ""));
         }
     }
 
@@ -197,23 +224,33 @@ public class TreeBean implements Serializable {
     public void onNodeCollapse(NodeCollapseEvent event) {
         logger.log(Level.INFO, "onNodeCollapse");
         event.getTreeNode().getChildren().clear();
-        if (cmisService.hasChildFolder((FSFolder) event.getTreeNode().getData())) {
-            FSFolder fold = new FSFolder();
-            fold.setName("Empty Folder");
-            new DefaultTreeNode(fold, event.getTreeNode());
+        try {
+            if (cmisService.hasChildFolder((FSFolder) event.getTreeNode().getData())) {
+                FSFolder fold = new FSFolder();
+                fold.setName("Empty Folder");
+                new DefaultTreeNode(fold, event.getTreeNode());
+            }
+        } catch (ConnectionException e) {
+            logger.log(Level.INFO, "onNodeCollapse catched: " + e.getMessage());
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Connection error!",
+                    "Connection lost!"));
+        } catch (BaseException e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    e.getMessage(),
+                    ""));
         }
     }
-
 
     public void changedTableParentFolder() {
         lazyModel = new LazyFSObjectDataModel(cmisService, parent);
     }
 
-
     public void setSelectedNode(TreeNode selectedNodes) {
         logger.log(Level.INFO, "setSelectedNode");
         if (selectedNodes != null) {
             this.selectedNodes = selectedNodes;
+            logger.log(Level.INFO, "SelectedFSObject  = "+((FSObject) selectedNodes.getData()).getName());
             setSelectedFSObject((FSObject) selectedNodes.getData());
             if (selectedFSObject.getPath() == null) {
                 parent.setPath("/");
@@ -221,42 +258,41 @@ public class TreeBean implements Serializable {
             } else {
                 parent.setPath(selectedFSObject.getPath());
             }
-            if (findQuery.isEmpty()) {
-                changedTableParentFolder();
-            }
+//            if (findQuery.isEmpty()) {
+//                changedTableParentFolder();
+//            }
             PageState state = new PageState();
 //            state.setCurrentPage(currentPage);
             state.setSelectedNode(selectedNodes);
             state.setSelectedObject(selectedFSObject);
             state.setParentpath(parent.getPath());
             addToBack(state);
+            this.cachedNode = selectedNodes;
             this.selectedNodes.setSelected(false);
         }
     }
 
     public void onRowSelect(SelectEvent event) {
         if (selectedNodes != null) {
+            this.cachedNode = selectedNodes;
             this.selectedNodes.setSelected(false);
         }
         setSelectedFSObject((FSObject) event.getObject());
     }
 
-//    public void onDragDrop(TreeDragDropEvent event) {
-//        TreeNode dragNode = event.getDragNode();
-//        TreeNode dropNode = event.getDropNode();
-//        int dropIndex = event.getDropIndex();
-//        FSFolder fff = (FSFolder)dragNode.getData();
-//        FSFolder ddd = (FSFolder)dropNode.getData();
-//
-//        logger.log(Level.INFO, "DragNode data = "+fff.getPath());
-//        logger.log(Level.INFO, "DropNode data = "+ddd.getPath());
-//        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Dragged " + dragNode.getData(), "Dropped on " + dropNode.getData() + " at " + dropIndex);
-//        FacesContext.getCurrentInstance().addMessage(null, message);
-//        cmisService.move(fff,ddd);
-//        logger.log(Level.INFO, "MOVED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-//        updateTree(dragNode);
-//        updateTree(dropNode);
-//    }
+    public void onDragDrop(TreeDragDropEvent event) {
+        FSFolder dragedFolder = (FSFolder) event.getDragNode().getData();
+        FSFolder dropedFolder = (FSFolder) event.getDropNode().getData();
+        try {
+            cmisService.move(dragedFolder, dropedFolder);
+        } catch (BrowserRuntimeException e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    e.getMessage(),
+                    "This name already exists in folder!"));
+            updateTree(getRoot().getChildren().get(0));
+        }
+
+    }
 
     public boolean isCheckThatSelected() {
         return selectedFSObject != null ? true : false;
@@ -340,28 +376,27 @@ public class TreeBean implements Serializable {
         logger.log(Level.INFO, "==___________findAdvanced()____");
 
 
-
-        if(findName != ""){
+        if (findName != "") {
             searchQueryAdvanced.put(1, "%" + findName + "%");
-        } else{
+        } else {
             searchQueryAdvanced.put(1, findName);
         }
 
-        if(metaDataType != null){
+        if (metaDataType != null) {
             searchQueryAdvanced.put(2, metaDataType);
-        } else{
+        } else {
             searchQueryAdvanced.put(2, "");
         }
-        if(findName != ""){
+        if (findName != "") {
             searchQueryAdvanced.put(3, "%." + docType);
-        } else{
+        } else {
             searchQueryAdvanced.put(3, docType);
         }
         searchQueryAdvanced.put(4, snippet);
 
-        if(contentType != null){
+        if (contentType != null) {
             searchQueryAdvanced.put(5, contentType);
-        } else{
+        } else {
             searchQueryAdvanced.put(5, "");
         }
         searchQueryAdvanced.put(6, calendarFrom);
@@ -376,12 +411,12 @@ public class TreeBean implements Serializable {
         logger.log(Level.INFO, "==___________BOOOOOOOOOOOOOOOM~!!!!____");
     }
 
-    public void openSearchAdvanced(){
+    public void openSearchAdvanced() {
         searchQueryAdvanced.put(0, "cmis:document");
     }
 
-    public void ableSearchAdvanced(){
-        if((openAccordion*(-1)) == 1){
+    public void ableSearchAdvanced() {
+        if ((openAccordion * (-1)) == 1) {
             disableSearchSimple = true;
             // treeBean.getLazyModel().setAbleSearchAdvanced(true);
 
@@ -394,17 +429,14 @@ public class TreeBean implements Serializable {
     }
 
 
-
-    public void choosenCmisType(){
+    public void choosenCmisType() {
         searchQueryAdvanced.put(0, cmisType);
-        if(cmisType == "cmis:folder"){
+        if (cmisType == "cmis:folder") {
             disableSearchFolderProperties = true;
-        }
-        else{
+        } else {
             disableSearchFolderProperties = false;
         }
     }
-
 
 
     public String getFindName() {
@@ -543,5 +575,15 @@ public class TreeBean implements Serializable {
 
     public void setDisableSearchSimple(boolean disableSearchSimple) {
         this.disableSearchSimple = disableSearchSimple;
+    }
+
+    public TreeNode getCachedNode() {
+        return cachedNode;
+    }
+
+    public void setCachedNode(TreeNode cachedNode) {
+        logger.log(Level.INFO, "SetCachedNode");
+        if (cachedNode != null)
+            this.cachedNode = cachedNode;
     }
 }

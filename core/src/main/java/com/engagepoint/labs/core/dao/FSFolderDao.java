@@ -8,6 +8,8 @@ package com.engagepoint.labs.core.dao;
 
 import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
+import com.engagepoint.labs.core.models.exceptions.BaseException;
+import com.engagepoint.labs.core.models.exceptions.BrowserRuntimeException;
 import org.apache.chemistry.opencmis.client.api.Session;
 
 import java.util.List;
@@ -29,16 +31,7 @@ public interface FSFolderDao {
      * @param folderName - name of folder which you want create
      * @return created folder, FSFolder type
      */
-    public FSFolder create(FSFolder parent, String folderName);
-
-    /**
-     * Method that will rename folder
-     *
-     * @param folder  - folder which you want rename
-     * @param newName - new name of folder
-     * @return renamed folder
-     */
-    public FSFolder rename(FSFolder folder, String newName);
+    public FSFolder create(FSFolder parent, String folderName) throws BaseException;
 
     /**
      * Get all children from parent folder
@@ -46,7 +39,7 @@ public interface FSFolderDao {
      * @param parent - folder in which you want get children
      * @return - list of FSObject files
      */
-    public List<FSObject> getChildren(FSFolder parent);
+    public List<FSObject> getChildren(FSFolder parent) throws BaseException;
 
     /**
      * Method that will delete folder from repository
@@ -58,6 +51,14 @@ public interface FSFolderDao {
 
     public boolean deleteAllTree(FSFolder folder);
 
+    /**
+     * Method that will rename folder
+     *
+     * @param folder  - folder which you want rename
+     * @param newName - new name of folder
+     * @return renamed folder
+     */
+    public FSFolder rename(FSFolder folder, String newName) throws BaseException;
     /**
      * @return root folder
      */
@@ -76,11 +77,11 @@ public interface FSFolderDao {
 
     public List<FSObject> getPageForLazy(FSFolder parent, int first, int pageSize);
 
-    public boolean hasChildFolder(FSFolder folder);
+    public boolean hasChildFolder(FSFolder folder) throws BaseException;
 
-    public boolean hasChildren(FSFolder folder);
+    public boolean hasChildren(FSFolder folder) throws BaseException;
 
-    public FSFolder move(FSFolder source, FSFolder target);
+    public FSFolder move(FSFolder source, FSFolder target) throws BrowserRuntimeException;
 
     public void copyFolder(FSFolder folder, String name, String targetId);
 

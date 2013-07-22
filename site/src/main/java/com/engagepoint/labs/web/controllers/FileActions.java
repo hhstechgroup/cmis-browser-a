@@ -2,6 +2,9 @@ package com.engagepoint.labs.web.controllers;
 
 import com.engagepoint.labs.core.models.FSFile;
 import com.engagepoint.labs.core.models.MimeTypes;
+import com.engagepoint.labs.core.models.exceptions.BaseException;
+import com.engagepoint.labs.core.models.exceptions.ConnectionException;
+import com.engagepoint.labs.core.models.exceptions.FileNotFoundException;
 import com.engagepoint.labs.core.service.CMISService;
 import com.engagepoint.labs.core.service.CMISServiceImpl;
 import org.primefaces.model.DefaultStreamedContent;
@@ -37,7 +40,17 @@ public class FileActions implements Serializable {
     private UploadedFile file;
 
     public FileActions() {
-        cmisService = CMISServiceImpl.getService();
+        try {
+            cmisService = CMISServiceImpl.getService();
+        } catch (ConnectionException e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    e.getMessage(),
+                    "Try later"));
+        } catch (BaseException e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    e.getMessage(),
+                    ""));
+        }
         logger = Logger.getLogger(FileActions.class.getName());
         selectedIsFile = false;
     }
@@ -52,20 +65,20 @@ public class FileActions implements Serializable {
         logger.log(Level.INFO, "id: " + file.getId());
         InputStream inputStream = null;
 
-//        try {
+        try {
             inputStream = cmisService.getInputStream(file);
             logger.log(Level.INFO, "inputStream - null? - " + (inputStream == null));
-//
-//        } catch (FileNotFoundException e) {
-//            logger.log(Level.INFO, "Is inputStream - null? - " + (inputStream == null));
-//            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-//                    e.getMessage(),
-//                    "Maybe, file was deleted!"));
-//        } catch (BaseException e) {
-//            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-//                    e.getMessage(),
-//                    ""));
-//        }
+
+        } catch (FileNotFoundException e) {
+            logger.log(Level.INFO, "Is inputStream - null? - " + (inputStream == null));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    e.getMessage(),
+                    "Maybe, file was deleted!"));
+        } catch (BaseException e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    e.getMessage(),
+                    ""));
+        }
         logger.log(Level.INFO, "ggggggggggggggggggggggggggg");
         String extension = MimeTypes.getExtension(file.getMimetype());
         logger.log(Level.INFO, "wwwwwwwwwwwwwwwwwwwwwwwwwwww");

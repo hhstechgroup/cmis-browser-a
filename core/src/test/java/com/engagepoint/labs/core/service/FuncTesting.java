@@ -6,6 +6,7 @@ package com.engagepoint.labs.core.service;
 
 import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
+import com.engagepoint.labs.core.models.exceptions.BaseException;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -39,7 +40,12 @@ public class FuncTesting {
 
     @Test
     public void getRootFolderTest() {
-        CMISService cmisService = CMISServiceImpl.getService();
+        CMISService cmisService = null;
+        try {
+            cmisService = CMISServiceImpl.getService();
+        } catch (BaseException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
         FSObject root = cmisService.getRootFolder();
         String expectedPath = "/";
         assertEquals(root.getParent(), null);
