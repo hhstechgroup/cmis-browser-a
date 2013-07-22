@@ -51,7 +51,7 @@ public interface FSFileDao {
 
     public InputStream getInputStream(FSFile file);
 
-    public void copy(String id, String targetId);
+    public boolean copy(String id, String newName, String targetId);
 
     public FSFile getHistory(FSFile file);
 

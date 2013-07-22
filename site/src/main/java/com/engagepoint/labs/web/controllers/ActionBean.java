@@ -66,16 +66,27 @@ public class ActionBean implements Serializable {
     }
 
     public void copyFolder(FSObject target) {
-        try {
-            logger.log(Level.INFO, "folder name: " + folderForCopy.getName() + " def name: " + defaultFolderName);
+        if (folderForCopy instanceof FSFile) {
+            logger.log(Level.INFO, "file name: " + folderForCopy.getName() + " def name: " + defaultFolderName);
             if (!folderForCopy.getName().equals(getDefaultFolderName())) {
                 folderForCopy.setName(getDefaultFolderName());
             }
-            cmisService.copyFolder((FSFolder) folderForCopy, folderForCopy.getName(), target.getId());
-        } catch (NullPointerException ex) {
-
+            cmisService.copyFile(folderForCopy.getId(), folderForCopy.getName(), target.getId());
+            defaultFolderName = "Copy_";
         }
-        defaultFolderName = "Copy_";
+
+        if (folderForCopy instanceof FSFolder) {
+            try {
+                logger.log(Level.INFO, "folder name: " + folderForCopy.getName() + " def name: " + defaultFolderName);
+                if (!folderForCopy.getName().equals(getDefaultFolderName())) {
+                    folderForCopy.setName(getDefaultFolderName());
+                }
+                cmisService.copyFolder((FSFolder) folderForCopy, folderForCopy.getName(), target.getId());
+            } catch (NullPointerException ex) {
+
+            }
+            defaultFolderName = "Copy_";
+        }
     }
 
     public ActionBean() {
@@ -113,7 +124,7 @@ public class ActionBean implements Serializable {
         }
         this.name = "";
         this.type = "";
-       // ====================paging==================treeBean.updatetablePageList();
+        // ====================paging==================treeBean.updatetablePageList();
     }
 
     public void edit(FSObject selected) {
@@ -144,7 +155,7 @@ public class ActionBean implements Serializable {
             logger.log(Level.INFO, "deleteSelect++++++" + object.getName());
             cmisService.deleteFile((FSFile) object);
         }
-       //===============paging====================== treeBean.updatetablePageList();
+        //===============paging====================== treeBean.updatetablePageList();
     }
 
     /**
@@ -267,10 +278,10 @@ public class ActionBean implements Serializable {
     public String getDefaultFolderName() {
         if (folderForCopy != null) {
             if (defaultFolderName.equals("Copy_")) {
-                logger.log(Level.INFO, "if: "+folderForCopy.getName());
+                logger.log(Level.INFO, "if: " + folderForCopy.getName());
                 defaultFolderName += folderForCopy.getName();
             } else {
-                logger.log(Level.INFO, "else: "+folderForCopy.getName());
+                logger.log(Level.INFO, "else: " + folderForCopy.getName());
                 defaultFolderName = "Copy_" + folderForCopy.getName();
             }
         }
@@ -280,8 +291,6 @@ public class ActionBean implements Serializable {
     public void setDefaultFolderName(String defaultFolderName) {
         this.defaultFolderName = defaultFolderName;
     }
-
-
 
 
 }

@@ -6,6 +6,7 @@ import com.engagepoint.labs.core.models.FSObject;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author volodymyr.kozubal  <volodymyr.kozubal@engagepoint.com>
@@ -21,9 +22,11 @@ public interface CMISService {
 
     public int getMaxNumberOfRowsByQuery(String query);
 
+    public int getMaxNumberOfRowsByQuery(Map<Integer, Object> query);
+
     public List<FSObject> getPageForLazySearchQuery(int first,int pageSize, String query);
 
-
+    public List<FSObject> getPageForLazySearchQuery(int first,int pageSize, Map<Integer, Object> query);
     /**
      * Return a list children of our parent fsFolder folder
      *
@@ -95,4 +98,7 @@ public interface CMISService {
     public FSFile getHistory(FSFile file);
 
     public List<FSObject> find(String query);
+
+
+    public void copyFile(String fileId,String name, String targetId) ;
 }

@@ -16,10 +16,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -57,7 +54,20 @@ public class TreeBean implements Serializable {
 
 
     private String findQuery;
-
+    private Map<Integer, Object> searchQueryAdvanced;
+    private String findName;
+    private String cmisType;
+    private String metaDataType;
+    private String docType;
+    private Date calendarFrom;
+    private Date calendarTo;
+    private String contentType;
+    private String sizeFrom;
+    private String sizeTo;
+    private String snippet;
+    private boolean disableSearchFolderProperties;
+    private boolean disableSearchSimple;
+    private int openAccordion;
 
     public String getFolderType() {
         return folderType;
@@ -88,6 +98,10 @@ public class TreeBean implements Serializable {
         this.selectedNodes = node0;
         changedTableParentFolder();
         folderTypes.put("CMIS Folder (cmis:folder)", "CMIS Folder (cmis:folder)");
+
+        searchQueryAdvanced = new HashMap<Integer, Object>();
+        searchQueryAdvanced.put(0, "cmis:document");
+        openAccordion = -1;
     }
 
     public void updateTree(TreeNode parent) {
@@ -314,5 +328,220 @@ public class TreeBean implements Serializable {
             logger.log(Level.INFO, "setFindQuery=-------------- " + getLazyModel().getSearchQuery());
 
         }
+    }
+
+    public void findObjects() {
+        logger.log(Level.INFO, "find=" + cmisService.find(findQuery).get(0).getName());
+        // treeBean.updatetablePageList(cmisService.find(findQuery));
+    }
+
+    public void findAdvanced() {
+
+        logger.log(Level.INFO, "==___________findAdvanced()____");
+
+
+
+        if(findName != ""){
+            searchQueryAdvanced.put(1, "%" + findName + "%");
+        } else{
+            searchQueryAdvanced.put(1, findName);
+        }
+
+        if(metaDataType != null){
+            searchQueryAdvanced.put(2, metaDataType);
+        } else{
+            searchQueryAdvanced.put(2, "");
+        }
+        if(findName != ""){
+            searchQueryAdvanced.put(3, "%." + docType);
+        } else{
+            searchQueryAdvanced.put(3, docType);
+        }
+        searchQueryAdvanced.put(4, snippet);
+
+        if(contentType != null){
+            searchQueryAdvanced.put(5, contentType);
+        } else{
+            searchQueryAdvanced.put(5, "");
+        }
+        searchQueryAdvanced.put(6, calendarFrom);
+        searchQueryAdvanced.put(7, calendarTo);
+        searchQueryAdvanced.put(8, sizeFrom);
+        searchQueryAdvanced.put(9, sizeTo);
+        logger.log(Level.INFO, "==______BEFORE_____BOOOOOOOOOOOOOOOM~!!!!____");
+        getLazyModel().setSearchQueryAdvanced(searchQueryAdvanced);
+
+        getLazyModel().setAbleSearchAdvanced(true);
+
+        logger.log(Level.INFO, "==___________BOOOOOOOOOOOOOOOM~!!!!____");
+    }
+
+    public void openSearchAdvanced(){
+        searchQueryAdvanced.put(0, "cmis:document");
+    }
+
+    public void ableSearchAdvanced(){
+        if((openAccordion*(-1)) == 1){
+            disableSearchSimple = true;
+            // treeBean.getLazyModel().setAbleSearchAdvanced(true);
+
+            logger.log(Level.INFO, "==___________otkrilo____");
+        } else {
+            disableSearchSimple = false;
+            //treeBean.getLazyModel().setAbleSearchAdvanced(false);
+            logger.log(Level.INFO, "==___________zakrilo____");
+        }
+    }
+
+
+
+    public void choosenCmisType(){
+        searchQueryAdvanced.put(0, cmisType);
+        if(cmisType == "cmis:folder"){
+            disableSearchFolderProperties = true;
+        }
+        else{
+            disableSearchFolderProperties = false;
+        }
+    }
+
+
+
+    public String getFindName() {
+        return findName;
+    }
+
+    public void setFindName(String findName) {
+
+        logger.log(Level.INFO, "___________________________________Name___" + findName + "______________");
+        if (findName != null) {
+            this.findName = findName;
+        } else {
+            this.findName = "";
+        }
+    }
+
+    public Map<Integer, Object> getSearchQueryAdvanced() {
+        return searchQueryAdvanced;
+    }
+
+    public Date getCalendarTo() {
+        return calendarTo;
+    }
+
+    public void setCalendarTo(Date calendarTo) {
+        this.calendarTo = calendarTo;
+        logger.log(Level.INFO, "___________calendar format___" + this.calendarFrom + ">");
+
+    }
+
+    public Date getCalendarFrom() {
+        return calendarFrom;
+    }
+
+    public void setCalendarFrom(Date calendarFrom) {
+        this.calendarFrom = calendarFrom;
+
+        logger.log(Level.INFO, "___________calendar format___" + this.calendarFrom + ">");
+    }
+
+    public String getSnippet() {
+        return snippet;
+    }
+
+    public void setSnippet(String snippet) {
+        if (snippet != null) {
+            this.snippet = snippet;
+        } else {
+            this.snippet = "";
+        }
+    }
+
+    public String getSizeTo() {
+        return sizeTo;
+    }
+
+    public void setSizeTo(String sizeTo) {
+        if (sizeTo != null) {
+            this.sizeTo = sizeTo;
+        } else {
+            this.sizeTo = "";
+        }
+    }
+
+    public String getSizeFrom() {
+        return sizeFrom;
+    }
+
+    public void setSizeFrom(String sizeFrom) {
+        if (sizeFrom != null) {
+            this.sizeFrom = sizeFrom;
+        } else {
+            this.sizeFrom = "";
+        }
+    }
+
+    public String getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(String contentType) {
+        if (contentType != null) {
+            this.contentType = contentType;
+        } else {
+            this.contentType = "";
+        }
+    }
+
+    public String getDocType() {
+        return docType;
+    }
+
+    public void setDocType(String docType) {
+        if (docType != null) {
+            this.docType = docType;
+        } else {
+            this.docType = "";
+        }
+    }
+
+    public String getMetaDataType() {
+        return metaDataType;
+    }
+
+    public void setMetaDataType(String metaDataType) {
+        if (metaDataType != null) {
+            this.metaDataType = metaDataType;
+        } else {
+            this.metaDataType = "";
+        }
+    }
+
+    public String getCmisType() {
+        return cmisType;
+    }
+
+    public void setCmisType(String cmisType) {
+        if (cmisType != null) {
+            this.cmisType = cmisType;
+        } else {
+            this.cmisType = "";
+        }
+    }
+
+    public boolean isDisableSearchFolderProperties() {
+        return disableSearchFolderProperties;
+    }
+
+    public void setDisableSearchFolderProperties(boolean disableSearchFolderProperties) {
+        this.disableSearchFolderProperties = disableSearchFolderProperties;
+    }
+
+    public boolean isDisableSearchSimple() {
+        return disableSearchSimple;
+    }
+
+    public void setDisableSearchSimple(boolean disableSearchSimple) {
+        this.disableSearchSimple = disableSearchSimple;
     }
 }

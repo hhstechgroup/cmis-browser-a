@@ -25,6 +25,7 @@ public class FSFileDaoImpl implements FSFileDao {
 
     private Session session;
     private static Logger logger = Logger.getLogger(FSFileDaoImpl.class.getName());
+
     @Override
     public void setSession(Session session) {
         this.session = session;
@@ -83,8 +84,7 @@ public class FSFileDaoImpl implements FSFileDao {
     @Override
     public FSFile edit(FSFile file, byte[] content, String mimeType) {
         Document cmisFile = (Document) session.getObject(file.getId());
-        if(content == null)
-        {
+        if (content == null) {
             content = new byte[0];
         }
         InputStream input = new ByteArrayInputStream(content);
@@ -115,10 +115,27 @@ public class FSFileDaoImpl implements FSFileDao {
     }
 
     @Override
-    public void copy(String id, String targetId) {
-        Document doc = (Document) session.getObject(id);
+    public boolean copy(String id, String newName, String targetId) {
+        String tempName = "TempCopyName";
+        Document document = (Document) session.getObject(id);
+        Folder folder = (Folder) session.getObject(targetId);
+        String defaultName = document.getName();
+
         ObjectId targetObjId = new ObjectIdImpl(targetId);
-        doc.copy(targetObjId);
+        Map<String, String> newDocumentProperties = new HashMap<String, String>();
+        newDocumentProperties.put(PropertyIds.NAME, tempName);
+        document.updateProperties(newDocumentProperties);
+        Document copiedDocument = null;
+        copiedDocument = document.copy(targetObjId);
+        newDocumentProperties.put(PropertyIds.NAME, newName);
+        copiedDocument.updateProperties(newDocumentProperties);
+        copiedDocument.delete();
+        newDocumentProperties.put(PropertyIds.NAME, defaultName);
+        document.updateProperties(newDocumentProperties);
+        System.out.println("Documents ID which we are copy is " + document.getId());
+        System.out.println("Copied document ID is " + copiedDocument.getId());
+        System.out.println("Document is copied successfully");
+        return true;
     }
 
     @Override

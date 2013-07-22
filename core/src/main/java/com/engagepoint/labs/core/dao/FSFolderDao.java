@@ -11,6 +11,7 @@ import com.engagepoint.labs.core.models.FSObject;
 import org.apache.chemistry.opencmis.client.api.Session;
 
 import java.util.List;
+import java.util.Map;
 
 public interface FSFolderDao {
 
@@ -84,5 +85,7 @@ public interface FSFolderDao {
     public void copyFolder(FSFolder folder, String name, String targetId);
 
     public List<FSObject> find(String query);
+
+    public List<FSObject> find(Map<Integer, Object> query);
 
 }

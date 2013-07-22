@@ -17,10 +17,7 @@ import org.apache.chemistry.opencmis.commons.enums.UnfileObject;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisBaseException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,9 +27,22 @@ public class FSFolderDaoImpl implements FSFolderDao {
     private FSFileDao fsFileDao;
     private static Logger logger = Logger.getLogger(FSFolderDaoImpl.class.getName());
 
+    private Map<Integer, String> searchAdvancedParametrs;
 
     public FSFolderDaoImpl() {
         fsFileDao = new FSFileDaoImpl();
+
+        searchAdvancedParametrs = new HashMap<Integer, String>();
+        searchAdvancedParametrs.put(0, "SELECT * FROM ? WHERE ");
+        searchAdvancedParametrs.put(1, " cmis:name LIKE ? ");
+        searchAdvancedParametrs.put(2, "");
+        searchAdvancedParametrs.put(3, " cmis:contentStreamFileName LIKE ? ");
+        searchAdvancedParametrs.put(4, " CONTAINS(?) ");
+        searchAdvancedParametrs.put(5, "");
+        searchAdvancedParametrs.put(6, " cmis:lastModificationDate >=  TIMESTAMP ? ");
+        searchAdvancedParametrs.put(7, " cmis:lastModificationDate <=  TIMESTAMP ? ");
+        searchAdvancedParametrs.put(8, " cmis:contentStreamLength >= \"");
+        searchAdvancedParametrs.put(9, " cmis:contentStreamLength <= \"");
     }
 
     @Override
@@ -272,6 +282,38 @@ public class FSFolderDaoImpl implements FSFolderDao {
         return files;
     }
 
+    @Override
+    public List<FSObject> find(Map<Integer, Object> query) {
+        List<FSObject> files = new LinkedList<FSObject>();
+        String myType = (String)query.get(0);
+        logger.log(Level.INFO, "=========" + myType);
+        ObjectType type = session.getTypeDefinition(myType);
+        logger.log(Level.INFO, "====!=====");
+        PropertyDefinition<?> objectIdPropDef = type.getPropertyDefinitions().get(PropertyIds.OBJECT_ID);
+        logger.log(Level.INFO, "====!1=====");
+        String objectIdQueryName = objectIdPropDef.getQueryName();
+        logger.log(Level.INFO, "====!11=====");
+        String queryString = getQuery(query);
+        ItemIterable<QueryResult> Results = session.query(queryString, false);
+        if(myType == "cmis:document"){
+            parseFSFile(files, objectIdQueryName, Results);
+        } else {
+            parseFSFolder(files, objectIdQueryName, Results);
+        }
+//        myType = "cmis:folder";
+//        type = session.getTypeDefinition(myType);
+//        objectIdPropDef = type.getPropertyDefinitions().get(PropertyIds.OBJECT_ID);
+//        objectIdQueryName = objectIdPropDef.getQueryName();
+////        logger.log(Level.INFO, "============DAOOOOOOO!======" );
+//        queryString = getQuery(query, type);
+////        logger.log(Level.INFO, "============DAOOOOOOO!!======" );
+//        ItemIterable<QueryResult> folderResults = session.query(queryString, false);
+////        logger.log(Level.INFO, "============DAOOOOOOO!!!======" );
+//        parseFSFolder(files, objectIdQueryName, folderResults);
+////        logger.log(Level.INFO, "============DAOOOOOOO!!!!======" );
+        return files;
+    }
+
     /**
      * Find all cmis folders from searching in repository by query
      *
@@ -335,7 +377,102 @@ public class FSFolderDaoImpl implements FSFolderDao {
             fsFile.setLastModifiedBy(doc.getLastModifiedBy());
             fsFile.setLastModifiedTime(doc.getLastModificationDate().getTime());
             fsFile.setAbsolutePath(doc.getPaths().get(0));
+            fsFile.setSize(String.valueOf(doc.getContentStreamLength()));
             files.add(fsFile);
+        }
+    }
+    private String getQuery(Map<Integer, Object> query) {
+
+        QueryStatement qs;
+        String plusQuery = "SELECT * FROM " + query.get(0);
+        int counter = 0;
+
+        for (int i = 1; i < 6; ++i) {
+            if (query.get(i) != "") {
+                if (counter == 0) {
+                    plusQuery += " WHERE ";
+                }
+                qs = session.createQueryStatement(searchAdvancedParametrs.get(i));
+                logger.log(Level.INFO, "===prop____# " + i + "=="+query.get(0)+"===="+query.get(i)+"===");
+                qs.setString(1,(String) query.get(i));
+                logger.log(Level.INFO, "===prop____# " + i + "=="+qs.toQueryString()+"=="+query.get(i)+"===");
+                if (counter > 0) {
+                    plusQuery += " AND ";
+                }
+                plusQuery += qs.toQueryString();
+                ++counter;
+            }
+        }
+
+        for (int i = 6; i < 8; ++i) {
+            if (query.get(i) != null) {
+                if (counter == 0) {
+                    plusQuery += " WHERE ";
+                }
+                qs = session.createQueryStatement(searchAdvancedParametrs.get(i));
+                qs.setDateTime(1, (Date) query.get(i));
+
+                logger.log(Level.INFO, "===prop____# " + i + "=="+qs.toQueryString()+"=="+query.get(i));
+                if (counter > 0) {
+                    plusQuery += " AND ";
+                }
+                plusQuery += qs.toQueryString();
+                ++counter;
+            }
+        }
+
+
+        for (int i = 8; i < 10; ++i) {
+            if (query.get(i) != "") {
+                if (counter == 0) {
+                    plusQuery += " WHERE ";
+                }
+                qs = session.createQueryStatement(searchAdvancedParametrs.get(i));
+                qs.setString(1, (String) query.get(i));
+                logger.log(Level.INFO, "===prop____# " + i + "=="+qs.toQueryString()+"==");
+                if (counter > 0) {
+                    plusQuery += " AND ";
+                }
+                plusQuery += searchAdvancedParametrs.get(i) + query.get(i) + "\" ";
+                ++counter;
+            }
+        }
+
+        logger.log(Level.INFO, "______________________" + plusQuery + "__________________");
+
+        return plusQuery;
+    }
+
+    private void parseFSFile(List<FSObject> files, String objectIdQueryName, ItemIterable<QueryResult> fileResult) {
+        for (QueryResult qResult : fileResult) {
+            FSFile fsFile = new FSFile();
+            String objectId = qResult.getPropertyValueByQueryName(objectIdQueryName);
+            Document doc = (Document) session.getObject(session.createObjectId(objectId));
+            fsFile.setName(doc.getName());
+            fsFile.setId(doc.getId());
+            fsFile.setTypeId(doc.getType().getId());
+            fsFile.setParentTypeId(doc.getType().getParentTypeId());
+            fsFile.setCreatedBy(doc.getCreatedBy());
+            fsFile.setCreationTime(doc.getCreationDate().getTime());
+            fsFile.setLastModifiedBy(doc.getLastModifiedBy());
+            fsFile.setLastModifiedTime(doc.getLastModificationDate().getTime());
+            fsFile.setAbsolutePath(doc.getPaths().get(0));
+            fsFile.setSize(String.valueOf(doc.getContentStreamLength()));
+            files.add(fsFile);
+        }
+    }
+
+    private void parseFSFolder(List<FSObject> files, String objectIdQueryName, ItemIterable<QueryResult> folderResults) {
+        for (QueryResult qResult : folderResults) {
+            FSFolder fsFolder = new FSFolder();
+            String objectId = qResult.getPropertyValueByQueryName(objectIdQueryName);
+            Folder folder = (Folder) session.getObject(session.createObjectId(objectId));
+            fsFolder.setPath(folder.getPath());
+            fsFolder.setName(folder.getName());
+            fsFolder.setId(folder.getId());
+            fsFolder.setTypeId(folder.getType().getDisplayName());
+            fsFolder.setParentTypeId(folder.getType().getParentTypeId());
+            files.add(fsFolder);
         }
     }
 
