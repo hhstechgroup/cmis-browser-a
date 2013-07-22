@@ -2,10 +2,7 @@ package com.engagepoint.labs.core.dao;
 
 import com.engagepoint.labs.core.models.FSFile;
 import com.engagepoint.labs.core.models.FSFolder;
-import org.apache.chemistry.opencmis.client.api.Document;
-import org.apache.chemistry.opencmis.client.api.Folder;
-import org.apache.chemistry.opencmis.client.api.ObjectId;
-import org.apache.chemistry.opencmis.client.api.Session;
+import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.client.runtime.ObjectIdImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
@@ -13,7 +10,9 @@ import org.apache.chemistry.opencmis.commons.enums.VersioningState;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -120,6 +119,33 @@ public class FSFileDaoImpl implements FSFileDao {
         Document doc = (Document) session.getObject(id);
         ObjectId targetObjId = new ObjectIdImpl(targetId);
         doc.copy(targetObjId);
+    }
+
+    @Override
+    public FSFile getHistory(FSFile file) {
+        Document cmisFile = (Document) session.getObject(file.getId());
+        if (((DocumentType) (cmisFile.getType())).isVersionable()) {
+            List<Document> versions = cmisFile.getAllVersions();
+            List<FSFile> fileVersions = new ArrayList<FSFile>(versions.size());
+            for (Document version : versions) {
+                FSFile versionFile = new FSFile();
+                versionFile.setName(version.getName());
+                versionFile.setVersionLabel(version.getVersionLabel());
+                versionFile.setLastModifiedBy(version.getLastModifiedBy());
+                versionFile.setLastModifiedTime(version.getLastModificationDate().getTime());
+                versionFile.setSize(String.valueOf(version.getContentStreamLength() / 1024));
+                versionFile.setId(version.getId());
+                versionFile.setVersionable(true);
+                versionFile.setMimetype(version.getContentStreamMimeType());
+                versionFile.setTypeId(version.getBaseType().getDisplayName());
+                versionFile.setParentTypeId(version.getType().getParentTypeId());
+                versionFile.setAbsolutePath(version.getPaths().get(0));
+                fileVersions.add(versionFile);
+            }
+            file.setAllVersions(fileVersions);
+            return file;
+        }
+        return null;
     }
 
 }

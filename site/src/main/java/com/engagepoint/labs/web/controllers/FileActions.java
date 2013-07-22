@@ -8,8 +8,10 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.UploadedFile;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
+import javax.faces.context.FacesContext;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.logging.Level;
@@ -31,7 +33,7 @@ public class FileActions implements Serializable {
     private static Logger logger;
     private boolean selectedIsFile;
     private String selectedName;
-
+    private boolean versionable;
     private UploadedFile file;
 
     public FileActions() {
@@ -40,10 +42,44 @@ public class FileActions implements Serializable {
         selectedIsFile = false;
     }
 
-    public StreamedContent download(FSFile file) throws IllegalArgumentException{
-        InputStream inputStream = cmisService.getInputStream(file);
+    public StreamedContent download(FSFile file) throws IllegalArgumentException/*, FileNotFoundException*/ {
+        logger.log(Level.INFO, "download: " + file.getName());
+        String fileName = file.getName();
+        if (file.isVersionable()) {
+            logger.log(Level.INFO, "file is versinable: " + file.getVersionLabel());
+            fileName += (file.getVersionLabel() == null) ? "" : file.getVersionLabel();
+        }
+        logger.log(Level.INFO, "id: " + file.getId());
+        InputStream inputStream = null;
+
+//        try {
+            inputStream = cmisService.getInputStream(file);
+            logger.log(Level.INFO, "inputStream - null? - " + (inputStream == null));
+//
+//        } catch (FileNotFoundException e) {
+//            logger.log(Level.INFO, "Is inputStream - null? - " + (inputStream == null));
+//            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+//                    e.getMessage(),
+//                    "Maybe, file was deleted!"));
+//        } catch (BaseException e) {
+//            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+//                    e.getMessage(),
+//                    ""));
+//        }
+        logger.log(Level.INFO, "ggggggggggggggggggggggggggg");
         String extension = MimeTypes.getExtension(file.getMimetype());
-        return new DefaultStreamedContent(inputStream, file.getMimetype(), file.getName()+extension);
+        logger.log(Level.INFO, "wwwwwwwwwwwwwwwwwwwwwwwwwwww");
+        DefaultStreamedContent defaultStreamedContent = null;
+        try {
+            if (inputStream != null)
+                defaultStreamedContent = new DefaultStreamedContent(inputStream, file.getMimetype(), fileName + extension);
+        } catch (Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    e.getMessage(),
+                    "Maybe, file was deleted!"));
+        }
+
+        return defaultStreamedContent;
     }
 
     public boolean isSelectedIsFile() {
@@ -68,5 +104,13 @@ public class FileActions implements Serializable {
 
     public void setSelectedName(String selectedName) {
         this.selectedName = selectedName;
+    }
+
+    public boolean isVersionable() {
+        return versionable;
+    }
+
+    public void setVersionable(boolean versionable) {
+        this.versionable = versionable;
     }
 }

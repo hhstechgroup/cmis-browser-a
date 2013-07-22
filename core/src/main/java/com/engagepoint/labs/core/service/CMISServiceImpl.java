@@ -152,6 +152,11 @@ public class CMISServiceImpl implements CMISService {
     }
 
     @Override
+    public FSFile getHistory(FSFile file) {
+        return fsFolderDao.getFsFileDao().getHistory(file);
+    }
+
+    @Override
     public List<FSObject> find(String query) {
         return fsFolderDao.find(query);
     }

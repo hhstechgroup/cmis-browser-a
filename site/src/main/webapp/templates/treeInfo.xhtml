@@ -42,6 +42,65 @@
             </h:form>
         </p:dialog>
 
+        <p:dialog id="historyDialogid" modal="true"
+                  showEffect="fade"
+                  hideEffect="fade"
+                  resizable="false"
+                  dynamic="true"
+                  appendToBody="true"
+                  header="#{treeBean.selectedFSObject.name} history" widgetVar="historyDialog">
+            <h:form id="historyForm">
+                <p:dataTable id="historyTable"
+                             var="fsFile"
+                             scrollable="true"
+                             value="#{action.history}"
+                             emptyMessage="No history"
+                             scrollHeight="400" style="width: 770px;"
+                             rowKey="#{fsFile}"
+                             selection="#{treeBean.selectedFSObject}"
+                             selectionMode="single"
+                             paginator="true" rows="5"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15"
+                        >
+                    <p:ajax event="rowSelect" listener="#{treeBean.onRowSelect}"
+                            update=":historyForm:historyTable"/>
+
+                    <f:facet name="header">
+                        <p:tabMenu id="actiontabhistorymenu" activeIndex="1">
+                            <p:menuitem id="downloadhistorymenuitem" disabled="#{!fileActions.selectedIsFile}"
+                                        value="Download"
+                                        ajax="false"
+                                        icon="ui-icon-triangle-1-s">
+                                <p:fileDownload value="#{fileActions.download(treeBean.selectedFSObject)}"/>
+                            </p:menuitem>
+                        </p:tabMenu>
+                    </f:facet>
+                    <p:column style="width: 100px;" headerText="Id">
+                        <h:outputText value="#{fsFile.id}"/>
+                    </p:column>
+                    <p:column style="width: 200px;" headerText="Name">
+                        <h:outputText value="#{fsFile.name}"/>
+                    </p:column>
+                    <p:column style="width: 100px;" headerText="Version label">
+                        <h:outputText value="#{fsFile.versionLabel}"/>
+                    </p:column>
+                    <p:column style="width: 150px;" headerText="Content Type">
+                        <h:outputText value="#{fsFile.mimetype}"/>
+                    </p:column>
+                    <p:column style="width: 100px;" headerText="Size, KB">
+                        <h:outputText value="#{fsFile.size}"/>
+                    </p:column>
+                    <p:column style="width: 300px;" headerText="Last Modified By">
+                        <h:outputText value="#{fsFile.lastModifiedBy}"/>
+                    </p:column>
+                    <p:column style="width: 300px;" headerText="Last Modification date">
+                        <h:outputText value="#{fsFile.lastModifiedTime}"/>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
         <iframe id="dj_history" src="resources/js/dojo/resources/iframe_history.html" name="dj_history"
                 style="border:0;width:1px;height:1px;position:absolute;visibility:hidden;bottom:0;right:0;">
         </iframe>

@@ -53,4 +53,6 @@ public interface FSFileDao {
 
     public void copy(String id, String targetId);
 
+    public FSFile getHistory(FSFile file);
+
 }

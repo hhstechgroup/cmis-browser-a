@@ -14,6 +14,8 @@ import org.apache.chemistry.opencmis.client.runtime.ObjectIdImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
 import org.apache.chemistry.opencmis.commons.enums.UnfileObject;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisBaseException;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -73,34 +75,41 @@ public class FSFolderDaoImpl implements FSFolderDao {
     }
 
     @Override
-    public List<FSObject> getChildren(FSFolder parent) {
+    public List<FSObject> getChildren(FSFolder parent) /*throws BaseException*/ {
         String notRootFolder = parent.getPath().equals("/") ? "" : parent.getPath();
         List<FSObject> children = new ArrayList<FSObject>();
         Folder cmisParent = (Folder) session.getObjectByPath(parent.getPath());
         ItemIterable<CmisObject> cmisChildren = cmisParent.getChildren();
-        for (CmisObject o : cmisChildren) {
-            FSObject fsObject;
-            if (o instanceof Folder) {
-                fsObject = new FSFolder();
-                fsObject.setPath(((Folder) o).getPath());
-            } else {
-                fsObject = new FSFile();
-                fsObject.setMimetype(((Document) o).getContentStreamMimeType());
-                fsObject.setPath(notRootFolder);
-                fsObject.setSize(String.valueOf(((Document) o).getContentStreamLength() / 1024));
-                ((FSFile) fsObject).setAbsolutePath(notRootFolder + "/" + o.getName());
+       // try {
+            for (CmisObject o : cmisChildren) {
+                FSObject fsObject;
+                if (o instanceof Folder) {
+                    fsObject = new FSFolder();
+                    fsObject.setPath(((Folder) o).getPath());
+                } else {
+                    fsObject = new FSFile();
+                    fsObject.setMimetype(((Document) o).getContentStreamMimeType());
+                    ((FSFile) fsObject).setVersionable(((DocumentType) (o.getType())).isVersionable());
+                    fsObject.setPath(notRootFolder);
+                    fsObject.setSize(String.valueOf(((Document) o).getContentStreamLength() / 1024));
+                    ((FSFile) fsObject).setAbsolutePath(notRootFolder + "/" + o.getName());
+                }
+                fsObject.setParentTypeId(o.getType().getParentTypeId());
+                fsObject.setCreatedBy(o.getCreatedBy());
+                fsObject.setCreationTime(o.getCreationDate().getTime());
+                fsObject.setLastModifiedBy(o.getLastModifiedBy());
+                fsObject.setLastModifiedTime(o.getLastModificationDate().getTime());
+                fsObject.setTypeId(o.getBaseType().getDisplayName());
+                fsObject.setName(o.getName());
+                fsObject.setId(o.getId());
+                fsObject.setParent(parent);
+                children.add(fsObject);
             }
-            fsObject.setParentTypeId(o.getType().getParentTypeId());
-            fsObject.setCreatedBy(o.getCreatedBy());
-            fsObject.setCreationTime(o.getCreationDate().getTime());
-            fsObject.setLastModifiedBy(o.getLastModifiedBy());
-            fsObject.setLastModifiedTime(o.getLastModificationDate().getTime());
-            fsObject.setTypeId(o.getBaseType().getDisplayName());
-            fsObject.setName(o.getName());
-            fsObject.setId(o.getId());
-            fsObject.setParent(parent);
-            children.add(fsObject);
-        }
+       /* } catch (CmisObjectNotFoundException e) {
+            throw new ConnectionException(e.getMessage());
+        }     catch (CmisBaseException e) {
+            throw new BaseException(e.getMessage());
+        }*/
         return children;
     }
 
@@ -159,33 +168,41 @@ public class FSFolderDaoImpl implements FSFolderDao {
         String notRootFolder = parent.getPath().equals("/") ? "" : parent.getPath();
         List<FSObject> children = new ArrayList<FSObject>();
         Folder cmisParent = (Folder) session.getObjectByPath(parent.getPath());
+
         OperationContext operationContext = session.createOperationContext();
         operationContext.setMaxItemsPerPage(pageSize);
         ItemIterable<CmisObject> childrenCmis = cmisParent.getChildren(operationContext);
         ItemIterable<CmisObject> cmisChildren = childrenCmis.skipTo(first).getPage();
-        for (CmisObject o : cmisChildren) {
-            FSObject fsObject;
-            if (o instanceof Folder) {
-                fsObject = new FSFolder();
-                fsObject.setPath(((Folder) o).getPath());
-            } else {
-                fsObject = new FSFile();
-                fsObject.setMimetype(((Document) o).getContentStreamMimeType());
-                fsObject.setPath(notRootFolder);
-                fsObject.setSize(String.valueOf(((Document) o).getContentStreamLength() / 1024));
-                ((FSFile) fsObject).setAbsolutePath(notRootFolder + "/" + o.getName());
+       // try {
+            for (CmisObject o : cmisChildren) {
+                FSObject fsObject;
+                if (o instanceof Folder) {
+                    fsObject = new FSFolder();
+                    fsObject.setPath(((Folder) o).getPath());
+                } else {
+                    fsObject = new FSFile();
+                    fsObject.setMimetype(((Document) o).getContentStreamMimeType());
+                    fsObject.setPath(notRootFolder);
+                    ((FSFile) fsObject).setVersionable(((DocumentType) (o.getType())).isVersionable());
+                    fsObject.setSize(String.valueOf(((Document) o).getContentStreamLength() / 1024));
+                    ((FSFile) fsObject).setAbsolutePath(notRootFolder + "/" + o.getName());
+                }
+                fsObject.setParentTypeId(o.getType().getParentTypeId());
+                fsObject.setCreatedBy(o.getCreatedBy());
+                fsObject.setCreationTime(o.getCreationDate().getTime());
+                fsObject.setLastModifiedBy(o.getLastModifiedBy());
+                fsObject.setLastModifiedTime(o.getLastModificationDate().getTime());
+                fsObject.setTypeId(o.getType().getId());
+                fsObject.setName(o.getName());
+                fsObject.setId(o.getId());
+                fsObject.setParent(parent);
+                children.add(fsObject);
             }
-            fsObject.setParentTypeId(o.getType().getParentTypeId());
-            fsObject.setCreatedBy(o.getCreatedBy());
-            fsObject.setCreationTime(o.getCreationDate().getTime());
-            fsObject.setLastModifiedBy(o.getLastModifiedBy());
-            fsObject.setLastModifiedTime(o.getLastModificationDate().getTime());
-            fsObject.setTypeId(o.getType().getId());
-            fsObject.setName(o.getName());
-            fsObject.setId(o.getId());
-            fsObject.setParent(parent);
-            children.add(fsObject);
-        }
+        /*} catch (CmisObjectNotFoundException e) {
+            throw new ConnectionException(e.getMessage());
+        }    catch (CmisBaseException e) {
+            throw new BaseException(e.getMessage());
+        }*/
         return children;
     }
 

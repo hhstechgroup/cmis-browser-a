@@ -264,6 +264,7 @@ public class TreeBean implements Serializable {
         if (sn != null) {
             if (sn instanceof FSFile) {
                 fileActions.setSelectedIsFile(true);
+                fileActions.setVersionable(((FSFile) sn).isVersionable());
             } else {
                 fileActions.setSelectedIsFile(false);
             }

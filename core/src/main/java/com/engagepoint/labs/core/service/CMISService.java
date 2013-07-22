@@ -92,5 +92,7 @@ public interface CMISService {
 
     public void copyFolder(FSFolder folder, String name, String targetID);
 
+    public FSFile getHistory(FSFile file);
+
     public List<FSObject> find(String query);
 }

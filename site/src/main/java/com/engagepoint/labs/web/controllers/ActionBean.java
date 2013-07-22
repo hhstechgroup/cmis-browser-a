@@ -16,6 +16,7 @@ import javax.faces.bean.SessionScoped;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import java.io.Serializable;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -41,7 +42,7 @@ public class ActionBean implements Serializable {
     private UIComponent createcomponent;
     private static Logger logger;
     private final CMISService cmisService;
-
+    private List<FSFile> history;
     private FSObject folderForCopy;
     private String findQuery;
 
@@ -180,6 +181,22 @@ public class ActionBean implements Serializable {
        /* if (treeBean.getSelectedNode().getParent() != null) {
             treeBean.updateTree(treeBean.getSelectedNode().getParent());
         }*/
+    }
+
+    public void fillHistory(FSFile fsFile) {
+        try {
+            this.history = cmisService.getHistory(fsFile).getAllVersions();
+        } catch (NullPointerException ex) {
+            logger.log(Level.WARNING, ex.getMessage());
+        }
+    }
+
+    public List<FSFile> getHistory() {
+        return history;
+    }
+
+    public void setHistory(List<FSFile> history) {
+        this.history = history;
     }
 
     public String getName() {
