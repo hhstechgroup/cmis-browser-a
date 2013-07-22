@@ -327,6 +327,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
             Document doc = (Document) session.getObject(session.createObjectId(objectId));
             fsFile.setName(doc.getName());
             fsFile.setId(doc.getId());
+            fsFile.setVersionable(((DocumentType) (doc.getType())).isVersionable());
             fsFile.setTypeId(doc.getType().getId());
             fsFile.setParentTypeId(doc.getType().getParentTypeId());
             fsFile.setCreatedBy(doc.getCreatedBy());
