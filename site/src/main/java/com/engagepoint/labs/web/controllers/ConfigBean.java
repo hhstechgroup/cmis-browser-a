@@ -5,12 +5,14 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
-import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
 
 @ManagedBean(name = "config")
@@ -21,6 +23,7 @@ public class ConfigBean implements Serializable {
     private LoginBean loginBean;
 
     private final static String repoURLkey = "REPO_URL";
+    private final static String repoNameKey = "REPO_NAME";
     private final static String nameColumnRender = "nameColumnRender";
     private final static String typeIDColumnRender = "typeIDColumnRender";
     private final static String parentTypeIdColumnRender = "parentTypeIdColumnRender";
@@ -34,6 +37,7 @@ public class ConfigBean implements Serializable {
 
     private Preferences prefs;
     private String repoURL;
+    private String repoName;
     private Logger logger = Logger.getLogger(ConfigBean.class.getName());
 
     private boolean name = true;
@@ -47,17 +51,14 @@ public class ConfigBean implements Serializable {
     private boolean lastModifiedBy = true;
     private boolean lastModifiedDate = true;
 
+    private List<SelectItem> repositories;
+
     public ConfigBean() {
-        try {
-            Preferences.importPreferences(new BufferedInputStream(new FileInputStream("D:\\settings.properties")));
-        } catch (IOException e) {
-        } catch (InvalidPreferencesFormatException e) {
-        }
+        repositories = new LinkedList<SelectItem>();
         prefs = Preferences.userRoot().node(this.getClass().getName());
     }
 
     public void savePrefs() {
-        prefs.put(repoURLkey, repoURL);
         prefs.putBoolean(nameColumnRender, name);
         prefs.putBoolean(typeIDColumnRender, typeId);
         prefs.putBoolean(parentTypeIdColumnRender, parentTypeId);
@@ -68,8 +69,10 @@ public class ConfigBean implements Serializable {
         prefs.putBoolean(sizeColumnRender, size);
         prefs.putBoolean(lastModifiedByColumnRender, lastModifiedBy);
         prefs.putBoolean(lastModifiedDateColumnRender, lastModifiedDate);
-        List<SelectItem> repositories = new LinkedList<SelectItem>();
-        repositories.add(new SelectItem(getRepoURL(), "Lab5"));
+        prefs.put(repoURLkey, repoURL);
+        prefs.put(repoNameKey, repoName);
+        repositories.add(new SelectItem(repoURL, repoName));
+
         loginBean.setRepositories(repositories);
         try {
             prefs.exportSubtree(new BufferedOutputStream(new FileOutputStream("D:\\settings.properties")));
@@ -82,8 +85,16 @@ public class ConfigBean implements Serializable {
         }
     }
 
+    public String getRepoName() {
+        return prefs.get(repoNameKey, "");
+    }
+
+    public void setRepoName(String repoName) {
+        this.repoName = repoName;
+    }
+
     public String getRepoURL() {
-        return prefs.get(repoURLkey, "http://lab5:8080/chemistry-opencmis-server-inmemory-0.9.0/atom11");
+        return prefs.get(repoURLkey, "");
     }
 
     public void setRepoURL(String repoURL) {
