@@ -30,7 +30,8 @@ public class ConnectionFactory {
     private String username;
     private String password;
 
-    private ConnectionFactory(){}
+    private ConnectionFactory() {
+    }
 
     /**
      * Return session
@@ -43,8 +44,12 @@ public class ConnectionFactory {
             SessionFactory sessionFactory = SessionFactoryImpl.newInstance();
             Map<String, String> parameter = new HashMap<String, String>();
             parameter.put(SessionParameter.BINDING_TYPE, BindingType.ATOMPUB.value());
-            parameter.put(SessionParameter.USER,     username);
-            parameter.put(SessionParameter.PASSWORD, password);
+            if (!username.isEmpty()) {
+                parameter.put(SessionParameter.USER, username);
+            }
+            if (!password.isEmpty()) {
+                parameter.put(SessionParameter.PASSWORD, password);
+            }
             parameter.put(SessionParameter.ATOMPUB_URL, url);
 //        parameter.put(SessionParameter.ATOMPUB_URL, "http://repo.opencmis.org/inmemory/atom/");
 
