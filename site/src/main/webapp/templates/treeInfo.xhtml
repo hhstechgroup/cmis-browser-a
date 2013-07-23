@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:ct="http://java.sun.com/jsf/composite/composite">
+
+
+<h:body>
+    <ui:composition>
+        <h:outputStylesheet library="style" name="style.css"/>
+        <h:outputScript library="js" name="native_but.js"/>
+
+        <p:messages id="erro" showDetail="true" autoUpdate="true"/>
+
+        <ct:cmisBrowserComponent id="cmisbrowser"/>
+
+        <p:dialog id="copyDialogId" header="Copy" widgetVar="copyDialog"
+                  modal="true"
+                  showEffect="fade"
+                  hideEffect="fade"
+                  resizable="false"
+                  dynamic="true"
+                  appendToBody="true"
+                >
+
+            <ct:cmisBrowserComponent tableview="false"/>
+            <h:form id="formCopy">
+                <p:inputText id="inputCopyName" value="#{action.defaultFolderName}">
+                </p:inputText>
+                <br></br>
+
+
+                <p:commandButton value="OK"
+                                 update=":cmisbrowser"
+                                 actionListener="#{action.copyFolder(treeBean.selectedFSObject)}"
+                                 oncomplete="if (!args.validationFailed) copyDialog.hide()"/>
+
+                <p:commandButton value="Cancel" type="button" onclick="copyDialog.hide();"
+                                 style="float:right;"/>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog id="historyDialogid" modal="true"
+                  showEffect="fade"
+                  hideEffect="fade"
+                  resizable="false"
+                  dynamic="true"
+                  appendToBody="true"
+                  header="#{treeBean.selectedFSObject.name} history" widgetVar="historyDialog">
+            <h:form id="historyForm">
+                <p:dataTable id="historyTable"
+                             var="fsFile"
+                             scrollable="true"
+                             value="#{action.history}"
+                             emptyMessage="No history"
+                             scrollHeight="400" style="width: 770px;"
+                             rowKey="#{fsFile}"
+                             selection="#{treeBean.selectedFSObject}"
+                             selectionMode="single"
+                             paginator="true" rows="5"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15"
+                        >
+                    <p:ajax event="rowSelect" listener="#{treeBean.onRowSelect}"
+                            update=":historyForm:historyTable"/>
+
+                    <f:facet name="header">
+                        <p:tabMenu id="actiontabhistorymenu" activeIndex="1">
+                            <p:menuitem id="downloadhistorymenuitem" disabled="#{!fileActions.selectedIsFile}"
+                                        value="Download"
+                                        ajax="false"
+                                        icon="ui-icon-triangle-1-s">
+                                <p:fileDownload value="#{fileActions.download(treeBean.selectedFSObject)}"/>
+                            </p:menuitem>
+                        </p:tabMenu>
+                    </f:facet>
+                    <p:column style="width: 100px;" headerText="Id">
+                        <h:outputText value="#{fsFile.id}"/>
+                    </p:column>
+                    <p:column style="width: 200px;" headerText="Name">
+                        <h:outputText value="#{fsFile.name}"/>
+                    </p:column>
+                    <p:column style="width: 100px;" headerText="Version label">
+                        <h:outputText value="#{fsFile.versionLabel}"/>
+                    </p:column>
+                    <p:column style="width: 150px;" headerText="Content Type">
+                        <h:outputText value="#{fsFile.mimetype}"/>
+                    </p:column>
+                    <p:column style="width: 100px;" headerText="Size, KB">
+                        <h:outputText value="#{fsFile.size}"/>
+                    </p:column>
+                    <p:column style="width: 300px;" headerText="Last Modified By">
+                        <h:outputText value="#{fsFile.lastModifiedBy}"/>
+                    </p:column>
+                    <p:column style="width: 300px;" headerText="Last Modification date">
+                        <h:outputText value="#{fsFile.lastModifiedTime}"/>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+        <iframe id="dj_history" src="resources/js/dojo/resources/iframe_history.html" name="dj_history"
+                style="border:0;width:1px;height:1px;position:absolute;visibility:hidden;bottom:0;right:0;">
+        </iframe>
+        <p:commandButton value="View as Dialog" onclick="TreeinDialog.show();"/>
+        <p:dialog id="TreeDailog" widgetVar="TreeinDialog"
+                  showEffect="fade"
+                  hideEffect="fade"
+                  modal="true"
+                  resizable="false">
+            <ct:cmisBrowserComponent id="cmisbrowserdialog"/>
+
+            <p:commandButton value="View as Web Page" type="button" onclick="TreeinDialog.hide()"/>
+        </p:dialog>
+    </ui:composition>
+</h:body>
+</html>
