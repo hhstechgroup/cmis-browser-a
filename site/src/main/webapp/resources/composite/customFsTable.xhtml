@@ -54,72 +54,82 @@
         <p:ajax event="rowSelect" listener="#{treeBean.onRowSelect}"
                 update="@form :#{cc.parent.clientId}:actiondialogs:#{cc.parent.clientId}edit :historyDialogid :copyDialogId"/>
         <f:facet name="header">
-            <h:inputText value="#{treeBean.parent.path}" id="currentPath"
+            <h:inputText value="#{treeBean.parent.path}"
                          style="border-radius: 11px;font-size: 16px; margin-bottom: 5px; color: #000000;" size="90"
                          disabled="true"/>
 
 
-            <p:inputText id="finditem" value="#{treeBean.findQuery}" disabled="#{treeBean.disableSearchSimple}"/>
-            <p:commandButton value="Search" process="tablecomponent"
-                             update=":#{cc.parent.clientId}:treeForm:table:tablecomponent" disabled="#{treeBean.disableSearchSimple}"/>
-                             <p:watermark for="finditem"  value="name"/>
+            <p:inputText id="finditem" value="#{treeBean.findQuery}" />
+            <p:watermark for="finditem" value="name"/>
 
-            <p:accordionPanel activeIndex="-1" actionListener="#{treeBean.openSearchAdvanced}">
-                <p:ajax event="tabChange" listener="#{treeBean.ableSearchAdvanced}"  />
+            <p:splitButton value="Search" process="tablecomponent"
+                           update=":#{cc.parent.clientId}:treeForm:table:tablecomponent" action="#{treeBean.findAdvanced}">
+                <p:menuitem value="Simple" actionListener="#{treeBean.disableSearchAdvanced}" update=":#{cc.parent.clientId}:treeForm:table:tablecomponent" icon="ui-icon-arrowrefresh-1-w"/>
+                <p:separator />
+                <p:menuitem value="Advanced" actionListener="#{treeBean.ableSearchAdvanced}" update=":#{cc.parent.clientId}:treeForm:table:tablecomponent" icon="ui-icon-close"/>
+
+
+            </p:splitButton>
+
+            <p:accordionPanel id="accordion" activeIndex="-1" rendered="#{treeBean.ableSearchAdvanced}" >
+                <p:ajax event="tabChange" listener="#{treeBean.ableSearchAdvanced}"/>
                 <p:tab title="Advanced search">
 
 
+
+
                     <h:outputText value="Type: "/>
-                    <p:selectOneRadio id="options" value="#{treeBean.cmisType}" actionListener="#{treeBean.choosenCmisType}">
-                        <f:selectItem itemLabel="Folder" itemValue="cmis:folder"/>
+                    <p:selectOneRadio id="options" value="#{treeBean.cmisType}">
+                        <p:ajax event="change" listener="#{treeBean.choosenCmisType}"
+                                update=":#{cc.parent.clientId}:treeForm:table:tablecomponent:accordion:properties"/>
                         <f:selectItem itemLabel="Document" itemValue="cmis:document"/>
+                        <f:selectItem itemLabel="Folder" itemValue="cmis:folder"/>
                     </p:selectOneRadio>
-                    <br/>
+                    <p:outputPanel id="properties">
 
-                    <p:inputText id="findName" value="#{treeBean.findName}"/>
-                    <p:watermark value="findName" for="findName"/>
-                    <br/>
+                        <!--metadata-->
+                        <p:inputText id="metaDataType" value="#{treeBean.metaDataType}" disabled="true"/>
+                        <p:watermark value="metaDataType" for="metaDataType"/>
+                        <br/>
 
-                    <!--metadata-->
-                    <p:inputText id="metaDataType" value="#{treeBean.metaDataType}" disabled="true"/>
-                    <p:watermark value="metaDataType" for="metaDataType"/>
-                    <br/>
+                        <!--format-->
+                        <p:inputText id="docType" value="#{treeBean.docType}"
+                                     disabled="#{treeBean.disableSearchFolderProperties}"/>
+                        <p:watermark value="metaDataType" for="docType"/>
+                        <br/>
 
-                    <!--format-->
-                    <p:inputText id="docType" value="#{treeBean.docType}" disabled="#{treeBean.disableSearchFolderProperties}"/>
-                    <p:watermark value="metaDataType" for="docType"/>
-                    <br/>
+                        <!--date-->
+                        <h:outputText value="From "/>
+                        <p:calendar id="calendarFrom" value="#{treeBean.calendarFrom}"/>
+                        <p:watermark value="First date" for="calendarFrom"/>
+                        <h:outputText value=" to "/>
+                        <p:calendar id="calendarTo" value="#{treeBean.calendarTo}"/>
 
-                    <!--date-->
-                    <h:outputText value="From "/>
-                    <p:calendar id="calendarFrom" value="#{treeBean.calendarFrom}"/>
-                    <p:watermark value="First date" for="calendarFrom"/>
-                    <h:outputText value=" to "/>
-                    <p:calendar id="calendarTo" value="#{treeBean.calendarTo}"/>
+                        <p:watermark value="Second date" for="calendarTo"/>
+                        <br/>
 
-                    <p:watermark value="Second date" for="calendarTo"/>
-                    <br/>
+                        <!--Metadata-->
+                        <p:inputText id="contentType" value="#{treeBean.contentType}" disabled="true"/>
+                        <p:watermark value="findType" for="contentType"/>
+                        <br/>
 
-                    <!--Metadata-->
-                    <p:inputText id="contentType" value="#{treeBean.contentType}" disabled="true"/>
-                    <p:watermark value="findType" for="contentType"/>
-                    <br/>
+                        <!--size -->
+                        <h:outputText value="From "/>
+                        <p:inputText id="sizeFrom" value="#{treeBean.sizeFrom}"
+                                     disabled="#{treeBean.disableSearchFolderProperties}"/>
+                        <p:watermark value="min size" for="sizeFrom"/>
+                        <h:outputText value=" to "/>
+                        <p:inputText id="sizeTo" value="#{treeBean.sizeTo}"
+                                     disabled="#{treeBean.disableSearchFolderProperties}"/>
+                        <p:watermark value="max size" for="sizeTo"/>
+                        <br/>
 
-                    <!--size -->
-                    <h:outputText value="From "/>
-                    <p:inputText id="sizeFrom" value="#{treeBean.sizeFrom}" disabled="#{treeBean.disableSearchFolderProperties}"/>
-                    <p:watermark value="min size" for="sizeFrom"/>
-                    <h:outputText value=" to "/>
-                    <p:inputText id="sizeTo" value="#{treeBean.sizeTo}" disabled="#{treeBean.disableSearchFolderProperties}"/>
-                    <p:watermark value="max size" for="sizeTo"/>
-                    <br/>
+                        <p:inputText id="snippet" value="#{treeBean.snippet}"
+                                     disabled="#{treeBean.disableSearchFolderProperties}"/>
+                        <p:watermark value="snippet for search" for="snippet"/>
+                        <br/>
+                    </p:outputPanel>
 
-                    <p:inputText id="snippet" value="#{treeBean.snippet}" disabled="#{treeBean.disableSearchFolderProperties}"/>
-                    <p:watermark value="snippet for search" for="snippet"/>
-                    <br/>
-                    <p:commandButton value="Search3" actionListener="#{treeBean.findAdvanced}"
-                                     process=":#{cc.parent.clientId}:treeForm:table:tablecomponent"
-                                     update=":#{cc.parent.clientId}:treeForm:table:tablecomponent"/>
                 </p:tab>
             </p:accordionPanel>
 

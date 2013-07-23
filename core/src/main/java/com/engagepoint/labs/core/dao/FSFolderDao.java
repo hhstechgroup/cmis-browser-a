@@ -9,6 +9,8 @@ package com.engagepoint.labs.core.dao;
 import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
 import com.engagepoint.labs.core.models.exceptions.*;
+import com.engagepoint.labs.core.models.exceptions.BaseException;
+import com.engagepoint.labs.core.models.exceptions.BrowserRuntimeException;
 import org.apache.chemistry.opencmis.client.api.Session;
 
 import java.util.List;
@@ -48,8 +50,7 @@ public interface FSFolderDao {
      */
     public boolean delete(FSFolder folder);
 
-    public boolean deleteAllTree(FSFolder folder) throws FolderNotFoundException;
-
+    public boolean deleteAllTree(FSFolder folder);
     /**
      * Method that will rename folder
      *
@@ -74,7 +75,7 @@ public interface FSFolderDao {
 
     public List<FSObject> getPageForLazySearchQuery(int first,int pageSize, String query);
 
-    public List<FSObject> getPageForLazy(FSFolder parent, int first, int pageSize) throws BaseException;
+    public List<FSObject> getPageForLazy(FSFolder parent, int first, int pageSize);
 
     public boolean hasChildFolder(FSFolder folder) throws BaseException;
 
@@ -82,7 +83,7 @@ public interface FSFolderDao {
 
     public FSFolder move(FSFolder source, FSFolder target) throws BrowserRuntimeException;
 
-    public void copyFolder(FSFolder folder, String name, String targetId) throws FolderAlreadyExistException;
+    public void copyFolder(FSFolder folder, String name, String targetId);
 
     public List<FSObject> find(String query);
 

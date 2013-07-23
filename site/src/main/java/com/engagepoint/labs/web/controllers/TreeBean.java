@@ -60,9 +60,8 @@ public class TreeBean implements Serializable {
     private Map<String, String> folderTypes = new HashMap<String, String>();
 
 
-    private String findQuery = "";
+    private String findQuery;
     private Map<Integer, Object> searchQueryAdvanced;
-    private String findName;
     private String cmisType;
     private String metaDataType;
     private String docType;
@@ -74,7 +73,8 @@ public class TreeBean implements Serializable {
     private String snippet;
     private boolean disableSearchFolderProperties;
     private boolean disableSearchSimple;
-    private int openAccordion;
+    private boolean ableSearchAdvanced;
+    private String searchPropertiesVisibility;
 
     public String getFolderType() {
         return folderType;
@@ -103,13 +103,10 @@ public class TreeBean implements Serializable {
                     e.getMessage(),
                     ""));
         }
-
-
-        folderTypes.put("CMIS Folder (cmis:folder)", "CMIS Folder (cmis:folder)");
-
         searchQueryAdvanced = new HashMap<Integer, Object>();
         searchQueryAdvanced.put(0, "cmis:document");
-        openAccordion = -1;
+        ableSearchAdvanced = false;
+        cmisType = "cmis:document";
     }
 
     public void drawComponent(){
@@ -122,6 +119,12 @@ public class TreeBean implements Serializable {
         new DefaultTreeNode(fold, node0);
         this.selectedNodes = node0;
         changedTableParentFolder();
+        folderTypes.put("CMIS Folder (cmis:folder)", "CMIS Folder (cmis:folder)");
+
+        searchQueryAdvanced = new HashMap<Integer, Object>();
+        searchQueryAdvanced.put(0, "cmis:document");
+        ableSearchAdvanced = false;
+        cmisType = "cmis:document";
     }
 
     public void updateTree(TreeNode parent) {
@@ -254,7 +257,7 @@ public class TreeBean implements Serializable {
         logger.log(Level.INFO, "setSelectedNode");
         if (selectedNodes != null) {
             this.selectedNodes = selectedNodes;
-            logger.log(Level.INFO, "SelectedFSObject  = "+((FSObject) selectedNodes.getData()).getName());
+            logger.log(Level.INFO, "SelectedFSObject  = " + ((FSObject) selectedNodes.getData()).getName());
             setSelectedFSObject((FSObject) selectedNodes.getData());
             if (selectedFSObject.getPath() == null) {
                 parent.setPath("/");
@@ -388,10 +391,10 @@ public class TreeBean implements Serializable {
         logger.log(Level.INFO, "==___________findAdvanced()____");
 
 
-        if (findName != "") {
-            searchQueryAdvanced.put(1, "%" + findName + "%");
+        if (findQuery != "") {
+            searchQueryAdvanced.put(1, "%" + findQuery + "%");
         } else {
-            searchQueryAdvanced.put(1, findName);
+            searchQueryAdvanced.put(1, findQuery);
         }
 
         if (metaDataType != null) {
@@ -399,7 +402,7 @@ public class TreeBean implements Serializable {
         } else {
             searchQueryAdvanced.put(2, "");
         }
-        if (findName != "") {
+        if (docType != "") {
             searchQueryAdvanced.put(3, "%." + docType);
         } else {
             searchQueryAdvanced.put(3, docType);
@@ -418,7 +421,11 @@ public class TreeBean implements Serializable {
         logger.log(Level.INFO, "==______BEFORE_____BOOOOOOOOOOOOOOOM~!!!!____");
         getLazyModel().setSearchQueryAdvanced(searchQueryAdvanced);
 
-        getLazyModel().setAbleSearchAdvanced(true);
+        if(ableSearchAdvanced){
+            getLazyModel().setAbleSearchAdvanced(true);
+        } else {
+            getLazyModel().setAbleSearchAdvanced(false);
+        }
 
         logger.log(Level.INFO, "==___________BOOOOOOOOOOOOOOOM~!!!!____");
     }
@@ -428,40 +435,22 @@ public class TreeBean implements Serializable {
     }
 
     public void ableSearchAdvanced() {
-        if ((openAccordion * (-1)) == 1) {
-            disableSearchSimple = true;
-            // treeBean.getLazyModel().setAbleSearchAdvanced(true);
-
-            logger.log(Level.INFO, "==___________otkrilo____");
-        } else {
-            disableSearchSimple = false;
-            //treeBean.getLazyModel().setAbleSearchAdvanced(false);
-            logger.log(Level.INFO, "==___________zakrilo____");
-        }
+        ableSearchAdvanced = true;
+//        searchPropertiesVisibility = "visible";
+//        lazyModel.setAbleSearchAdvanced(true);
     }
-
+    public void disableSearchAdvanced() {
+        ableSearchAdvanced = false;
+//        searchPropertiesVisibility = "hidden";
+//        lazyModel.setAbleSearchAdvanced(false);
+    }
 
     public void choosenCmisType() {
         searchQueryAdvanced.put(0, cmisType);
-        if (cmisType == "cmis:folder") {
+        if (cmisType.equals("cmis:folder")) {
             disableSearchFolderProperties = true;
         } else {
             disableSearchFolderProperties = false;
-        }
-    }
-
-
-    public String getFindName() {
-        return findName;
-    }
-
-    public void setFindName(String findName) {
-
-        logger.log(Level.INFO, "___________________________________Name___" + findName + "______________");
-        if (findName != null) {
-            this.findName = findName;
-        } else {
-            this.findName = "";
         }
     }
 
@@ -597,5 +586,17 @@ public class TreeBean implements Serializable {
         logger.log(Level.INFO, "SetCachedNode");
         if (cachedNode != null)
             this.cachedNode = cachedNode;
+    }
+
+    public String getSearchPropertiesVisibility() {
+        return searchPropertiesVisibility;
+    }
+
+    public void setSearchPropertiesVisibility(String searchPropertiesVisibility) {
+        this.searchPropertiesVisibility = searchPropertiesVisibility;
+    }
+
+    public boolean isAbleSearchAdvanced() {
+        return ableSearchAdvanced;
     }
 }

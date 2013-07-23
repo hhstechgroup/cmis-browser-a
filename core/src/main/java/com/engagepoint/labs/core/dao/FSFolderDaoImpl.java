@@ -10,6 +10,10 @@ import com.engagepoint.labs.core.models.FSFile;
 import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
 import com.engagepoint.labs.core.models.exceptions.*;
+import com.engagepoint.labs.core.models.exceptions.BaseException;
+import com.engagepoint.labs.core.models.exceptions.BrowserRuntimeException;
+import com.engagepoint.labs.core.models.exceptions.ConnectionException;
+import com.engagepoint.labs.core.models.exceptions.FolderAlreadyExistException;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.client.runtime.ObjectIdImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
@@ -331,7 +335,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
     @Override
     public List<FSObject> find(Map<Integer, Object> query) {
         List<FSObject> files = new LinkedList<FSObject>();
-        String myType = (String) query.get(0);
+        String myType = (String)query.get(0);
         logger.log(Level.INFO, "=========" + myType);
         ObjectType type = session.getTypeDefinition(myType);
         logger.log(Level.INFO, "====!=====");
@@ -341,7 +345,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
         logger.log(Level.INFO, "====!11=====");
         String queryString = getQuery(query);
         ItemIterable<QueryResult> Results = session.query(queryString, false);
-        if (myType == "cmis:document") {
+        if(myType.equals("cmis:document")){
             parseFSFile(files, objectIdQueryName, Results);
         } else {
             parseFSFolder(files, objectIdQueryName, Results);
@@ -427,7 +431,6 @@ public class FSFolderDaoImpl implements FSFolderDao {
             files.add(fsFile);
         }
     }
-
     private String getQuery(Map<Integer, Object> query) {
 
         QueryStatement qs;
@@ -435,14 +438,14 @@ public class FSFolderDaoImpl implements FSFolderDao {
         int counter = 0;
 
         for (int i = 1; i < 6; ++i) {
-            if (query.get(i) != "") {
+            if (!query.get(i).equals("")) {
                 if (counter == 0) {
                     plusQuery += " WHERE ";
                 }
                 qs = session.createQueryStatement(searchAdvancedParametrs.get(i));
-                logger.log(Level.INFO, "===prop____# " + i + "==" + query.get(0) + "====" + query.get(i) + "===");
-                qs.setString(1, (String) query.get(i));
-                logger.log(Level.INFO, "===prop____# " + i + "==" + qs.toQueryString() + "==" + query.get(i) + "===");
+                logger.log(Level.INFO, "===prop____# " + i + "=="+query.get(0)+"===="+query.get(i)+"===");
+                qs.setString(1,(String) query.get(i));
+                logger.log(Level.INFO, "===prop____# " + i + "=="+qs.toQueryString()+"=="+query.get(i)+"===");
                 if (counter > 0) {
                     plusQuery += " AND ";
                 }
@@ -459,7 +462,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
                 qs = session.createQueryStatement(searchAdvancedParametrs.get(i));
                 qs.setDateTime(1, (Date) query.get(i));
 
-                logger.log(Level.INFO, "===prop____# " + i + "==" + qs.toQueryString() + "==" + query.get(i));
+                logger.log(Level.INFO, "===prop____# " + i + "=="+qs.toQueryString()+"=="+query.get(i));
                 if (counter > 0) {
                     plusQuery += " AND ";
                 }
@@ -476,7 +479,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
                 }
                 qs = session.createQueryStatement(searchAdvancedParametrs.get(i));
                 qs.setString(1, (String) query.get(i));
-                logger.log(Level.INFO, "===prop____# " + i + "==" + qs.toQueryString() + "==");
+                logger.log(Level.INFO, "===prop____# " + i + "=="+qs.toQueryString()+"==");
                 if (counter > 0) {
                     plusQuery += " AND ";
                 }

@@ -28,10 +28,9 @@ public interface CMISService {
 
     public int getMaxNumberOfRowsByQuery(Map<Integer, Object> query);
 
-    public List<FSObject> getPageForLazySearchQuery(int first, int pageSize, String query);
+    public List<FSObject> getPageForLazySearchQuery(int first,int pageSize, String query);
 
-    public List<FSObject> getPageForLazySearchQuery(int first, int pageSize, Map<Integer, Object> query);
-
+    public List<FSObject> getPageForLazySearchQuery(int first,int pageSize, Map<Integer, Object> query);
     /**
      * Return a list children of our parent fsFolder folder
      *
@@ -59,12 +58,11 @@ public interface CMISService {
 
     /**
      * Create new folder in repository with folder name folderName
-     *
-     * @param parent     parent folder for folderName folder
+     * @param parent    parent folder for folderName folder
      * @param folderName
-     * @return created FSFolder object
+     * @return  created FSFolder object
      * @throws Exception if folder with this name exist in parent directory
-     *                   or connection is fail
+     * or connection is fail
      */
     public FSFolder createFolder(FSFolder parent, String folderName) throws Exception;
 
@@ -77,7 +75,7 @@ public interface CMISService {
 
     public boolean deleteFolder(FSFolder folder);
 
-    public boolean deleteAllTree(FSFolder folder) throws FolderNotFoundException;
+    public boolean deleteAllTree(FSFolder folder);
 
 
     public boolean hasChildFolder(FSFolder folder) throws BaseException;
@@ -88,7 +86,7 @@ public interface CMISService {
 
     public FSFolder move(FSFolder source, FSFolder target) throws BrowserRuntimeException;
 
-    public void copyFolder(FSFolder folder, String name, String targetID) throws FolderAlreadyExistException;
+    public void copyFolder(FSFolder folder, String name, String targetID);
 
     public FSFile getHistory(FSFile file);
 

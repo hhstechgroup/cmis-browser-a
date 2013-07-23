@@ -37,7 +37,7 @@ public class LazyFSObjectDataModel extends LazyDataModel<FSObject> {
         this.parent = parent;
         this.searchQuery = "";
         searchQueryAdvanced = new HashMap<Integer, Object>();
-        boolean ableSearchAdvanced = true;
+        boolean ableSearchAdvanced = false;
 
         logger.log(Level.INFO, "===============================LazyFSObjectDataModel(CMISService cmisService, FSFolder parent) ========");
     }
@@ -71,18 +71,10 @@ public class LazyFSObjectDataModel extends LazyDataModel<FSObject> {
                 logger.log(Level.INFO, "============DATASIZE==========" + dataSize + "========");
 
                 if (dataSize > pageSize) {
-                    try {
-                        data = cmisService.getPageForLazy(parent, first, pageSize);
-                    } catch (BaseException e) {
-                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                    }
+                    data = cmisService.getPageForLazy(parent, first, pageSize);
                     return data;
                 } else {
-                    try {
-                        data = cmisService.getPageForLazy(parent, 0, pageSize);
-                    } catch (BaseException e) {
-                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                    }
+                    data = cmisService.getPageForLazy(parent, 0, pageSize);
                     return data;
                 }
             } else {
