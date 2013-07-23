@@ -117,6 +117,7 @@ public class ConfigBean implements Serializable {
         this.typeId = typeId;
     }
 
+
     public boolean isParentTypeId() {
         return prefs.getBoolean(parentTypeIdColumnRender, true);
     }
