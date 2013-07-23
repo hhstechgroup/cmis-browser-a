@@ -50,7 +50,7 @@ public interface FSFolderDao {
      */
     public boolean delete(FSFolder folder);
 
-    public boolean deleteAllTree(FSFolder folder);
+    public boolean deleteAllTree(FSFolder folder) throws FolderNotFoundException;
     /**
      * Method that will rename folder
      *
@@ -75,7 +75,7 @@ public interface FSFolderDao {
 
     public List<FSObject> getPageForLazySearchQuery(int first,int pageSize, String query);
 
-    public List<FSObject> getPageForLazy(FSFolder parent, int first, int pageSize);
+    public List<FSObject> getPageForLazy(FSFolder parent, int first, int pageSize) throws BaseException;
 
     public boolean hasChildFolder(FSFolder folder) throws BaseException;
 
@@ -83,7 +83,7 @@ public interface FSFolderDao {
 
     public FSFolder move(FSFolder source, FSFolder target) throws BrowserRuntimeException;
 
-    public void copyFolder(FSFolder folder, String name, String targetId);
+    public void copyFolder(FSFolder folder, String name, String targetId) throws FolderAlreadyExistException;
 
     public List<FSObject> find(String query);
 

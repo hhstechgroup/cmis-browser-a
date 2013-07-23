@@ -75,7 +75,7 @@ public interface CMISService {
 
     public boolean deleteFolder(FSFolder folder);
 
-    public boolean deleteAllTree(FSFolder folder);
+    public boolean deleteAllTree(FSFolder folder) throws FolderNotFoundException;
 
 
     public boolean hasChildFolder(FSFolder folder) throws BaseException;
@@ -86,7 +86,7 @@ public interface CMISService {
 
     public FSFolder move(FSFolder source, FSFolder target) throws BrowserRuntimeException;
 
-    public void copyFolder(FSFolder folder, String name, String targetID);
+    public void copyFolder(FSFolder folder, String name, String targetID) throws FolderAlreadyExistException;
 
     public FSFile getHistory(FSFile file);
 

@@ -71,10 +71,16 @@ public class LazyFSObjectDataModel extends LazyDataModel<FSObject> {
                 logger.log(Level.INFO, "============DATASIZE==========" + dataSize + "========");
 
                 if (dataSize > pageSize) {
-                    data = cmisService.getPageForLazy(parent, first, pageSize);
+                    try {
+                        data = cmisService.getPageForLazy(parent, first, pageSize);
+                    } catch (BaseException e) {
+                    }
                     return data;
                 } else {
-                    data = cmisService.getPageForLazy(parent, 0, pageSize);
+                    try {
+                        data = cmisService.getPageForLazy(parent, 0, pageSize);
+                    } catch (BaseException e) {
+                    }
                     return data;
                 }
             } else {
