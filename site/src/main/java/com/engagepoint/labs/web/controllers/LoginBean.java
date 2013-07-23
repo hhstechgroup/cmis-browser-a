@@ -1,11 +1,20 @@
 package com.engagepoint.labs.web.controllers;
 
+import com.engagepoint.labs.core.models.exceptions.BaseException;
+import com.engagepoint.labs.core.service.CMISService;
+import com.engagepoint.labs.core.service.CMISServiceImpl;
+
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
+import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created with IntelliJ IDEA.
@@ -17,14 +26,43 @@ import java.util.List;
 @ManagedBean(name = "login")
 @SessionScoped
 public class LoginBean implements Serializable {
+
+    @ManagedProperty(value = "#{treeBean}")
+    private TreeBean treeBean;
+
+    private Logger logger = Logger.getLogger(LoginBean.class.getName());
+
     private String login;
     private String password;
     private String repository;
     private boolean anonymous;
     private List<SelectItem> repositories = new ArrayList<SelectItem>();
 
+    private CMISService cmisService;
+
     public LoginBean() {
         anonymous = true;
+        try {
+            cmisService = CMISServiceImpl.getService();
+        } catch (BaseException e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    e.getMessage(),
+                    ""));
+        }
+    }
+
+    public void doLogin() {
+        try {
+            if (anonymous) {
+                login = "unknown";
+                password = "unknown";
+            }
+            cmisService.connect(login, password, repository);
+            treeBean.drawComponent();
+        } catch (BaseException e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    e.getMessage(), ""));
+        }
     }
 
     public String getLogin() {
@@ -64,10 +102,18 @@ public class LoginBean implements Serializable {
     }
 
     public List<SelectItem> getRepositories() {
-        if (repositories.isEmpty()) {
-            repositories.add(new SelectItem("http://repo.opencmis.org/inmemory/atom1/", "Chemistry"));
-            repositories.add(new SelectItem("http://repo.opencmis.org/inmemory/atom2/", "EngagePoint"));
-        }
         return repositories;
+    }
+
+    public void setRepositories(List<SelectItem> repositories) {
+        this.repositories = repositories;
+    }
+
+    public TreeBean getTreeBean() {
+        return treeBean;
+    }
+
+    public void setTreeBean(TreeBean treeBean) {
+        this.treeBean = treeBean;
     }
 }

@@ -1,6 +1,8 @@
 package com.engagepoint.labs.core.service;
 
-import com.engagepoint.labs.core.dao.*;
+import com.engagepoint.labs.core.dao.ConnectionFactory;
+import com.engagepoint.labs.core.dao.FSFolderDao;
+import com.engagepoint.labs.core.dao.FSFolderDaoImpl;
 import com.engagepoint.labs.core.models.FSFile;
 import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
@@ -25,10 +27,11 @@ public class CMISServiceImpl implements CMISService {
     private static Logger logger = Logger.getLogger(CMISServiceImpl.class.getName());
 
     private static CMISServiceImpl service = null;
+    private ConnectionFactory connectionFactory;
 
-    private CMISServiceImpl() throws BaseException{
+    private CMISServiceImpl() throws BaseException {
         fsFolderDao = new FSFolderDaoImpl();
-        fsFolderDao.setSession(ConnectionFactory.getSession());
+        connectionFactory = ConnectionFactory.getInstance();
     }
 
     /**
@@ -102,17 +105,17 @@ public class CMISServiceImpl implements CMISService {
     }
 
     @Override
-    public int getMaxNumberOfRows(FSFolder parent){
+    public int getMaxNumberOfRows(FSFolder parent) {
         return fsFolderDao.getMaxNumberOfRows(parent);
     }
 
     @Override
-    public int getMaxNumberOfRowsByQuery(String query){
+    public int getMaxNumberOfRowsByQuery(String query) {
         return fsFolderDao.getMaxNumberOfRowsByQuery(query);
     }
 
     @Override
-    public int getMaxNumberOfRowsByQuery(Map<Integer, Object> query){
+    public int getMaxNumberOfRowsByQuery(Map<Integer, Object> query) {
         logger.log(Level.INFO, "============BEFORE FIND======");
         int total = fsFolderDao.find(query).size();
         return total;
@@ -126,7 +129,7 @@ public class CMISServiceImpl implements CMISService {
     @Override
     public List<FSObject> getPageForLazySearchQuery(int first, int pageSize, Map<Integer, Object> query) {
 
-        return fsFolderDao.find(query).subList(first, first + pageSize );
+        return fsFolderDao.find(query).subList(first, first + pageSize);
     }
 
     @Override
@@ -143,9 +146,10 @@ public class CMISServiceImpl implements CMISService {
     public InputStream getInputStream(FSFile file) throws BaseException {
         return fsFolderDao.getFsFileDao().getInputStream(file);
     }
+
     @Override
     public FSFolder move(FSFolder source, FSFolder target) throws BrowserRuntimeException {
-        return fsFolderDao.move(source,target);
+        return fsFolderDao.move(source, target);
     }
 
     @Override
@@ -167,12 +171,20 @@ public class CMISServiceImpl implements CMISService {
     public void copyFile(String fileId, String name, String targetId) throws BaseException {
         fsFolderDao.getFsFileDao().copy(fileId, name, targetId);
     }
+
     /**
      * {@inheritDoc}
      */
     @Override
     public FSFolder renameFolder(FSFolder folder, String newName) throws BaseException {
         return fsFolderDao.rename(folder, newName);
+    }
+
+    public void connect(String username, String password, String url) throws BaseException {
+        connectionFactory.setPassword(password);
+        connectionFactory.setUsername(username);
+        connectionFactory.setUrl(url);
+        fsFolderDao.setSession(connectionFactory.getSession());
     }
 
 }

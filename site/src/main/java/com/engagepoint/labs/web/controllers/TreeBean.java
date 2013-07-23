@@ -60,7 +60,7 @@ public class TreeBean implements Serializable {
     private Map<String, String> folderTypes = new HashMap<String, String>();
 
 
-    private String findQuery;
+    private String findQuery = "";
     private Map<Integer, Object> searchQueryAdvanced;
     private String findName;
     private String cmisType;
@@ -98,7 +98,6 @@ public class TreeBean implements Serializable {
         try {
             cmisService = CMISServiceImpl.getService();
         } catch (ConnectionException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         } catch (BaseException e) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     e.getMessage(),
@@ -113,7 +112,7 @@ public class TreeBean implements Serializable {
         openAccordion = -1;
     }
 
-    public void paintComponent(){
+    public void drawComponent(){
         FSFolder root = cmisService.getRootFolder();
         parent.setPath("/");
         main = new DefaultTreeNode("Main", null);

@@ -17,7 +17,18 @@
 
         <p:messages id="erro" showDetail="true" autoUpdate="true"/>
 
-        <ct:cmisBrowserComponent id="cmisbrowser"/>
+        <ct:cmisBrowserComponent id="cmisbrowser"
+                                 Name="#{config.name}"
+                                 TypeId="#{config.typeId}"
+                                 ParentTypeId="#{config.parentTypeId}"
+                                 Id="#{config.id}"
+                                 Size="#{config.size}"
+                                 ContentType="#{config.contentType}"
+                                 Createdby="#{config.createdBy}"
+                                 Creationdate="#{config.creationDate}"
+                                 LastModifiedBy="#{config.lastModifiedBy}"
+                                 LastModificationdate="#{config.lastModifiedDate}"
+                />
 
         <p:dialog id="copyDialogId" header="Copy" widgetVar="copyDialog"
                   modal="true"
@@ -108,9 +119,7 @@
                 style="border:0;width:1px;height:1px;position:absolute;visibility:hidden;bottom:0;right:0;">
         </iframe>
         <p:commandButton value="View as Dialog" onclick="TreeinDialog.show();"/>
-        <h:form>
-            <h:commandButton value="Click" action="#{treeBean.paintComponent}" update=":cmisbrowser"/>
-        </h:form>
+
         <p:dialog id="TreeDailog" widgetVar="TreeinDialog"
                   showEffect="fade"
                   hideEffect="fade"

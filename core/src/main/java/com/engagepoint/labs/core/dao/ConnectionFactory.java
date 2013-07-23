@@ -23,7 +23,14 @@ import java.util.Map;
  */
 public class ConnectionFactory {
 
-    private static Session session;
+    private static ConnectionFactory connectionFactory;
+
+    private Session session;
+    private String url;
+    private String username;
+    private String password;
+
+    private ConnectionFactory(){}
 
     /**
      * Return session
@@ -31,15 +38,14 @@ public class ConnectionFactory {
      * @return session
      */
 
-    public static Session getSession() throws BaseException {
+    public Session getSession() throws BaseException {
         try {
             SessionFactory sessionFactory = SessionFactoryImpl.newInstance();
             Map<String, String> parameter = new HashMap<String, String>();
             parameter.put(SessionParameter.BINDING_TYPE, BindingType.ATOMPUB.value());
-            parameter.put(SessionParameter.USER,     "Rowestik");
-            parameter.put(SessionParameter.PASSWORD, "Rostik");
-            parameter.put(SessionParameter.BINDING_TYPE, BindingType.ATOMPUB.value());
-            parameter.put(SessionParameter.ATOMPUB_URL, "http://lab9:8080/chemistry-opencmis-server-inmemory-0.9.0/atom11");
+            parameter.put(SessionParameter.USER,     username);
+            parameter.put(SessionParameter.PASSWORD, password);
+            parameter.put(SessionParameter.ATOMPUB_URL, url);
 //        parameter.put(SessionParameter.ATOMPUB_URL, "http://repo.opencmis.org/inmemory/atom/");
 
             List<Repository> repositories = sessionFactory.getRepositories(parameter);
@@ -55,4 +61,34 @@ public class ConnectionFactory {
         return session;
     }
 
+    public static ConnectionFactory getInstance() {
+        if (connectionFactory == null) {
+            connectionFactory = new ConnectionFactory();
+        }
+        return connectionFactory;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }

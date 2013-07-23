@@ -30,7 +30,7 @@ public class FSFileDaoImplTest {
     public static void setUPclass() throws Exception {
         fsFolderDao = new FSFolderDaoImpl();
         fsFileDao = new FSFileDaoImpl();
-        session = ConnectionFactory.getSession();
+//      session = ConnectionFactory.getSession();
         fsFolderDao.setSession(session);
         fsFileDao.setSession(session);
     }

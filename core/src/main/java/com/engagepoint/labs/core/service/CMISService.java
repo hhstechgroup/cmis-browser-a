@@ -28,9 +28,10 @@ public interface CMISService {
 
     public int getMaxNumberOfRowsByQuery(Map<Integer, Object> query);
 
-    public List<FSObject> getPageForLazySearchQuery(int first,int pageSize, String query);
+    public List<FSObject> getPageForLazySearchQuery(int first, int pageSize, String query);
 
-    public List<FSObject> getPageForLazySearchQuery(int first,int pageSize, Map<Integer, Object> query);
+    public List<FSObject> getPageForLazySearchQuery(int first, int pageSize, Map<Integer, Object> query);
+
     /**
      * Return a list children of our parent fsFolder folder
      *
@@ -58,11 +59,12 @@ public interface CMISService {
 
     /**
      * Create new folder in repository with folder name folderName
-     * @param parent    parent folder for folderName folder
+     *
+     * @param parent     parent folder for folderName folder
      * @param folderName
-     * @return  created FSFolder object
+     * @return created FSFolder object
      * @throws Exception if folder with this name exist in parent directory
-     * or connection is fail
+     *                   or connection is fail
      */
     public FSFolder createFolder(FSFolder parent, String folderName) throws Exception;
 
@@ -93,5 +95,8 @@ public interface CMISService {
     public List<FSObject> find(String query);
 
     public FSFolder renameFolder(FSFolder folder, String newName) throws BaseException;
-    public void copyFile(String fileId,String name, String targetId) throws BaseException;
+
+    public void copyFile(String fileId, String name, String targetId) throws BaseException;
+
+    public void connect(String username, String password, String url) throws BaseException;
 }

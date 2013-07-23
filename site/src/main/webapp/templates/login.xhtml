@@ -17,18 +17,18 @@
 
                 <h:form id="loginForm">
                     <p:panel id="panel" header="Login to repository" style="margin-bottom:10px;">
-                        <h:panelGrid columns="3">
+                        <h:panelGrid columns="2">
                             <h:outputText value="Choose repository"/>
                             <p:selectOneMenu id="sel" value="#{login.repository}">
                                 <f:selectItems value="#{login.repositories}"/>
                             </p:selectOneMenu>
-                            <br/>
+
                             <h:outputText value="Stay as anonymous?"/>
                             <p:selectBooleanCheckbox value="#{login.anonymous}"
                                                      valueChangeListener="#{login.changeAnonumous}">
                                 <f:ajax render="login password"/>
                             </p:selectBooleanCheckbox>
-                            <br/>
+
                             <h:outputLabel for="login" value="Login: *"/>
                             <p:inputText id="login" value="#{login.login}"
                                          required="true" label="Login" disabled="#{login.anonymous}"/>
@@ -38,7 +38,7 @@
                                          required="true" label="Password" disabled="#{login.anonymous}"/>
 
 
-                            <p:commandButton value="Login" ajax="false"/>
+                            <p:commandButton value="Login" action="#{login.doLogin}" ajax="false"/>
                         </h:panelGrid>
                     </p:panel>
                 </h:form>
