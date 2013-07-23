@@ -5,6 +5,8 @@ import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
 import com.engagepoint.labs.core.models.exceptions.BaseException;
 import com.engagepoint.labs.core.models.exceptions.BrowserRuntimeException;
+import com.engagepoint.labs.core.models.exceptions.FolderAlreadyExistException;
+import com.engagepoint.labs.core.models.exceptions.FolderNotFoundException;
 
 import java.io.InputStream;
 import java.util.List;
@@ -44,7 +46,7 @@ public interface CMISService {
      * @param parent parent object, pageNumber, numbersOfRows for right pagination
      * @return List of FSObjects on the page
      */
-    public List<FSObject> getPageForLazy(FSFolder parent, int first, int pageSize);
+    public List<FSObject> getPageForLazy(FSFolder parent, int first, int pageSize) throws BaseException;
 
     /**
      * Return a root folder from our repository
@@ -73,7 +75,7 @@ public interface CMISService {
 
     public boolean deleteFolder(FSFolder folder);
 
-    public boolean deleteAllTree(FSFolder folder);
+    public boolean deleteAllTree(FSFolder folder) throws FolderNotFoundException;
 
 
     public boolean hasChildFolder(FSFolder folder) throws BaseException;
@@ -84,7 +86,7 @@ public interface CMISService {
 
     public FSFolder move(FSFolder source, FSFolder target) throws BrowserRuntimeException;
 
-    public void copyFolder(FSFolder folder, String name, String targetID);
+    public void copyFolder(FSFolder folder, String name, String targetID) throws FolderAlreadyExistException;
 
     public FSFile getHistory(FSFile file);
 

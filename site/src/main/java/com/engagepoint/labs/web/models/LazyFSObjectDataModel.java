@@ -2,6 +2,7 @@ package com.engagepoint.labs.web.models;
 
 import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
+import com.engagepoint.labs.core.models.exceptions.BaseException;
 import com.engagepoint.labs.core.service.CMISService;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortMeta;
@@ -70,10 +71,18 @@ public class LazyFSObjectDataModel extends LazyDataModel<FSObject> {
                 logger.log(Level.INFO, "============DATASIZE==========" + dataSize + "========");
 
                 if (dataSize > pageSize) {
-                    data = cmisService.getPageForLazy(parent, first, pageSize);
+                    try {
+                        data = cmisService.getPageForLazy(parent, first, pageSize);
+                    } catch (BaseException e) {
+                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    }
                     return data;
                 } else {
-                    data = cmisService.getPageForLazy(parent, 0, pageSize);
+                    try {
+                        data = cmisService.getPageForLazy(parent, 0, pageSize);
+                    } catch (BaseException e) {
+                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    }
                     return data;
                 }
             } else {

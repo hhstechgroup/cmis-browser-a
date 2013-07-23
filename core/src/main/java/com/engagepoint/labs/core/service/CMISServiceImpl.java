@@ -6,6 +6,8 @@ import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
 import com.engagepoint.labs.core.models.exceptions.BaseException;
 import com.engagepoint.labs.core.models.exceptions.BrowserRuntimeException;
+import com.engagepoint.labs.core.models.exceptions.FolderAlreadyExistException;
+import com.engagepoint.labs.core.models.exceptions.FolderNotFoundException;
 
 import java.io.InputStream;
 import java.util.List;
@@ -83,7 +85,7 @@ public class CMISServiceImpl implements CMISService {
     }
 
     @Override
-    public boolean deleteAllTree(FSFolder folder) {
+    public boolean deleteAllTree(FSFolder folder) throws FolderNotFoundException {
         return fsFolderDao.deleteAllTree(folder);
     }
 
@@ -95,7 +97,7 @@ public class CMISServiceImpl implements CMISService {
     }
 
     @Override
-    public List<FSObject> getPageForLazy(FSFolder parent, int first, int pageSize){
+    public List<FSObject> getPageForLazy(FSFolder parent, int first, int pageSize) throws BaseException {
         return fsFolderDao.getPageForLazy(parent, first, pageSize);
     }
 
@@ -147,7 +149,7 @@ public class CMISServiceImpl implements CMISService {
     }
 
     @Override
-    public void copyFolder(FSFolder folder, String name, String targetID) {
+    public void copyFolder(FSFolder folder, String name, String targetID) throws FolderAlreadyExistException {
         fsFolderDao.copyFolder(folder, name, targetID);
     }
 

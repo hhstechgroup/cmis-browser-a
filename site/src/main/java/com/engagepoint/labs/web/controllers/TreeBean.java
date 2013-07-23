@@ -258,9 +258,9 @@ public class TreeBean implements Serializable {
             } else {
                 parent.setPath(selectedFSObject.getPath());
             }
-//            if (findQuery.isEmpty()) {
-//                changedTableParentFolder();
-//            }
+            if (findQuery.isEmpty()) {
+                changedTableParentFolder();
+            }
             PageState state = new PageState();
 //            state.setCurrentPage(currentPage);
             state.setSelectedNode(selectedNodes);
@@ -282,7 +282,15 @@ public class TreeBean implements Serializable {
 
     public void onDragDrop(TreeDragDropEvent event) {
         FSFolder dragedFolder = (FSFolder) event.getDragNode().getData();
-        FSFolder dropedFolder = (FSFolder) event.getDropNode().getData();
+        FSFolder dropedFolder = null;
+        try {
+            dropedFolder = (FSFolder) event.getDropNode().getData();
+        } catch (Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "You cant move into this folder!",
+                    "It is a terrible idea!"));
+            updateTree(getRoot().getChildren().get(0));
+        }
         try {
             cmisService.move(dragedFolder, dropedFolder);
         } catch (BrowserRuntimeException e) {

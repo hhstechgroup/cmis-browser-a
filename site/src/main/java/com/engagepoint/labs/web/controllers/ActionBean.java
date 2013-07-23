@@ -99,7 +99,13 @@ public class ActionBean implements Serializable {
                 if (!folderForCopy.getName().equals(getDefaultFolderName())) {
                     folderForCopy.setName(getDefaultFolderName());
                 }
-                cmisService.copyFolder((FSFolder) folderForCopy, tempName, target.getId());
+                try {
+                    cmisService.copyFolder((FSFolder) folderForCopy, tempName, target.getId());
+                } catch (FolderAlreadyExistException e) {
+                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            e.getMessage(),
+                            "Rename folder, please!"));
+                }
             } catch (NullPointerException ex) {
 
             }
@@ -198,10 +204,12 @@ public class ActionBean implements Serializable {
             }
         } else { //FSFolder
             try {
-                cmisService.renameFolder((FSFolder) selected, selected.getName());
+
+                treeBean.getParent().setPath(cmisService.renameFolder((FSFolder) selected, selected.getName()).getPath());
             } catch (FolderAlreadyExistException ex) {
                 logger.log(Level.INFO, "edit catched: " + ex.getMessage());
                 logger.log(Level.INFO, "edit catched node: " + ((FSFolder)treeBean.getCachedNode().getData()).getName());
+
                 treeBean.updateTree(treeBean.getCachedNode().getParent());
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                         "Folder error!",
@@ -213,7 +221,8 @@ public class ActionBean implements Serializable {
             }
             if (parent != null) {
                 logger.log(Level.INFO, "NE NULL SIKA");
-                treeBean.updateTree(parent.getParent());
+                if(treeBean.getCachedNode().getParent() != null)
+                    treeBean.updateTree(treeBean.getCachedNode().getParent());
             }
         }
 
@@ -233,7 +242,6 @@ public class ActionBean implements Serializable {
             logger.log(Level.INFO, "deleteSelect++++++" + object.getName());
             cmisService.deleteFile((FSFile) object);
         }
-        //===============paging====================== treeBean.updatetablePageList();
     }
 
     /**
@@ -244,7 +252,13 @@ public class ActionBean implements Serializable {
      */
     public void deleteAllTree(FSObject object) {
 
-        cmisService.deleteAllTree((FSFolder) object);
+        try {
+            cmisService.deleteAllTree((FSFolder) object);
+        } catch (FolderNotFoundException e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    e.getMessage(),
+                    "Folder has been deleted already!"));
+        }
         treeBean.getParent().setPath("/");
 //        treeBean.updateTree(treeBean.getSelectedNode().getParent());
     }

@@ -9,10 +9,7 @@ package com.engagepoint.labs.core.dao;
 import com.engagepoint.labs.core.models.FSFile;
 import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
-import com.engagepoint.labs.core.models.exceptions.BaseException;
-import com.engagepoint.labs.core.models.exceptions.BrowserRuntimeException;
-import com.engagepoint.labs.core.models.exceptions.ConnectionException;
-import com.engagepoint.labs.core.models.exceptions.FolderAlreadyExistException;
+import com.engagepoint.labs.core.models.exceptions.*;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.client.runtime.ObjectIdImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
@@ -80,12 +77,11 @@ public class FSFolderDaoImpl implements FSFolderDao {
             folder.setParentTypeId(newFolder.getType().getParentTypeId());
         } catch (CmisNameConstraintViolationException ex) {
             throw new FolderAlreadyExistException(ex.getMessage());
-        }  catch (CmisBaseException e) {
+        } catch (CmisBaseException e) {
             throw new BaseException(e.getMessage());
         }
         return folder;
     }
-
 
 
     @Override
@@ -121,7 +117,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
             }
         } catch (CmisObjectNotFoundException e) {
             throw new ConnectionException(e.getMessage());
-        }     catch (CmisBaseException e) {
+        } catch (CmisBaseException e) {
             throw new BaseException(e.getMessage());
         }
         return children;
@@ -135,9 +131,13 @@ public class FSFolderDaoImpl implements FSFolderDao {
     }
 
     @Override
-    public boolean deleteAllTree(FSFolder folder) {
-        Folder cmisFolder = (Folder) session.getObjectByPath(folder.getPath());
-        cmisFolder.deleteTree(true, UnfileObject.DELETE, true);
+    public boolean deleteAllTree(FSFolder folder) throws FolderNotFoundException {
+        try {
+            Folder cmisFolder = (Folder) session.getObjectByPath(folder.getPath());
+            cmisFolder.deleteTree(true, UnfileObject.DELETE, true);
+        } catch (CmisObjectNotFoundException e) {
+            throw new FolderNotFoundException("Folder not found!");
+        }
         return true;
     }
 
@@ -178,7 +178,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
     }
 
     @Override
-    public List<FSObject> getPageForLazy(FSFolder parent, int first, int pageSize) {
+    public List<FSObject> getPageForLazy(FSFolder parent, int first, int pageSize) throws BaseException {
         String notRootFolder = parent.getPath().equals("/") ? "" : parent.getPath();
         List<FSObject> children = new ArrayList<FSObject>();
         Folder cmisParent = (Folder) session.getObjectByPath(parent.getPath());
@@ -187,7 +187,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
         operationContext.setMaxItemsPerPage(pageSize);
         ItemIterable<CmisObject> childrenCmis = cmisParent.getChildren(operationContext);
         ItemIterable<CmisObject> cmisChildren = childrenCmis.skipTo(first).getPage();
-       // try {
+        try {
             for (CmisObject o : cmisChildren) {
                 FSObject fsObject;
                 if (o instanceof Folder) {
@@ -212,11 +212,11 @@ public class FSFolderDaoImpl implements FSFolderDao {
                 fsObject.setParent(parent);
                 children.add(fsObject);
             }
-        /*} catch (CmisObjectNotFoundException e) {
+        } catch (CmisObjectNotFoundException e) {
             throw new ConnectionException(e.getMessage());
-        }    catch (CmisBaseException e) {
+        } catch (CmisBaseException e) {
             throw new BaseException(e.getMessage());
-        }*/
+        }
         return children;
     }
 
@@ -227,7 +227,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
             children = getChildren(folder);
         } catch (ConnectionException e) {
             throw new ConnectionException(e.getMessage());
-        }      catch (CmisBaseException e) {
+        } catch (CmisBaseException e) {
             throw new BaseException(e.getMessage());
         }
         if (!children.isEmpty()) {
@@ -251,7 +251,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
             folder.setPath(cmisFolder.getPath());
         } catch (CmisNameConstraintViolationException ex) {
             throw new FolderAlreadyExistException("Folder already exist");
-        }     catch (CmisBaseException e) {
+        } catch (CmisBaseException e) {
             throw new BaseException(e.getMessage());
         }
 
@@ -265,7 +265,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
             children = getChildren(folder);
         } catch (ConnectionException e) {
             throw new ConnectionException(e.getMessage());
-        }    catch (CmisBaseException e) {
+        } catch (CmisBaseException e) {
             throw new BaseException(e.getMessage());
         }
         return !children.isEmpty();
@@ -287,14 +287,20 @@ public class FSFolderDaoImpl implements FSFolderDao {
     }
 
     @Override
-    public void copyFolder(FSFolder folder, String name, String targetId) {
+    public void copyFolder(FSFolder folder, String name, String targetId) throws FolderAlreadyExistException {
         Folder cmisFolderSource = (Folder) session.getObject(folder.getId());
         Folder cmisFolderTarget = (Folder) session.getObject(targetId);
         ItemIterable<CmisObject> cmisFolderSourceChildren = cmisFolderSource.getChildren();
         Map<String, String> newFolderProps = new HashMap<String, String>();
         newFolderProps.put(PropertyIds.OBJECT_TYPE_ID, "cmis:folder");
         newFolderProps.put(PropertyIds.NAME, name);
-        Folder copySourceFolder = cmisFolderTarget.createFolder(newFolderProps);
+
+        Folder copySourceFolder = null;
+        try {
+            copySourceFolder = cmisFolderTarget.createFolder(newFolderProps);
+        } catch (CmisNameConstraintViolationException e) {
+            throw new FolderAlreadyExistException("Folder already exist!");
+        }
 
         for (CmisObject o : cmisFolderSourceChildren) {
             if (o instanceof Folder) {
@@ -325,7 +331,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
     @Override
     public List<FSObject> find(Map<Integer, Object> query) {
         List<FSObject> files = new LinkedList<FSObject>();
-        String myType = (String)query.get(0);
+        String myType = (String) query.get(0);
         logger.log(Level.INFO, "=========" + myType);
         ObjectType type = session.getTypeDefinition(myType);
         logger.log(Level.INFO, "====!=====");
@@ -335,7 +341,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
         logger.log(Level.INFO, "====!11=====");
         String queryString = getQuery(query);
         ItemIterable<QueryResult> Results = session.query(queryString, false);
-        if(myType == "cmis:document"){
+        if (myType == "cmis:document") {
             parseFSFile(files, objectIdQueryName, Results);
         } else {
             parseFSFolder(files, objectIdQueryName, Results);
@@ -421,6 +427,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
             files.add(fsFile);
         }
     }
+
     private String getQuery(Map<Integer, Object> query) {
 
         QueryStatement qs;
@@ -433,9 +440,9 @@ public class FSFolderDaoImpl implements FSFolderDao {
                     plusQuery += " WHERE ";
                 }
                 qs = session.createQueryStatement(searchAdvancedParametrs.get(i));
-                logger.log(Level.INFO, "===prop____# " + i + "=="+query.get(0)+"===="+query.get(i)+"===");
-                qs.setString(1,(String) query.get(i));
-                logger.log(Level.INFO, "===prop____# " + i + "=="+qs.toQueryString()+"=="+query.get(i)+"===");
+                logger.log(Level.INFO, "===prop____# " + i + "==" + query.get(0) + "====" + query.get(i) + "===");
+                qs.setString(1, (String) query.get(i));
+                logger.log(Level.INFO, "===prop____# " + i + "==" + qs.toQueryString() + "==" + query.get(i) + "===");
                 if (counter > 0) {
                     plusQuery += " AND ";
                 }
@@ -452,7 +459,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
                 qs = session.createQueryStatement(searchAdvancedParametrs.get(i));
                 qs.setDateTime(1, (Date) query.get(i));
 
-                logger.log(Level.INFO, "===prop____# " + i + "=="+qs.toQueryString()+"=="+query.get(i));
+                logger.log(Level.INFO, "===prop____# " + i + "==" + qs.toQueryString() + "==" + query.get(i));
                 if (counter > 0) {
                     plusQuery += " AND ";
                 }
@@ -469,7 +476,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
                 }
                 qs = session.createQueryStatement(searchAdvancedParametrs.get(i));
                 qs.setString(1, (String) query.get(i));
-                logger.log(Level.INFO, "===prop____# " + i + "=="+qs.toQueryString()+"==");
+                logger.log(Level.INFO, "===prop____# " + i + "==" + qs.toQueryString() + "==");
                 if (counter > 0) {
                     plusQuery += " AND ";
                 }
