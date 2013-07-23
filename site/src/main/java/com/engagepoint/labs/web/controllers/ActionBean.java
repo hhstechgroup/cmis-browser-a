@@ -204,7 +204,7 @@ public class ActionBean implements Serializable {
             }
         } else { //FSFolder
             try {
-
+                logger.log(Level.INFO, "edit catched: " + selected.getName());
                 treeBean.getParent().setPath(cmisService.renameFolder((FSFolder) selected, selected.getName()).getPath());
             } catch (FolderAlreadyExistException ex) {
                 logger.log(Level.INFO, "edit catched: " + ex.getMessage());
@@ -222,6 +222,7 @@ public class ActionBean implements Serializable {
             if (parent != null) {
                 logger.log(Level.INFO, "NE NULL SIKA");
                 if(treeBean.getCachedNode().getParent() != null)
+                    logger.log(Level.INFO, "NE NULL SIKA"+((FSObject)treeBean.getCachedNode().getParent()).getName());
                     treeBean.updateTree(treeBean.getCachedNode().getParent());
             }
         }

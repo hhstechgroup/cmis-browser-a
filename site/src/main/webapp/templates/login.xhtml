@@ -32,12 +32,11 @@
                             <h:outputLabel for="login" value="Login: *"/>
                             <p:inputText id="login" value="#{login.login}"
                                          required="true" label="Login" disabled="#{login.anonymous}"/>
-                            <p:message for="login"/>
 
                             <h:outputLabel for="password" value="Password: *"/>
                             <p:inputText id="password" value="#{login.password}"
                                          required="true" label="Password" disabled="#{login.anonymous}"/>
-                            <p:message for="password"/>
+
 
                             <p:commandButton value="Login" ajax="false"/>
                         </h:panelGrid>

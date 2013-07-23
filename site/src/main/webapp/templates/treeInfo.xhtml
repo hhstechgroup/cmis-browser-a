@@ -10,6 +10,7 @@
 
 
 <h:body>
+
     <ui:composition>
         <h:outputStylesheet library="style" name="style.css"/>
         <h:outputScript library="js" name="native_but.js"/>
@@ -107,6 +108,9 @@
                 style="border:0;width:1px;height:1px;position:absolute;visibility:hidden;bottom:0;right:0;">
         </iframe>
         <p:commandButton value="View as Dialog" onclick="TreeinDialog.show();"/>
+        <h:form>
+            <h:commandButton value="Click" action="#{treeBean.paintComponent}" update=":cmisbrowser"/>
+        </h:form>
         <p:dialog id="TreeDailog" widgetVar="TreeinDialog"
                   showEffect="fade"
                   hideEffect="fade"

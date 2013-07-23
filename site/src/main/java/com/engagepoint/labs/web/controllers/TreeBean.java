@@ -104,6 +104,16 @@ public class TreeBean implements Serializable {
                     e.getMessage(),
                     ""));
         }
+
+
+        folderTypes.put("CMIS Folder (cmis:folder)", "CMIS Folder (cmis:folder)");
+
+        searchQueryAdvanced = new HashMap<Integer, Object>();
+        searchQueryAdvanced.put(0, "cmis:document");
+        openAccordion = -1;
+    }
+
+    public void paintComponent(){
         FSFolder root = cmisService.getRootFolder();
         parent.setPath("/");
         main = new DefaultTreeNode("Main", null);
@@ -113,11 +123,6 @@ public class TreeBean implements Serializable {
         new DefaultTreeNode(fold, node0);
         this.selectedNodes = node0;
         changedTableParentFolder();
-        folderTypes.put("CMIS Folder (cmis:folder)", "CMIS Folder (cmis:folder)");
-
-        searchQueryAdvanced = new HashMap<Integer, Object>();
-        searchQueryAdvanced.put(0, "cmis:document");
-        openAccordion = -1;
     }
 
     public void updateTree(TreeNode parent) {
