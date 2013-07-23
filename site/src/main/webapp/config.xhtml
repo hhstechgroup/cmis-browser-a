@@ -4,7 +4,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:h="http://java.sun.com/jsf/html"
-      xmlns:p="http://java.sun.com/jsf/html" xmlns:ui="http://java.sun.com/jsf/facelets">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:uib="http://engagepoint.com/uib">
 
 <h:head>
     <title>Configuration</title>
@@ -12,12 +14,41 @@
 <h:body>
     <ui:composition template="templates/templateLayout.xhtml">
         <ui:define name="login">
-            <p:graphicImage value="/resources/images/construction.jpg"/>
+
         </ui:define>
         <ui:define name="treeInfo">
+            <h:form id="configForm">
+                <h:panelGrid id="panel" columns="2">
+                    <p:outputLabel value="Name column" for="name" />
+                    <p:selectBooleanCheckbox id="name" value="#{config.name}" />
+                    <p:outputLabel value="TypeId column" for="typeId" />
+                    <p:selectBooleanCheckbox id="typeId" value="#{config.typeId}" />
+                    <p:outputLabel value="Parent Type Id column" for="parentType" />
+                    <p:selectBooleanCheckbox id="parentType" value="#{config.parentTypeId}" />
+                    <p:outputLabel value="Id column" for="idCol" />
+                    <p:selectBooleanCheckbox id="idCol" value="#{config.id}" />
 
+                    <p:outputLabel value="Size column" for="size" />
+                    <p:selectBooleanCheckbox id="size" value="#{config.size}" />
+                    <p:outputLabel value="ContentType column" for="contentType" />
+                    <p:selectBooleanCheckbox id="contentType" value="#{config.contentType}" />
+                    <p:outputLabel value="Created By column" for="createdBy" />
+                    <p:selectBooleanCheckbox id="createdBy" value="#{config.createdBy}" />
+                    <p:outputLabel value="Creation date column" for="createDated" />
+                    <p:selectBooleanCheckbox id="createDated" value="#{config.creationDate}" />
+                    <p:outputLabel value="Last Modified By column" for="lastModifiedBy" />
+                    <p:selectBooleanCheckbox id="lastModifiedBy" value="#{config.lastModifiedBy}" />
+                    <p:outputLabel value="Last Modified Date column" for="lastModifiedDate" />
+                    <p:selectBooleanCheckbox id="lastModifiedDate" value="#{config.lastModifiedDate}" />
+
+
+                    <p:outputLabel value="Repo url" for="test2" />
+                    <uib:input id="test2" placeholder="Repo url" value="#{config.repoURL}"/>
+                    <p:commandButton type="submit" value="Ok" action="#{config.savePrefs}" ajax="false"/>
+                </h:panelGrid>
+            </h:form>
         </ui:define>
-    </ui:composition>
 
+    </ui:composition>
 </h:body>
 </html>

@@ -14,7 +14,18 @@
         <h:outputStylesheet library="style" name="style.css"/>
         <h:outputScript library="js" name="native_but.js"/>
 
-        <ct:cmisBrowserComponent id="cmisbrowser"/>
+        <ct:cmisBrowserComponent id="cmisbrowser"
+                                 Name="#{config.name}"
+                                 TypeId="#{config.typeId}"
+                                 ParentTypeId="#{config.parentTypeId}"
+                                 Id="#{config.id}"
+                                 Size="#{config.size}"
+                                 ContentType="#{config.contentType}"
+                                 Createdby="#{config.createdBy}"
+                                 Creationdate="#{config.creationDate}"
+                                 LastModifiedBy="#{config.lastModifiedBy}"
+                                 LastModificationdate="#{config.lastModifiedDate}"
+                />
 
         <p:dialog id="copyDialogId" header="Copy" widgetVar="copyDialog"
                   modal="true"
