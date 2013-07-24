@@ -238,7 +238,8 @@ public class ActionBean implements Serializable {
     public void delete(FSObject object) {
         if (object instanceof FSFolder) {
             deleteAllTree(object);
-            treeBean.getParent().setPath("/");
+            treeBean.getParent().setPath(object.getParent().getPath());
+            treeBean.updateTree(treeBean.getSelectedNode().getParent());
         } else {
             logger.log(Level.INFO, "deleteSelect++++++" + object.getName());
             cmisService.deleteFile((FSFile) object);
@@ -347,6 +348,7 @@ public class ActionBean implements Serializable {
     }
 
     public String getDefaultFolderName() {
+        logger.log(Level.INFO, "getDefaultFolderName folderforcopy name = "+folderForCopy.getName());
         if (folderForCopy != null) {
             if (defaultFolderName.equals("Copy_")) {
                 logger.log(Level.INFO, "if: " + folderForCopy.getName());

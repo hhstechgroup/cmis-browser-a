@@ -21,7 +21,8 @@ import java.util.logging.Logger;
  * Time: 6:13 PM
  * To change this template use File | Settings | File Templates.
  */
-public class LazyFSObjectDataModel extends LazyDataModel<FSObject> {
+public class
+        LazyFSObjectDataModel extends LazyDataModel<FSObject> {
 
     private static Logger logger = Logger.getLogger(LazyFSObjectDataModel.class.getName());
 

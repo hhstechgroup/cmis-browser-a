@@ -265,9 +265,9 @@ public class TreeBean implements Serializable {
             } else {
                 parent.setPath(selectedFSObject.getPath());
             }
-            if (findQuery.isEmpty()) {
-                changedTableParentFolder();
-            }
+//            if (findQuery.isEmpty()) {
+//                changedTableParentFolder();
+//            }
             PageState state = new PageState();
 //            state.setCurrentPage(currentPage);
             state.setSelectedNode(selectedNodes);
@@ -306,6 +306,7 @@ public class TreeBean implements Serializable {
                     "This name already exists in folder!"));
             updateTree(getRoot().getChildren().get(0));
         }
+        updateTree(event.getDropNode());
 
     }
 
@@ -422,11 +423,13 @@ public class TreeBean implements Serializable {
         getLazyModel().setSearchQueryAdvanced(searchQueryAdvanced);
 
         if(ableSearchAdvanced){
+            logger.log(Level.INFO, "==___________B1111111111111111111111M~!!!!____"+searchQueryAdvanced);
             getLazyModel().setAbleSearchAdvanced(true);
         } else {
+            logger.log(Level.INFO, "==___________BssssssssssssssssssssssM~!!!!____"+searchQueryAdvanced);
             getLazyModel().setAbleSearchAdvanced(false);
         }
-
+        logger.log(Level.INFO, "==___________BOOOOOOOOOOOOOOOM~!!!!____"+searchQueryAdvanced);
         logger.log(Level.INFO, "==___________BOOOOOOOOOOOOOOOM~!!!!____");
     }
 
@@ -436,11 +439,13 @@ public class TreeBean implements Serializable {
 
     public void ableSearchAdvanced() {
         ableSearchAdvanced = true;
+        logger.log(Level.INFO, "ableSearchAdvanced = "+ableSearchAdvanced);
 //        searchPropertiesVisibility = "visible";
 //        lazyModel.setAbleSearchAdvanced(true);
     }
     public void disableSearchAdvanced() {
         ableSearchAdvanced = false;
+        logger.log(Level.INFO, "disableSearchAdvanced = "+ableSearchAdvanced);
 //        searchPropertiesVisibility = "hidden";
 //        lazyModel.setAbleSearchAdvanced(false);
     }

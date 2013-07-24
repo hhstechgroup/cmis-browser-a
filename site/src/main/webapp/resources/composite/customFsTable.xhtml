@@ -62,15 +62,16 @@
             <p:inputText id="finditem" value="#{treeBean.findQuery}"/>
             <p:watermark for="finditem" value="name"/>
 
-            <p:splitButton value="Search" process="tablecomponent"
+            <p:splitButton id="selectSearch" value="Search" process="tablecomponent"
                            update=":#{cc.parent.clientId}:treeForm:table:tablecomponent"
                            action="#{treeBean.findAdvanced}">
                 <p:menuitem value="Simple" actionListener="#{treeBean.disableSearchAdvanced}"
                             update=":#{cc.parent.clientId}:treeForm:table:tablecomponent"
-                            icon="ui-icon-arrowrefresh-1-w"/>
+                            icon="ui-icon-arrowrefresh-1-w" process="selectSearch"/>
                 <p:separator/>
                 <p:menuitem value="Advanced" actionListener="#{treeBean.ableSearchAdvanced}"
-                            update=":#{cc.parent.clientId}:treeForm:table:tablecomponent" icon="ui-icon-close"/>
+                            update=":#{cc.parent.clientId}:treeForm:table:tablecomponent" icon="ui-icon-close"
+                            process="selectSearch"/>
 
 
             </p:splitButton>
