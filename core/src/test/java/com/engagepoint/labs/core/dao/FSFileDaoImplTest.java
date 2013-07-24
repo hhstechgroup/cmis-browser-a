@@ -57,15 +57,15 @@ public class FSFileDaoImplTest {
 //        }
 //    }
 
-    @Test
-    public void testFind() throws Exception{
-        List<FSObject> fsFiles = fsFolderDao.find("d");
-        System.out.println(fsFiles.size());
-        for (FSObject fsObject : fsFiles){
-            System.out.println(fsObject.getName());
-        }
-        assertNotNull(fsFiles);
-    }
+//    @Test
+//    public void testFind() throws Exception{
+//        List<FSObject> fsFiles = fsFolderDao.find("d");
+//        System.out.println(fsFiles.size());
+//        for (FSObject fsObject : fsFiles){
+//            System.out.println(fsObject.getName());
+//        }
+//        assertNotNull(fsFiles);
+//    }
 
 //    @org.junit.Test
 //         public void testCopy() throws Exception {
