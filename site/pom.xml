@@ -11,15 +11,6 @@
     <packaging>war</packaging>
     <name>site</name>
 
-    <repositories>
-        <repository>
-            <id>prime-repo</id>
-            <name>PrimeFaces Maven Repository</name>
-            <url>http://repository.primefaces.org</url>
-            <layout>default</layout>
-        </repository>
-    </repositories>
-
     <dependencies>
         <dependency>
             <groupId>org.primefaces.themes</groupId>
@@ -67,6 +58,7 @@
             <artifactId>ui-bootstrap-components</artifactId>
             <version>1.6.3</version>
         </dependency>
+
     </dependencies>
 
     <build>

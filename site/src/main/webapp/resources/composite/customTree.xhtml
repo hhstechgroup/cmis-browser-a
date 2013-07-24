@@ -19,7 +19,7 @@
 </cc:interface>
 
 <cc:implementation>
-
+    <h:outputScript library="js" name="DD.js"/>
     <p:tree id="treecomponent"
             value="#{treeBean.root}"
             var="node"
@@ -47,6 +47,10 @@
 
         </p:treeNode>
     </p:tree>
+
+    <p:droppable for=":#{cc.parent.clientId}:treeForm:tree:treecomponent" tolerance="touch" activeStyleClass="ui-state-highlight" datasource=":#{cc.parent.clientId}:treeForm:table:tablecomponent" onDrop="handleDrop">
+        <p:ajax listener="#{treeBean.onDragFile}" update=":#{cc.parent.clientId}:treeForm:table:tablecomponent" />
+    </p:droppable>
 
     <p:contextMenu for="treecomponent" rendered="#{cc.attrs.context}">
         <p:menuitem value="New Folder" onclick="#{cc.attrs.create}.show();" icon="ui-icon-document"/>

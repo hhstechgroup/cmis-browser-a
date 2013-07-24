@@ -90,6 +90,8 @@ public interface CMISService {
 
     public FSFile getHistory(FSFile file);
 
+    public void move(FSFile source) throws BrowserRuntimeException;
+
     public List<FSObject> find(String query);
 
     public FSFolder renameFolder(FSFolder folder, String newName) throws BaseException;

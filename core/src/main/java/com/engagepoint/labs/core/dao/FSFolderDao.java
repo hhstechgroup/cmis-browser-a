@@ -6,6 +6,7 @@ package com.engagepoint.labs.core.dao;
  * Time: 2:53 PM
  */
 
+import com.engagepoint.labs.core.models.FSFile;
 import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
 import com.engagepoint.labs.core.models.exceptions.*;
@@ -82,6 +83,8 @@ public interface FSFolderDao {
     public boolean hasChildren(FSFolder folder) throws BaseException;
 
     public FSFolder move(FSFolder source, FSFolder target) throws BrowserRuntimeException;
+
+    public void move(FSFile source) throws BrowserRuntimeException;
 
     public void copyFolder(FSFolder folder, String name, String targetId) throws FolderAlreadyExistException;
 

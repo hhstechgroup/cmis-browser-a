@@ -105,6 +105,11 @@ public class CMISServiceImpl implements CMISService {
     }
 
     @Override
+    public void move(FSFile source) throws BrowserRuntimeException {
+        fsFolderDao.move(source);
+    }
+
+    @Override
     public int getMaxNumberOfRows(FSFolder parent) {
         return fsFolderDao.getMaxNumberOfRows(parent);
     }

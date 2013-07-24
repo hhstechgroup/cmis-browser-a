@@ -182,6 +182,20 @@ public class FSFolderDaoImpl implements FSFolderDao {
     }
 
     @Override
+    public void move(FSFile target) throws BrowserRuntimeException {
+        Document doc = (Document) session.getObject(target.getId());
+        Folder cmisFolder2 = (Folder) session.getObjectByPath("/");
+        Folder parent = doc.getParents().get(0);
+        ObjectId objectId = new ObjectIdImpl(cmisFolder2.getId());
+        ObjectId parObjectId = new ObjectIdImpl(parent.getId());
+        try {
+            doc.move(parObjectId, objectId);
+        } catch (CmisRuntimeException e) {
+            throw new BrowserRuntimeException("Cant move file!");
+        }
+    }
+
+    @Override
     public List<FSObject> getPageForLazy(FSFolder parent, int first, int pageSize) throws BaseException {
         String notRootFolder = parent.getPath().equals("/") ? "" : parent.getPath();
         List<FSObject> children = new ArrayList<FSObject>();
@@ -335,7 +349,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
     @Override
     public List<FSObject> find(Map<Integer, Object> query) {
         List<FSObject> files = new LinkedList<FSObject>();
-        String myType = (String)query.get(0);
+        String myType = (String) query.get(0);
         logger.log(Level.INFO, "=========" + myType);
         ObjectType type = session.getTypeDefinition(myType);
         logger.log(Level.INFO, "====!=====");
@@ -345,10 +359,13 @@ public class FSFolderDaoImpl implements FSFolderDao {
         logger.log(Level.INFO, "====!11=====");
         String queryString = getQuery(query);
         ItemIterable<QueryResult> Results = session.query(queryString, false);
-        if(myType.equals("cmis:document")){
+        logger.log(Level.INFO, "====I've got result=====");
+        if (myType.equals("cmis:document")) {
             parseFSFile(files, objectIdQueryName, Results);
+            logger.log(Level.INFO, "====Parse doc=====");
         } else {
             parseFSFolder(files, objectIdQueryName, Results);
+            logger.log(Level.INFO, "====Parse folder=====");
         }
 //        myType = "cmis:folder";
 //        type = session.getTypeDefinition(myType);
@@ -431,6 +448,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
             files.add(fsFile);
         }
     }
+
     private String getQuery(Map<Integer, Object> query) {
 
         QueryStatement qs;
@@ -443,9 +461,9 @@ public class FSFolderDaoImpl implements FSFolderDao {
                     plusQuery += " WHERE ";
                 }
                 qs = session.createQueryStatement(searchAdvancedParametrs.get(i));
-                logger.log(Level.INFO, "===prop____# " + i + "=="+query.get(0)+"===="+query.get(i)+"===");
-                qs.setString(1,(String) query.get(i));
-                logger.log(Level.INFO, "===prop____# " + i + "=="+qs.toQueryString()+"=="+query.get(i)+"===");
+                logger.log(Level.INFO, "===prop____# " + i + "==" + query.get(0) + "====" + query.get(i) + "===");
+                qs.setString(1, (String) query.get(i));
+                logger.log(Level.INFO, "===prop____# " + i + "==" + qs.toQueryString() + "==" + query.get(i) + "===");
                 if (counter > 0) {
                     plusQuery += " AND ";
                 }
@@ -462,7 +480,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
                 qs = session.createQueryStatement(searchAdvancedParametrs.get(i));
                 qs.setDateTime(1, (Date) query.get(i));
 
-                logger.log(Level.INFO, "===prop____# " + i + "=="+qs.toQueryString()+"=="+query.get(i));
+                logger.log(Level.INFO, "===prop____# " + i + "==" + qs.toQueryString() + "==" + query.get(i));
                 if (counter > 0) {
                     plusQuery += " AND ";
                 }
@@ -479,7 +497,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
                 }
                 qs = session.createQueryStatement(searchAdvancedParametrs.get(i));
                 qs.setString(1, (String) query.get(i));
-                logger.log(Level.INFO, "===prop____# " + i + "=="+qs.toQueryString()+"==");
+                logger.log(Level.INFO, "===prop____# " + i + "==" + qs.toQueryString() + "==");
                 if (counter > 0) {
                     plusQuery += " AND ";
                 }

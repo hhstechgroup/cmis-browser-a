@@ -9,10 +9,8 @@ import com.engagepoint.labs.core.models.exceptions.ConnectionException;
 import com.engagepoint.labs.core.service.CMISService;
 import com.engagepoint.labs.core.service.CMISServiceImpl;
 import com.engagepoint.labs.web.models.LazyFSObjectDataModel;
-import org.primefaces.event.NodeCollapseEvent;
-import org.primefaces.event.NodeExpandEvent;
-import org.primefaces.event.SelectEvent;
-import org.primefaces.event.TreeDragDropEvent;
+import org.primefaces.context.RequestContext;
+import org.primefaces.event.*;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 
@@ -467,6 +465,34 @@ public class TreeBean implements Serializable {
         } else {
             disableSearchFolderProperties = false;
         }
+    }
+
+    public void onDragFile(DragDropEvent event) {
+        FSObject fsObject = null;
+        try {
+            fsObject = (FSObject) event.getData();
+        } catch (Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "You cant move into this folder!",
+                    "It is a terrible idea!"));
+        }
+        try {
+            if (fsObject instanceof FSFile) {
+                cmisService.move((FSFile)fsObject);
+            }else{
+                RequestContext.getCurrentInstance().update(":cmisbrowser:treeForm:table:tablecomponent");
+                throw new BaseException("You cant move folder from table!");
+            }
+        } catch (BrowserRuntimeException e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    e.getMessage(),
+                    "This name already exists in folder!"));
+        } catch (BaseException e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    e.getMessage(),
+                    ""));
+        }
+
     }
 
     public Map<Integer, Object> getSearchQueryAdvanced() {
