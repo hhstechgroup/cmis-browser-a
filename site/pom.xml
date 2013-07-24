@@ -21,11 +21,11 @@
     </repositories>
 
     <dependencies>
-        <dependency>
-            <groupId>org.primefaces.themes</groupId>
-            <artifactId>all-themes</artifactId>
-            <version>1.0.9</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.primefaces.themes</groupId>-->
+            <!--<artifactId>all-themes</artifactId>-->
+            <!--<version>1.0.9</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>com.sun.faces</groupId>
             <artifactId>jsf-api</artifactId>

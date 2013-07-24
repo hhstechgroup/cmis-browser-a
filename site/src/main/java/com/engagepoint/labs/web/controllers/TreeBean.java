@@ -12,7 +12,7 @@ import com.engagepoint.labs.web.models.LazyFSObjectDataModel;
 import org.primefaces.event.NodeCollapseEvent;
 import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.event.SelectEvent;
-import org.primefaces.event.TreeDragDropEvent;
+//import org.primefaces.event.TreeDragDropEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 
@@ -75,6 +75,7 @@ public class TreeBean implements Serializable {
     private boolean disableSearchSimple;
     private boolean ableSearchAdvanced;
     private String searchPropertiesVisibility;
+    private int sizeMultiplier;
 
     public String getFolderType() {
         return folderType;
@@ -107,6 +108,7 @@ public class TreeBean implements Serializable {
         searchQueryAdvanced.put(0, "cmis:document");
         ableSearchAdvanced = false;
         cmisType = "cmis:document";
+        sizeMultiplier = 1024;
     }
 
     public void drawComponent(){
@@ -120,11 +122,11 @@ public class TreeBean implements Serializable {
         this.selectedNodes = node0;
         changedTableParentFolder();
         folderTypes.put("CMIS Folder (cmis:folder)", "CMIS Folder (cmis:folder)");
-
-        searchQueryAdvanced = new HashMap<Integer, Object>();
-        searchQueryAdvanced.put(0, "cmis:document");
-        ableSearchAdvanced = false;
-        cmisType = "cmis:document";
+//
+//        searchQueryAdvanced = new HashMap<Integer, Object>();
+//        searchQueryAdvanced.put(0, "cmis:document");
+//        ableSearchAdvanced = false;
+//        cmisType = "cmis:document";
     }
 
     public void updateTree(TreeNode parent) {
@@ -287,27 +289,27 @@ public class TreeBean implements Serializable {
         setSelectedFSObject((FSObject) event.getObject());
     }
 
-    public void onDragDrop(TreeDragDropEvent event) {
-        FSFolder dragedFolder = (FSFolder) event.getDragNode().getData();
-        FSFolder dropedFolder = null;
-        try {
-            dropedFolder = (FSFolder) event.getDropNode().getData();
-        } catch (Exception e) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "You cant move into this folder!",
-                    "It is a terrible idea!"));
-            updateTree(getRoot().getChildren().get(0));
-        }
-        try {
-            cmisService.move(dragedFolder, dropedFolder);
-        } catch (BrowserRuntimeException e) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    e.getMessage(),
-                    "This name already exists in folder!"));
-            updateTree(getRoot().getChildren().get(0));
-        }
-
-    }
+//    public void onDragDrop(TreeDragDropEvent event) {
+//        FSFolder dragedFolder = (FSFolder) event.getDragNode().getData();
+//        FSFolder dropedFolder = null;
+//        try {
+//            dropedFolder = (FSFolder) event.getDropNode().getData();
+//        } catch (Exception e) {
+//            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+//                    "You cant move into this folder!",
+//                    "It is a terrible idea!"));
+//            updateTree(getRoot().getChildren().get(0));
+//        }
+//        try {
+//            cmisService.move(dragedFolder, dropedFolder);
+//        } catch (BrowserRuntimeException e) {
+//            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+//                    e.getMessage(),
+//                    "This name already exists in folder!"));
+//            updateTree(getRoot().getChildren().get(0));
+//        }
+//
+//    }
 
     public boolean isCheckThatSelected() {
         return selectedFSObject != null ? true : false;
@@ -416,8 +418,22 @@ public class TreeBean implements Serializable {
         }
         searchQueryAdvanced.put(6, calendarFrom);
         searchQueryAdvanced.put(7, calendarTo);
-        searchQueryAdvanced.put(8, sizeFrom);
-        searchQueryAdvanced.put(9, sizeTo);
+        try {
+            Integer.parseInt(sizeFrom);
+            searchQueryAdvanced.put(8, Integer.toString(Integer.parseInt(sizeFrom) * sizeMultiplier));
+        } catch (NumberFormatException e) {
+            searchQueryAdvanced.put(8, "");
+        }
+         try {
+            Integer.parseInt(sizeTo);
+            searchQueryAdvanced.put(9, Integer.toString(Integer.parseInt(sizeTo) * sizeMultiplier));
+        } catch (NumberFormatException e) {
+            searchQueryAdvanced.put(9, "");
+        }
+
+//        searchQueryAdvanced.put(8, Integer.toString(Integer.parseInt(sizeFrom) * sizeMultiplier));
+//        searchQueryAdvanced.put(9, sizeTo);
+
         logger.log(Level.INFO, "==______BEFORE_____BOOOOOOOOOOOOOOOM~!!!!____");
         getLazyModel().setSearchQueryAdvanced(searchQueryAdvanced);
 
@@ -598,5 +614,13 @@ public class TreeBean implements Serializable {
 
     public boolean isAbleSearchAdvanced() {
         return ableSearchAdvanced;
+    }
+
+    public int getSizeMultiplier() {
+        return sizeMultiplier;
+    }
+
+    public void setSizeMultiplier(int sizeMultiplier) {
+        this.sizeMultiplier = sizeMultiplier;
     }
 }

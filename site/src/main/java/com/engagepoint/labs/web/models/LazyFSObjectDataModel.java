@@ -110,21 +110,23 @@ public class LazyFSObjectDataModel extends LazyDataModel<FSObject> {
             int dataSize = cmisService.getMaxNumberOfRowsByQuery(searchQueryAdvanced);
             this.setRowCount(dataSize);
 
-            if (dataSize > pageSize) {
-                if ((first + pageSize) > dataSize) {
-                    logger.log(Level.INFO, "============IN FIND====31==============");
-                    data = cmisService.getPageForLazySearchQuery(first, dataSize - first, searchQueryAdvanced);
-                    return data;
-                } else {
-                    logger.log(Level.INFO, "============IN FIND====32==============");
-                    data = cmisService.getPageForLazySearchQuery(first, pageSize, searchQueryAdvanced);
-                    return data;
-                }
-            } else {
-                logger.log(Level.INFO, "============IN FIND====4==============");
-                data = cmisService.getPageForLazySearchQuery(first, dataSize, searchQueryAdvanced);
-                return data;
-            }
+//            if (dataSize > pageSize) {
+//                if ((first + pageSize) > dataSize) {
+//                    logger.log(Level.INFO, "============IN FIND====31==============");
+//                    data = cmisService.getPageForLazySearchQuery(first, dataSize - first, searchQueryAdvanced);
+//                    return data;
+//                } else {
+//                    logger.log(Level.INFO, "============IN FIND====32==============");
+//                    data = cmisService.getPageForLazySearchQuery(first, pageSize, searchQueryAdvanced);
+//                    return data;
+//                }
+//            } else {
+//                logger.log(Level.INFO, "============IN FIND====4==============");
+//                data = cmisService.getPageForLazySearchQuery(first, dataSize, searchQueryAdvanced);
+//                return data;
+//            }
+
+
 
         }
     }

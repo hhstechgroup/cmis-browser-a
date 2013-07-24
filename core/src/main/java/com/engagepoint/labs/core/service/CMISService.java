@@ -31,6 +31,7 @@ public interface CMISService {
     public List<FSObject> getPageForLazySearchQuery(int first,int pageSize, String query);
 
     public List<FSObject> getPageForLazySearchQuery(int first,int pageSize, Map<Integer, Object> query);
+//    public Map<String , ?> getPageForLazySearchQuery2(int first, int pageSize, Map<Integer, Object> query);
     /**
      * Return a list children of our parent fsFolder folder
      *
