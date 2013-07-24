@@ -48,7 +48,7 @@
 
                 <p:commandButton value="OK"
                                  update=":cmisbrowser:treeForm"
-                                 actionListener="#{action.copyFolder(treeBean.selectedFSObject)}"
+                                 action="#{action.copyFolder}"
                                  oncomplete="if (!args.validationFailed) copyDialog.hide()"/>
 
                 <p:commandButton value="Cancel" type="button" onclick="copyDialog.hide();"

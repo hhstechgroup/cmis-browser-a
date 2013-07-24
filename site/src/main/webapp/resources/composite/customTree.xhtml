@@ -51,11 +51,14 @@
     <p:contextMenu for="treecomponent" rendered="#{cc.attrs.context}">
         <p:menuitem value="New Folder" onclick="#{cc.attrs.create}.show();" icon="ui-icon-document"/>
         <p:menuitem value="New Document" onclick="#{cc.attrs.createfile}.show();" icon="ui-icon-document"/>
-        <p:menuitem value="Copy" action="#{action.markFolder(treeBean.selectedFSObject)}"
-                    process=":#{cc.parent.clientId}:treeForm:tree"
+        <p:menuitem value="Copy" action="#{action.markFolder}" process=":#{cc.parent.clientId}:treeForm:tree"
+                    update=":#{cc.parent.clientId}:treeForm"
                     icon="ui-icon-document"/>
-        <p:menuitem value="Paste" action="#{action.copyFolder(treeBean.selectedFSObject)}"
-                    process=":#{cc.parent.clientId}:treeForm:tree" icon="ui-icon-document"/>
+        <p:menuitem id="pasteId" value="Paste" action="#{action.copyFolder}"
+                    process=":#{cc.parent.clientId}:treeForm:tree"
+                    update=":#{cc.parent.clientId}:treeForm"
+                    disabled="#{!action.copyItemPressed}"
+                    icon="ui-icon-document"/>
         <p:menuitem value="Edit" onclick="#{cc.attrs.edit}.show();" icon="ui-icon-document"/>
         <p:menuitem value="Delete" onclick="#{cc.attrs.delete}.show();" icon="ui-icon-document"/>
     </p:contextMenu>

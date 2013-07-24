@@ -54,8 +54,8 @@ public class LoginBean implements Serializable {
     public void doLogin() {
         try {
             if (anonymous) {
-                login = "unknown";
-                password = "unknown";
+                login = "";
+                password = "";
             }
             cmisService.connect(login, password, repository);
             treeBean.drawComponent();

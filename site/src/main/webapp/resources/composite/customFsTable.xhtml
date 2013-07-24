@@ -145,7 +145,8 @@
                     </p:menuButton>
                 </p:menuitem>
                 <p:menuitem id="copymenuitem" value="Copy" oncomplete="copyDialog.show();"
-                            action="#{action.markFolder(treeBean.selectedFSObject)}"
+                            action="#{action.markFolder}"
+                            update=":copyDialogId :#{cc.parent.clientId}:treeForm"
                             process="@this"
                             disabled="#{!treeBean.checkThatSelected}"/>
 

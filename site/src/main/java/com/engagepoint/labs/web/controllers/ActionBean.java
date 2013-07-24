@@ -47,6 +47,8 @@ public class ActionBean implements Serializable {
     private FSObject folderForCopy;
     private String findQuery;
 
+    private boolean copyItemPressed = false;
+
     /**
      * Handling exception and create a message to show user om dialog page  and log the exception
      * method fail validation and skip all the subsequent phases and go to render response
@@ -66,15 +68,12 @@ public class ActionBean implements Serializable {
         logger.log(Level.SEVERE, "Exception: ", ex);
     }
 
-    public void copyFolder(FSObject target) {
+    public void copyFolder() {
+        FSObject target = treeBean.getSelectedFSObject();
         String tempName = defaultFolderName;
         if (folderForCopy instanceof FSFile) {
             try {
-
                 logger.log(Level.INFO, "file name: " + folderForCopy.getName() + " def name: " + defaultFolderName + " def name: " + tempName);
-                if (!folderForCopy.getName().equals(getDefaultFolderName())) {
-                    folderForCopy.setName(getDefaultFolderName());
-                }
                 try {
                     logger.log(Level.INFO, "file name: " + folderForCopy.getName() + " def name: " + defaultFolderName + " def name: " + tempName);
                     cmisService.copyFile(folderForCopy.getId(), tempName, target.getId());
@@ -90,14 +89,13 @@ public class ActionBean implements Serializable {
             } catch (NullPointerException ex) {
 
             }
-            defaultFolderName = "Copy_";
         }
 
         if (folderForCopy instanceof FSFolder) {
             try {
                 logger.log(Level.INFO, "folder name: " + folderForCopy.getName() + " def name: " + defaultFolderName);
-                if (!folderForCopy.getName().equals(getDefaultFolderName())) {
-                    folderForCopy.setName(getDefaultFolderName());
+                if (defaultFolderName.equals("Copy_")) {
+                    tempName = getDefaultFolderName();
                 }
                 try {
                     cmisService.copyFolder((FSFolder) folderForCopy, tempName, target.getId());
@@ -106,11 +104,16 @@ public class ActionBean implements Serializable {
                             e.getMessage(),
                             "Rename folder, please!"));
                 }
+                finally {
+                    logger.log(Level.INFO, "cached node: " + ((FSFolder)treeBean.getCachedNode().getData()).getPath());
+                    treeBean.updateTree(treeBean.getCachedNode());
+                }
             } catch (NullPointerException ex) {
 
             }
-            defaultFolderName = "Copy_";
         }
+        defaultFolderName = "Copy_";
+        this.copyItemPressed = false;
     }
 
     public ActionBean() {
@@ -130,9 +133,9 @@ public class ActionBean implements Serializable {
         reqEx = "(.*[\\\\\\/]|^)(.*?)(?:[\\.]|$)([^\\.\\s]*$)";
     }
 
-    public void markFolder(FSObject folderForCopy) {
-        logger.log(Level.INFO, "folderForCopy: " + folderForCopy.getName());
-        this.folderForCopy = folderForCopy;
+    public void markFolder() {
+        this.folderForCopy = treeBean.getSelectedFSObject();
+        this.copyItemPressed = true;
     }
 
     public void createFile(FSFolder parent) {
@@ -349,19 +352,15 @@ public class ActionBean implements Serializable {
     }
 
     public void setFolderForCopy(FSObject folderForCopy) {
-
         this.folderForCopy = folderForCopy;
     }
 
     public String getDefaultFolderName() {
-        logger.log(Level.INFO, "getDefaultFolderName folderforcopy name = " + folderForCopy.getName());
         if (folderForCopy != null) {
             if (defaultFolderName.equals("Copy_")) {
-                logger.log(Level.INFO, "if: " + folderForCopy.getName());
                 defaultFolderName += folderForCopy.getName();
             } else {
-                logger.log(Level.INFO, "else: " + folderForCopy.getName());
-                defaultFolderName = "Copy_" + folderForCopy.getName();
+                defaultFolderName =  "Copy_" + folderForCopy.getName();
             }
         }
         return defaultFolderName;
@@ -371,5 +370,11 @@ public class ActionBean implements Serializable {
         this.defaultFolderName = defaultFolderName;
     }
 
+    public boolean isCopyItemPressed() {
+        return copyItemPressed;
+    }
 
+    public void setCopyItemPressed(boolean copyItemPressed) {
+        this.copyItemPressed = copyItemPressed;
+    }
 }
