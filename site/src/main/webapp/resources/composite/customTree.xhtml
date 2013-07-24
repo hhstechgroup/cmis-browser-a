@@ -32,7 +32,8 @@
             style="width: 300px;">
 
         <p:ajax event="dragdrop" listener="#{treeBean.onDragDrop}" update=":cmisbrowser:treeForm"/>
-        <p:ajax event="select" update="#{cc.attrs.updateId} :#{cc.parent.clientId}:actiondialogs:#{cc.parent.clientId}edit"/>
+        <p:ajax event="select"
+                update="#{cc.attrs.updateId} :#{cc.parent.clientId}:actiondialogs:#{cc.parent.clientId}edit"/>
 
         <p:ajax event="expand" listener="#{treeBean.onNodeExpand}"/>
 
@@ -50,10 +51,11 @@
     <p:contextMenu for="treecomponent" rendered="#{cc.attrs.context}">
         <p:menuitem value="New Folder" onclick="#{cc.attrs.create}.show();" icon="ui-icon-document"/>
         <p:menuitem value="New Document" onclick="#{cc.attrs.createfile}.show();" icon="ui-icon-document"/>
-        <p:menuitem value="Copy" actionListener="#{action.markFolder(treeBean.selectedFSObject)}"
+        <p:menuitem value="Copy" action="#{action.markFolder(treeBean.selectedFSObject)}"
+                    process=":#{cc.parent.clientId}:treeForm:tree"
                     icon="ui-icon-document"/>
-        <p:menuitem value="Paste" actionListener="#{action.copyFolder(treeBean.selectedFSObject)}"
-                    icon="ui-icon-document"/>
+        <p:menuitem value="Paste" action="#{action.copyFolder(treeBean.selectedFSObject)}"
+                    process=":#{cc.parent.clientId}:treeForm:tree" icon="ui-icon-document"/>
         <p:menuitem value="Edit" onclick="#{cc.attrs.edit}.show();" icon="ui-icon-document"/>
         <p:menuitem value="Delete" onclick="#{cc.attrs.delete}.show();" icon="ui-icon-document"/>
     </p:contextMenu>

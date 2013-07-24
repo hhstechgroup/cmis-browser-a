@@ -76,6 +76,8 @@ public class TreeBean implements Serializable {
     private boolean ableSearchAdvanced;
     private String searchPropertiesVisibility;
 
+    private boolean rowSelected ;
+
     public String getFolderType() {
         return folderType;
     }
@@ -107,6 +109,9 @@ public class TreeBean implements Serializable {
         searchQueryAdvanced.put(0, "cmis:document");
         ableSearchAdvanced = false;
         cmisType = "cmis:document";
+        findQuery = "";
+
+        rowSelected = false;
     }
 
     public void drawComponent(){
@@ -265,9 +270,9 @@ public class TreeBean implements Serializable {
             } else {
                 parent.setPath(selectedFSObject.getPath());
             }
-//            if (findQuery.isEmpty()) {
-//                changedTableParentFolder();
-//            }
+            if (findQuery.isEmpty()) {
+                changedTableParentFolder();
+            }
             PageState state = new PageState();
 //            state.setCurrentPage(currentPage);
             state.setSelectedNode(selectedNodes);
@@ -276,13 +281,18 @@ public class TreeBean implements Serializable {
             addToBack(state);
             this.cachedNode = selectedNodes;
             this.selectedNodes.setSelected(false);
+            setRowSelected(false);
+            logger.log(Level.INFO, "cachedNode setSelectedNode = " + ((FSObject)cachedNode.getData()).getName());
         }
     }
 
     public void onRowSelect(SelectEvent event) {
+        setRowSelected(true);
         if (selectedNodes != null) {
             this.cachedNode = selectedNodes;
             this.selectedNodes.setSelected(false);
+            logger.log(Level.INFO, "cachedNode onRowSelect = " + ((FSObject)cachedNode.getData()).getName());
+
         }
         setSelectedFSObject((FSObject) event.getObject());
     }
@@ -603,5 +613,13 @@ public class TreeBean implements Serializable {
 
     public boolean isAbleSearchAdvanced() {
         return ableSearchAdvanced;
+    }
+
+    public boolean isRowSelected() {
+        return rowSelected;
+    }
+
+    public void setRowSelected(boolean rowSelected) {
+        this.rowSelected = rowSelected;
     }
 }

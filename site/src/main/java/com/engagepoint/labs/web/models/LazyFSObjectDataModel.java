@@ -123,7 +123,7 @@ public class
                 }
             } else {
                 logger.log(Level.INFO, "============IN FIND====4==============");
-                data = cmisService.find(searchQuery);
+                data = cmisService.getPageForLazySearchQuery(first, dataSize, searchQueryAdvanced);
                 return data;
             }
 

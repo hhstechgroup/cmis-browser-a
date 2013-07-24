@@ -67,11 +67,11 @@ public class ActionBean implements Serializable {
     }
 
     public void copyFolder(FSObject target) {
-        String tempName =  defaultFolderName;
+        String tempName = defaultFolderName;
         if (folderForCopy instanceof FSFile) {
             try {
 
-                logger.log(Level.INFO, "file name: " + folderForCopy.getName() + " def name: " + defaultFolderName +" def name: " + tempName);
+                logger.log(Level.INFO, "file name: " + folderForCopy.getName() + " def name: " + defaultFolderName + " def name: " + tempName);
                 if (!folderForCopy.getName().equals(getDefaultFolderName())) {
                     folderForCopy.setName(getDefaultFolderName());
                 }
@@ -208,7 +208,7 @@ public class ActionBean implements Serializable {
                 treeBean.getParent().setPath(cmisService.renameFolder((FSFolder) selected, selected.getName()).getPath());
             } catch (FolderAlreadyExistException ex) {
                 logger.log(Level.INFO, "edit catched: " + ex.getMessage());
-                logger.log(Level.INFO, "edit catched node: " + ((FSFolder)treeBean.getCachedNode().getData()).getName());
+                logger.log(Level.INFO, "edit catched node: " + ((FSFolder) treeBean.getCachedNode().getData()).getName());
 
                 treeBean.updateTree(treeBean.getCachedNode().getParent());
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -219,12 +219,18 @@ public class ActionBean implements Serializable {
                         e.getMessage(),
                         ""));
             }
-            if (parent != null) {
-                logger.log(Level.INFO, "NE NULL SIKA");
-                if(treeBean.getCachedNode().getParent() != null)
-                    logger.log(Level.INFO, "NE NULL SIKA"+((FSObject)treeBean.getCachedNode().getParent()).getName());
-                    treeBean.updateTree(treeBean.getCachedNode().getParent());
+            if (treeBean.isRowSelected()) {
+                treeBean.updateTree(treeBean.getCachedNode());
+            } else {
+                treeBean.updateTree(treeBean.getCachedNode().getParent());
             }
+
+//            if (parent != null) {
+//                logger.log(Level.INFO, "NE NULL SIKA");
+//                if(treeBean.getCachedNode().getParent() != null)
+//                //    logger.log(Level.INFO, "NE NULL SIKA"+((FSObject)(treeBean.getCachedNode().getParent())).getName());
+//                    treeBean.updateTree(treeBean.getCachedNode().getParent());
+//            }
         }
 
     }
@@ -348,7 +354,7 @@ public class ActionBean implements Serializable {
     }
 
     public String getDefaultFolderName() {
-        logger.log(Level.INFO, "getDefaultFolderName folderforcopy name = "+folderForCopy.getName());
+        logger.log(Level.INFO, "getDefaultFolderName folderforcopy name = " + folderForCopy.getName());
         if (folderForCopy != null) {
             if (defaultFolderName.equals("Copy_")) {
                 logger.log(Level.INFO, "if: " + folderForCopy.getName());
