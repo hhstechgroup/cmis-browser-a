@@ -87,7 +87,7 @@ public class ActionBean implements Serializable {
                             ""));
                 }
             } catch (NullPointerException ex) {
-
+                            //
             }
         }
 
