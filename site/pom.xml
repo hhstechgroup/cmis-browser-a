@@ -58,7 +58,11 @@
             <artifactId>ui-bootstrap-components</artifactId>
             <version>1.6.3</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.primefaces</groupId>
+            <artifactId>primefaces</artifactId>
+            <version>3.5.8</version>
+        </dependency>
     </dependencies>
 
     <build>
