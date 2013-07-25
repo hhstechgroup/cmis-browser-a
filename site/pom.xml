@@ -52,6 +52,11 @@
             <artifactId>primefaces</artifactId>
             <version>3.5.8</version>
         </dependency>
+        <dependency>
+            <groupId>xerces</groupId>
+            <artifactId>xerces</artifactId>
+            <version>2.2.1</version>
+        </dependency>
     </dependencies>
 
     <build>

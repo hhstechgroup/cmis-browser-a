@@ -402,11 +402,12 @@ public class TreeBean implements Serializable {
         // treeBean.updatetablePageList(cmisService.find(findQuery));
     }
     public void findAdvanced() {
-
+        lazyModel = new LazyFSObjectDataModel(cmisService, parent);
+        getLazyModel().setSearchQuery(findQuery);
         logger.log(Level.INFO, "==___________findAdvanced()____");
 
 
-        if (metaDataType != "" &&  findQuery != null) {
+        if (findQuery != "" &&  findQuery != null) {
             searchQueryAdvanced.put(1, "%" + findQuery + "%");
             logger.log(Level.INFO, "==___________findAdvanced()____" + findQuery);
         } else {

@@ -67,29 +67,61 @@ public class
     @Override
     public List<FSObject> load(int first, int pageSize, String sortField, org.primefaces.model.SortOrder sortOrder, Map<String, String> filters) {
         List<FSObject> data = new ArrayList<FSObject>();
-
+        logger.log(Level.INFO, "============ROWINDEX==========" + this.getRowIndex() + "========");
         if (!ableSearchAdvanced) {
             if (searchQuery.equals("")) {
                 int dataSize = cmisService.getMaxNumberOfRows(parent);
                 this.setRowCount(dataSize);
                 logger.log(Level.INFO, "============DATASIZE==========" + dataSize + "========");
+                if (first < dataSize) {
+                    if (dataSize > pageSize) {
+                        if ((first + pageSize) > dataSize) {
+                            try {
+                                logger.log(Level.INFO, "============if((first + pageSize) > dataSize)==========" + dataSize + "========");
+                                data = cmisService.getPageForLazy(parent, first, dataSize - first);
+                            } catch (FolderNotFoundException ex) {
+                                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                        "Folder !",
+                                        ex.getMessage()));
+                            } catch (BaseException e) {
+                                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                        "Folder !",
+                                        e.getMessage()));
+                            }
+                            return data;
+                        } else {
+                            try {
+                                data = cmisService.getPageForLazy(parent, first, pageSize);
+                            } catch (FolderNotFoundException ex) {
+                                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                        "Folder !",
+                                        ex.getMessage()));
+                            } catch (BaseException e) {
+                                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                        "Folder !",
+                                        e.getMessage()));
+                            }
+                            return data;
 
-                if (dataSize > pageSize) {
-                    try {
-                        data = cmisService.getPageForLazy(parent, first, pageSize);
-                    } catch (FolderNotFoundException ex) {
-                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "Folder !",
-                                ex.getMessage()));
-                    } catch (BaseException e) {
-                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "Folder !",
-                                e.getMessage()));
+                        }
+                    } else {
+                        try {
+                            data = cmisService.getPageForLazy(parent, first, dataSize);
+                        } catch (FolderNotFoundException ex) {
+                            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                    "Folder !",
+                                    ex.getMessage()));
+                        } catch (BaseException e) {
+                            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                    "Folder !",
+                                    e.getMessage()));
+                        }
+                        return data;
+
                     }
-                    return data;
                 } else {
                     try {
-                        data = cmisService.getPageForLazy(parent, 0, pageSize);
+                        data = cmisService.getPageForLazy(parent, dataSize - dataSize % pageSize, dataSize % pageSize);
                     } catch (FolderNotFoundException ex) {
                         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                 "Folder !",
@@ -105,20 +137,25 @@ public class
                 int dataSize = cmisService.getMaxNumberOfRowsByQuery(searchQuery);
                 this.setRowCount(dataSize);
                 logger.log(Level.INFO, "============DATASIZE_Query==========" + dataSize + "========");
-
-                if (dataSize > pageSize) {
-                    if ((first + pageSize) > dataSize) {
-                        logger.log(Level.INFO, "============if((first + pageSize) > dataSize)==========" + dataSize + "========");
-                        data = cmisService.getPageForLazySearchQuery(first, dataSize - first, searchQuery);
-                        return data;
+                if (first < dataSize) {
+                    if (dataSize > pageSize) {
+                        if ((first + pageSize) > dataSize) {
+                            logger.log(Level.INFO, "============if((first + pageSize) > dataSize)==========" + dataSize + "========");
+                            data = cmisService.getPageForLazySearchQuery(first, dataSize - first, searchQuery);
+                            return data;
+                        } else {
+                            data = cmisService.getPageForLazySearchQuery(first, pageSize, searchQuery);
+                            return data;
+                        }
                     } else {
-                        data = cmisService.getPageForLazySearchQuery(first, pageSize, searchQuery);
+                        logger.log(Level.INFO, "============DATASIZE_Query from==========" + pageSize + "========");
+                        data = cmisService.find(searchQuery);
+                        logger.log(Level.INFO, "============DATASIZE_Query to==========" + pageSize + "========");
                         return data;
                     }
                 } else {
-                    logger.log(Level.INFO, "============DATASIZE_Query from==========" + pageSize + "========");
-                    data = cmisService.find(searchQuery);
-                    logger.log(Level.INFO, "============DATASIZE_Query to==========" + pageSize + "========");
+                    logger.log(Level.INFO, "============IN FIND====4==============");
+                    data = cmisService.getPageForLazySearchQuery(dataSize - dataSize % pageSize, dataSize % pageSize, searchQuery);
                     return data;
                 }
             }
@@ -127,20 +164,25 @@ public class
         else {
             int dataSize = cmisService.getMaxNumberOfRowsByQuery(searchQueryAdvanced);
             this.setRowCount(dataSize);
-
-            if (dataSize > pageSize) {
-                if ((first + pageSize) > dataSize) {
-                    logger.log(Level.INFO, "============IN FIND====31==============");
-                    data = cmisService.getPageForLazySearchQuery(first, dataSize - first, searchQueryAdvanced);
-                    return data;
+            if (first < dataSize) {
+                if (dataSize > pageSize) {
+                    if ((first + pageSize) > dataSize) {
+                        logger.log(Level.INFO, "============IN FIND====31==============" + first + "+++++" + (dataSize - first));
+                        data = cmisService.getPageForLazySearchQuery(first, dataSize - first, searchQueryAdvanced);
+                        return data;
+                    } else {
+                        logger.log(Level.INFO, "============IN FIND====32==============");
+                        data = cmisService.getPageForLazySearchQuery(first, pageSize, searchQueryAdvanced);
+                        return data;
+                    }
                 } else {
-                    logger.log(Level.INFO, "============IN FIND====32==============");
-                    data = cmisService.getPageForLazySearchQuery(first, pageSize, searchQueryAdvanced);
+                    logger.log(Level.INFO, "============IN FIND====4==============");
+                    data = cmisService.getPageForLazySearchQuery(first, dataSize, searchQueryAdvanced);
                     return data;
                 }
             } else {
                 logger.log(Level.INFO, "============IN FIND====4==============");
-                data = cmisService.getPageForLazySearchQuery(first, dataSize, searchQueryAdvanced);
+                data = cmisService.getPageForLazySearchQuery(dataSize - dataSize % pageSize, dataSize % pageSize, searchQueryAdvanced);
                 return data;
             }
 
