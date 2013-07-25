@@ -224,6 +224,73 @@ public class FSFolderDaoImpl implements FSFolderDao {
         return children;
     }
 
+    public Map<String, Object> getPageForLazy2(FSFolder parent, int first, int pageSize) throws BaseException {
+        String notRootFolder = parent.getPath().equals("/") ? "" : parent.getPath();
+        List<FSObject> children = new ArrayList<FSObject>();
+        Folder cmisParent = (Folder) session.getObjectByPath(parent.getPath());
+
+        Map<String, Object> page = new HashMap<String, Object>();
+        ItemIterable<CmisObject> cmisChildrenForDatasize = cmisParent.getChildren();
+        int dataSize = (int) cmisChildrenForDatasize.getTotalNumItems();
+        page.put("datasize", dataSize);
+        int   pageSizeCorrect = pageSize;
+
+        if (dataSize > pageSize) {
+            if ((first + pageSize) > dataSize) {
+                logger.log(Level.INFO, "============IN FIND====31==============");
+                pageSizeCorrect = dataSize - first;
+//                page.put("page", result.subList(first, dataSize));
+//                return page;
+            }
+
+        } else {
+            pageSizeCorrect = dataSize - first;
+//            logger.log(Level.INFO, "============IN FIND====4==============");
+//            page.put("page", result.subList(first, dataSize));
+//            return page;
+        }
+
+
+
+
+        OperationContext operationContext = session.createOperationContext();
+        operationContext.setMaxItemsPerPage(pageSize);
+        ItemIterable<CmisObject> childrenCmis = cmisParent.getChildren(operationContext);
+        ItemIterable<CmisObject> cmisChildren = childrenCmis.skipTo(first).getPage();
+        try {
+            for (CmisObject o : cmisChildren) {
+                FSObject fsObject;
+                if (o instanceof Folder) {
+                    fsObject = new FSFolder();
+                    fsObject.setPath(((Folder) o).getPath());
+                } else {
+                    fsObject = new FSFile();
+                    fsObject.setMimetype(((Document) o).getContentStreamMimeType());
+                    fsObject.setPath(notRootFolder);
+                    ((FSFile) fsObject).setVersionable(((DocumentType) (o.getType())).isVersionable());
+                    fsObject.setSize(String.valueOf(((Document) o).getContentStreamLength() / 1024));
+                    ((FSFile) fsObject).setAbsolutePath(notRootFolder + "/" + o.getName());
+                }
+                fsObject.setParentTypeId(o.getType().getParentTypeId());
+                fsObject.setCreatedBy(o.getCreatedBy());
+                fsObject.setCreationTime(o.getCreationDate().getTime());
+                fsObject.setLastModifiedBy(o.getLastModifiedBy());
+                fsObject.setLastModifiedTime(o.getLastModificationDate().getTime());
+                fsObject.setTypeId(o.getType().getId());
+                fsObject.setName(o.getName());
+                fsObject.setId(o.getId());
+                fsObject.setParent(parent);
+                children.add(fsObject);
+            }
+        } catch (CmisObjectNotFoundException e) {
+            throw new ConnectionException(e.getMessage());
+        } catch (CmisBaseException e) {
+            throw new BaseException(e.getMessage());
+        }
+        page.put("page", children);
+        return page;
+    }
+
     @Override
     public boolean hasChildFolder(FSFolder folder) throws BaseException {
         List<FSObject> children = null;
@@ -335,7 +402,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
     @Override
     public List<FSObject> find(Map<Integer, Object> query) {
         List<FSObject> files = new LinkedList<FSObject>();
-        String myType = (String)query.get(0);
+        String myType = (String) query.get(0);
         logger.log(Level.INFO, "=========" + myType);
         ObjectType type = session.getTypeDefinition(myType);
         logger.log(Level.INFO, "====!=====");
@@ -345,7 +412,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
         logger.log(Level.INFO, "====!11=====");
         String queryString = getQuery(query);
         ItemIterable<QueryResult> Results = session.query(queryString, false);
-        if(myType.equals("cmis:document")){
+        if (myType.equals("cmis:document")) {
             parseFSFile(files, objectIdQueryName, Results);
         } else {
             parseFSFolder(files, objectIdQueryName, Results);
@@ -431,6 +498,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
             files.add(fsFile);
         }
     }
+
     private String getQuery(Map<Integer, Object> query) {
 
         QueryStatement qs;
@@ -443,9 +511,9 @@ public class FSFolderDaoImpl implements FSFolderDao {
                     plusQuery += " WHERE ";
                 }
                 qs = session.createQueryStatement(searchAdvancedParametrs.get(i));
-                logger.log(Level.INFO, "===prop____# " + i + "=="+query.get(0)+"===="+query.get(i)+"===");
-                qs.setString(1,(String) query.get(i));
-                logger.log(Level.INFO, "===prop____# " + i + "=="+qs.toQueryString()+"=="+query.get(i)+"===");
+                logger.log(Level.INFO, "===prop____# " + i + "==" + query.get(0) + "====" + query.get(i) + "===");
+                qs.setString(1, (String) query.get(i));
+                logger.log(Level.INFO, "===prop____# " + i + "==" + qs.toQueryString() + "==" + query.get(i) + "===");
                 if (counter > 0) {
                     plusQuery += " AND ";
                 }
@@ -462,7 +530,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
                 qs = session.createQueryStatement(searchAdvancedParametrs.get(i));
                 qs.setDateTime(1, (Date) query.get(i));
 
-                logger.log(Level.INFO, "===prop____# " + i + "=="+qs.toQueryString()+"=="+query.get(i));
+                logger.log(Level.INFO, "===prop____# " + i + "==" + qs.toQueryString() + "==" + query.get(i));
                 if (counter > 0) {
                     plusQuery += " AND ";
                 }
@@ -479,7 +547,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
                 }
                 qs = session.createQueryStatement(searchAdvancedParametrs.get(i));
                 qs.setString(1, (String) query.get(i));
-                logger.log(Level.INFO, "===prop____# " + i + "=="+qs.toQueryString()+"==");
+                logger.log(Level.INFO, "===prop____# " + i + "==" + qs.toQueryString() + "==");
                 if (counter > 0) {
                     plusQuery += " AND ";
                 }

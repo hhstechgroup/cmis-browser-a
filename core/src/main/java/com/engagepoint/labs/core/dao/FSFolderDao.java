@@ -76,6 +76,7 @@ public interface FSFolderDao {
     public List<FSObject> getPageForLazySearchQuery(int first,int pageSize, String query);
 
     public List<FSObject> getPageForLazy(FSFolder parent, int first, int pageSize) throws BaseException;
+    public Map<String, Object> getPageForLazy2(FSFolder parent, int first, int pageSize) throws BaseException;
 
     public boolean hasChildFolder(FSFolder folder) throws BaseException;
 

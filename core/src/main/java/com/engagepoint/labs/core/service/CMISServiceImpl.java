@@ -12,6 +12,7 @@ import com.engagepoint.labs.core.models.exceptions.FolderAlreadyExistException;
 import com.engagepoint.labs.core.models.exceptions.FolderNotFoundException;
 
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -103,6 +104,10 @@ public class CMISServiceImpl implements CMISService {
     public List<FSObject> getPageForLazy(FSFolder parent, int first, int pageSize) throws BaseException {
         return fsFolderDao.getPageForLazy(parent, first, pageSize);
     }
+    @Override
+    public Map<String, Object> getPageForLazy2(FSFolder parent, int first, int pageSize) throws BaseException {
+        return fsFolderDao.getPageForLazy2(parent, first, pageSize);
+    }
 
     @Override
     public int getMaxNumberOfRows(FSFolder parent) {
@@ -130,6 +135,52 @@ public class CMISServiceImpl implements CMISService {
     public List<FSObject> getPageForLazySearchQuery(int first, int pageSize, Map<Integer, Object> query) {
 
         return fsFolderDao.find(query).subList(first, first + pageSize);
+    }
+
+    @Override
+    public Map<String, Object> getPageForLazySearchQuery2(int first, int pageSize, String query) {
+        List<FSObject> result = fsFolderDao.find(query);
+        int dataSize = result.size();
+        Map<String, Object> page = new HashMap<String, Object>();
+        page.put("datasize", dataSize);
+        if (dataSize > pageSize) {
+            if ((first + pageSize) > dataSize) {
+                logger.log(Level.INFO, "============IN FIND====31==============");
+                page.put("page", result.subList(first, dataSize));
+                return page;
+            } else {
+                logger.log(Level.INFO, "============IN FIND====32==============");
+                page.put("page", result.subList(first, first + pageSize));
+                return page;
+            }
+        } else {
+            logger.log(Level.INFO, "============IN FIND====4==============");
+            page.put("page", result.subList(first, dataSize));
+            return page;
+        }
+    }
+
+    @Override
+    public Map<String, Object> getPageForLazySearchQuery2(int first, int pageSize, Map<Integer, Object> query) {
+        List<FSObject> result = fsFolderDao.find(query);
+        int dataSize = result.size();
+        Map<String, Object> page = new HashMap<String, Object>();
+        page.put("datasize", dataSize);
+        if (dataSize > pageSize) {
+            if ((first + pageSize) > dataSize) {
+                logger.log(Level.INFO, "============IN FIND====31==============");
+                page.put("page", result.subList(first, dataSize));
+                return page;
+            } else {
+                logger.log(Level.INFO, "============IN FIND====32==============");
+                page.put("page", result.subList(first, first + pageSize));
+                return page;
+            }
+        } else {
+            logger.log(Level.INFO, "============IN FIND====4==============");
+            page.put("page", result.subList(first, dataSize));
+            return page;
+        }
     }
 
     @Override

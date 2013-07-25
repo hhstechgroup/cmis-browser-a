@@ -31,6 +31,8 @@ public interface CMISService {
     public List<FSObject> getPageForLazySearchQuery(int first,int pageSize, String query);
 
     public List<FSObject> getPageForLazySearchQuery(int first,int pageSize, Map<Integer, Object> query);
+    public Map<String, Object> getPageForLazySearchQuery2(int first, int pageSize, Map<Integer, Object> query);
+    public Map<String, Object> getPageForLazySearchQuery2(int first, int pageSize, String query);
     /**
      * Return a list children of our parent fsFolder folder
      *
@@ -47,6 +49,7 @@ public interface CMISService {
      * @return List of FSObjects on the page
      */
     public List<FSObject> getPageForLazy(FSFolder parent, int first, int pageSize) throws BaseException;
+    public Map<String, Object> getPageForLazy2(FSFolder parent, int first, int pageSize) throws BaseException;
 
     /**
      * Return a root folder from our repository
