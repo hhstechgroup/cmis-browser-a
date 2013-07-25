@@ -139,48 +139,48 @@ public class CMISServiceImpl implements CMISService {
 
     @Override
     public Map<String, Object> getPageForLazySearchQuery2(int first, int pageSize, String query) {
-        List<FSObject> result = fsFolderDao.find(query);
-        int dataSize = result.size();
-        Map<String, Object> page = new HashMap<String, Object>();
-        page.put("datasize", dataSize);
-        if (dataSize > pageSize) {
-            if ((first + pageSize) > dataSize) {
-                logger.log(Level.INFO, "============IN FIND====31==============");
-                page.put("page", result.subList(first, dataSize));
-                return page;
-            } else {
-                logger.log(Level.INFO, "============IN FIND====32==============");
-                page.put("page", result.subList(first, first + pageSize));
-                return page;
-            }
-        } else {
-            logger.log(Level.INFO, "============IN FIND====4==============");
-            page.put("page", result.subList(first, dataSize));
-            return page;
-        }
+        return fsFolderDao.find2(first, pageSize, query);
+//        int dataSize = result.size();
+//        Map<String, Object> page = new HashMap<String, Object>();
+//        page.put("datasize", dataSize);
+//        if (dataSize > pageSize) {
+//            if ((first + pageSize) > dataSize) {
+//                logger.log(Level.INFO, "============IN FIND====31==============");
+//                page.put("page", result.subList(first, dataSize));
+//                return page;
+//            } else {
+//                logger.log(Level.INFO, "============IN FIND====32==============");
+//                page.put("page", result.subList(first, first + pageSize));
+//                return page;
+//            }
+//        } else {
+//            logger.log(Level.INFO, "============IN FIND====4==============");
+//            page.put("page", result.subList(first, dataSize));
+//            return page;
+//        }
     }
 
     @Override
     public Map<String, Object> getPageForLazySearchQuery2(int first, int pageSize, Map<Integer, Object> query) {
-        List<FSObject> result = fsFolderDao.find(query);
-        int dataSize = result.size();
-        Map<String, Object> page = new HashMap<String, Object>();
-        page.put("datasize", dataSize);
-        if (dataSize > pageSize) {
-            if ((first + pageSize) > dataSize) {
-                logger.log(Level.INFO, "============IN FIND====31==============");
-                page.put("page", result.subList(first, dataSize));
-                return page;
-            } else {
-                logger.log(Level.INFO, "============IN FIND====32==============");
-                page.put("page", result.subList(first, first + pageSize));
-                return page;
-            }
-        } else {
-            logger.log(Level.INFO, "============IN FIND====4==============");
-            page.put("page", result.subList(first, dataSize));
-            return page;
-        }
+        return  fsFolderDao.find2(first, pageSize, query);
+//        int dataSize = result.size();
+//        Map<String, Object> page = new HashMap<String, Object>();
+//        page.put("datasize", dataSize);
+//        if (dataSize > pageSize) {
+//            if ((first + pageSize) > dataSize) {
+//                logger.log(Level.INFO, "============IN FIND====31==============");
+//                page.put("page", result.subList(first, dataSize));
+//                return page;
+//            } else {
+//                logger.log(Level.INFO, "============IN FIND====32==============");
+//                page.put("page", result.subList(first, first + pageSize));
+//                return page;
+//            }
+//        } else {
+//            logger.log(Level.INFO, "============IN FIND====4==============");
+//            page.put("page", result.subList(first, dataSize));
+//            return page;
+//        }
     }
 
     @Override

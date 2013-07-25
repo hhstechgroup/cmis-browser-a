@@ -391,33 +391,46 @@ public class TreeBean implements Serializable {
         logger.log(Level.INFO, "==___________findAdvanced()____");
 
 
-        if (findQuery != "") {
+        if (findQuery != "" && findQuery != null) {
             searchQueryAdvanced.put(1, "%" + findQuery + "%");
         } else {
-            searchQueryAdvanced.put(1, findQuery);
+            searchQueryAdvanced.put(1, "");
         }
 
-        if (metaDataType != null) {
+        if (metaDataType != "" && metaDataType != null ) {
             searchQueryAdvanced.put(2, metaDataType);
         } else {
             searchQueryAdvanced.put(2, "");
         }
-        if (docType != "") {
+        if (docType != "" && docType != null && cmisType.equals("cmis:document")) {
             searchQueryAdvanced.put(3, "%." + docType);
         } else {
-            searchQueryAdvanced.put(3, docType);
+            searchQueryAdvanced.put(3, "");
         }
-        searchQueryAdvanced.put(4, snippet);
+        if (snippet != "" && snippet != null && cmisType.equals("cmis:document")) {
+            searchQueryAdvanced.put(4, snippet);
+        } else {
+            searchQueryAdvanced.put(4, "");
+        }
 
-        if (contentType != null) {
+        if ( contentType != null && contentType != "") {
             searchQueryAdvanced.put(5, contentType);
         } else {
             searchQueryAdvanced.put(5, "");
         }
         searchQueryAdvanced.put(6, calendarFrom);
         searchQueryAdvanced.put(7, calendarTo);
-        searchQueryAdvanced.put(8, sizeFrom);
-        searchQueryAdvanced.put(9, sizeTo);
+        if ( sizeFrom != null && sizeFrom != "" && cmisType.equals("cmis:document")) {
+            searchQueryAdvanced.put(8, sizeFrom);
+        } else {
+            searchQueryAdvanced.put(8, "");
+        }
+        if ( sizeTo != null && sizeTo != "" && cmisType.equals("cmis:document")) {
+            searchQueryAdvanced.put(9, sizeTo);
+        } else {
+            searchQueryAdvanced.put(9, "");
+        }
+
         logger.log(Level.INFO, "==______BEFORE_____BOOOOOOOOOOOOOOOM~!!!!____");
         getLazyModel().setSearchQueryAdvanced(searchQueryAdvanced);
 
@@ -512,6 +525,7 @@ public class TreeBean implements Serializable {
         } else {
             this.sizeFrom = "";
         }
+        logger.log(Level.INFO, "___________SIZE___" + this.sizeFrom + ">");
     }
 
     public String getContentType() {
