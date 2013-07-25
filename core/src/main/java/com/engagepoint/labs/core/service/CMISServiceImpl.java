@@ -153,8 +153,8 @@ public class CMISServiceImpl implements CMISService {
     }
 
     @Override
-    public FSFolder move(FSFolder source, FSFolder target) throws BrowserRuntimeException {
-        return fsFolderDao.move(source, target);
+    public void move(FSFolder source, FSFolder target) throws BrowserRuntimeException {
+        fsFolderDao.move(source, target);
     }
 
     @Override

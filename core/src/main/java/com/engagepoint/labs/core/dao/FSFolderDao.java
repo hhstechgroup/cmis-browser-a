@@ -82,7 +82,7 @@ public interface FSFolderDao {
 
     public boolean hasChildren(FSFolder folder) throws BaseException;
 
-    public FSFolder move(FSFolder source, FSFolder target) throws BrowserRuntimeException;
+    public void move(FSFolder source, FSFolder target) throws BrowserRuntimeException;
 
     public void move(FSFile source) throws BrowserRuntimeException;
 

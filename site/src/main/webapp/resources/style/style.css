@@ -139,6 +139,7 @@
     color: #000000;
     font-family: MuseoSans700, sans-serif;
 }
+
 .ui-dialog.ui-widget-content .ui-inputfield {
     color: #000000;
 }
@@ -158,4 +159,11 @@
 
 .ui-accordion .ui-widget-header {
     color: #ffffff;
+}
+
+.ui-accordion .ui-radiobutton {
+}
+
+.ui-accordion .ui-accordion-content.ui-widget-content .ui-selectoneradio {
+    border-color: rgb(238, 238, 238);
 }

@@ -247,10 +247,15 @@ public class ActionBean implements Serializable {
     public void delete(FSObject object) {
         if (object instanceof FSFolder) {
             deleteAllTree(object);
-            treeBean.getParent().setPath(object.getParent().getPath());
-            treeBean.updateTree(treeBean.getSelectedNode().getParent());
+            if (treeBean.isRowSelected()) {
+                treeBean.getParent().setPath(((FSFolder)treeBean.getCachedNode().getData()).getPath());
+                treeBean.updateTree(treeBean.getCachedNode());
+            } else {
+                treeBean.getParent().setPath(((FSFolder)treeBean.getCachedNode().getParent().getData()).getPath());
+                treeBean.updateTree(treeBean.getCachedNode().getParent());
+                treeBean.setSelectedNode(treeBean.getCachedNode().getParent());
+            }
         } else {
-            logger.log(Level.INFO, "deleteSelect++++++" + object.getName());
             cmisService.deleteFile((FSFile) object);
         }
     }

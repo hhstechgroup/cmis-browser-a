@@ -72,13 +72,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
             newFolderProps.put(PropertyIds.OBJECT_TYPE_ID, "cmis:folder");
             newFolderProps.put(PropertyIds.NAME, folderName);
             Folder newFolder = cmisParent.createFolder(newFolderProps);
-            folder = new FSFolder();
-            folder.setPath(newFolder.getPath());
-            folder.setName(newFolder.getName());
-            folder.setParent(parent);
-            folder.setId(newFolder.getId());
-            folder.setTypeId(newFolder.getType().getDisplayName());
-            folder.setParentTypeId(newFolder.getType().getParentTypeId());
+            folder = (FSFolder) fsFileDao.convertCmisObjectToFSObject(newFolder, parent);
         } catch (CmisNameConstraintViolationException ex) {
             throw new FolderAlreadyExistException(ex.getMessage());
         } catch (CmisBaseException e) {
@@ -90,33 +84,12 @@ public class FSFolderDaoImpl implements FSFolderDao {
 
     @Override
     public List<FSObject> getChildren(FSFolder parent) throws BaseException /*throws BaseException*/ {
-        String notRootFolder = parent.getPath().equals("/") ? "" : parent.getPath();
         List<FSObject> children = new ArrayList<FSObject>();
         Folder cmisParent = (Folder) session.getObjectByPath(parent.getPath());
         ItemIterable<CmisObject> cmisChildren = cmisParent.getChildren();
         try {
             for (CmisObject o : cmisChildren) {
-                FSObject fsObject;
-                if (o instanceof Folder) {
-                    fsObject = new FSFolder();
-                    fsObject.setPath(((Folder) o).getPath());
-                } else {
-                    fsObject = new FSFile();
-                    fsObject.setMimetype(((Document) o).getContentStreamMimeType());
-                    ((FSFile) fsObject).setVersionable(((DocumentType) (o.getType())).isVersionable());
-                    fsObject.setPath(notRootFolder);
-                    fsObject.setSize(String.valueOf(((Document) o).getContentStreamLength() / 1024));
-                    ((FSFile) fsObject).setAbsolutePath(notRootFolder + "/" + o.getName());
-                }
-                fsObject.setParentTypeId(o.getType().getParentTypeId());
-                fsObject.setCreatedBy(o.getCreatedBy());
-                fsObject.setCreationTime(o.getCreationDate().getTime());
-                fsObject.setLastModifiedBy(o.getLastModifiedBy());
-                fsObject.setLastModifiedTime(o.getLastModificationDate().getTime());
-                fsObject.setTypeId(o.getBaseType().getDisplayName());
-                fsObject.setName(o.getName());
-                fsObject.setId(o.getId());
-                fsObject.setParent(parent);
+                FSObject fsObject = fsFileDao.convertCmisObjectToFSObject(o, parent);
                 children.add(fsObject);
             }
         } catch (CmisObjectNotFoundException e) {
@@ -149,11 +122,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
     @Override
     public FSFolder getRoot() {
         Folder cmisRoot = session.getRootFolder();
-        FSFolder root = new FSFolder();
-        root.setName(cmisRoot.getName());
-        root.setPath(cmisRoot.getPath());
-        root.setId(cmisRoot.getId());
-        root.setTypeId(cmisRoot.getBaseType().getDisplayName());
+        FSFolder root = (FSFolder) fsFileDao.convertCmisObjectToFSObject(cmisRoot, null);
         return root;
     }
 
@@ -171,14 +140,14 @@ public class FSFolderDaoImpl implements FSFolderDao {
         if (!find(query).isEmpty()) {
             logger.log(Level.INFO, find(query).get(0).getName());
         }
-        int total = (int) find(query).size();
+        int total = find(query).size();
         return total;
     }
 
     @Override
     public List<FSObject> getPageForLazySearchQuery(int first, int pageSize, String query) {
 
-        return (List<FSObject>) find(query).subList(first, first + pageSize);
+        return find(query).subList(first, first + pageSize);
     }
 
     @Override
@@ -197,7 +166,6 @@ public class FSFolderDaoImpl implements FSFolderDao {
 
     @Override
     public List<FSObject> getPageForLazy(FSFolder parent, int first, int pageSize) throws BaseException {
-        String notRootFolder = parent.getPath().equals("/") ? "" : parent.getPath();
         List<FSObject> children = new ArrayList<FSObject>();
         Folder cmisParent = (Folder) session.getObjectByPath(parent.getPath());
 
@@ -207,27 +175,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
         ItemIterable<CmisObject> cmisChildren = childrenCmis.skipTo(first).getPage();
         try {
             for (CmisObject o : cmisChildren) {
-                FSObject fsObject;
-                if (o instanceof Folder) {
-                    fsObject = new FSFolder();
-                    fsObject.setPath(((Folder) o).getPath());
-                } else {
-                    fsObject = new FSFile();
-                    fsObject.setMimetype(((Document) o).getContentStreamMimeType());
-                    fsObject.setPath(notRootFolder);
-                    ((FSFile) fsObject).setVersionable(((DocumentType) (o.getType())).isVersionable());
-                    fsObject.setSize(String.valueOf(((Document) o).getContentStreamLength() / 1024));
-                    ((FSFile) fsObject).setAbsolutePath(notRootFolder + "/" + o.getName());
-                }
-                fsObject.setParentTypeId(o.getType().getParentTypeId());
-                fsObject.setCreatedBy(o.getCreatedBy());
-                fsObject.setCreationTime(o.getCreationDate().getTime());
-                fsObject.setLastModifiedBy(o.getLastModifiedBy());
-                fsObject.setLastModifiedTime(o.getLastModificationDate().getTime());
-                fsObject.setTypeId(o.getType().getId());
-                fsObject.setName(o.getName());
-                fsObject.setId(o.getId());
-                fsObject.setParent(parent);
+                FSObject fsObject = fsFileDao.convertCmisObjectToFSObject(o, parent);
                 children.add(fsObject);
             }
         } catch (CmisObjectNotFoundException e) {
@@ -265,6 +213,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
             Map<String, String> newFolderProps = new HashMap<String, String>();
             newFolderProps.put(PropertyIds.NAME, newName);
             cmisFolder.updateProperties(newFolderProps);
+            folder = (FSFolder) fsFileDao.convertCmisObjectToFSObject(cmisFolder, folder.getParent());
             folder.setName(cmisFolder.getName());
             folder.setPath(cmisFolder.getPath());
         } catch (CmisNameConstraintViolationException ex) {
@@ -278,7 +227,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
 
     @Override
     public boolean hasChildren(FSFolder folder) throws BaseException {
-        List<FSObject> children = null;
+        List<FSObject> children;
         try {
             children = getChildren(folder);
         } catch (ConnectionException e) {
@@ -290,7 +239,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
     }
 
     @Override
-    public FSFolder move(FSFolder source, FSFolder target) throws BrowserRuntimeException {
+    public void move(FSFolder source, FSFolder target) throws BrowserRuntimeException {
         Folder cmisFolder1 = (Folder) session.getObjectByPath(source.getPath());
         Folder cmisFolder2 = (Folder) session.getObjectByPath(target.getPath());
         Folder parent = cmisFolder1.getFolderParent();
@@ -301,7 +250,6 @@ public class FSFolderDaoImpl implements FSFolderDao {
         } catch (CmisRuntimeException e) {
             throw new BrowserRuntimeException("Cant move folder!");
         }
-        return source;
     }
 
     @Override
@@ -368,17 +316,6 @@ public class FSFolderDaoImpl implements FSFolderDao {
             parseFSFolder(files, objectIdQueryName, Results);
             logger.log(Level.INFO, "====Parse folder=====");
         }
-//        myType = "cmis:folder";
-//        type = session.getTypeDefinition(myType);
-//        objectIdPropDef = type.getPropertyDefinitions().get(PropertyIds.OBJECT_ID);
-//        objectIdQueryName = objectIdPropDef.getQueryName();
-////        logger.log(Level.INFO, "============DAOOOOOOO!======" );
-//        queryString = getQuery(query, type);
-////        logger.log(Level.INFO, "============DAOOOOOOO!!======" );
-//        ItemIterable<QueryResult> folderResults = session.query(queryString, false);
-////        logger.log(Level.INFO, "============DAOOOOOOO!!!======" );
-//        parseFSFolder(files, objectIdQueryName, folderResults);
-////        logger.log(Level.INFO, "============DAOOOOOOO!!!!======" );
         return files;
     }
 
@@ -396,14 +333,9 @@ public class FSFolderDaoImpl implements FSFolderDao {
         String queryString = getFullQuery(query, type);
         ItemIterable<QueryResult> folderResults = session.query(queryString, false);
         for (QueryResult qResult : folderResults) {
-            FSFolder fsFolder = new FSFolder();
             String objectId = qResult.getPropertyValueByQueryName(objectIdQueryName);
             Folder folder = (Folder) session.getObject(session.createObjectId(objectId));
-            fsFolder.setPath(folder.getPath());
-            fsFolder.setName(folder.getName());
-            fsFolder.setId(folder.getId());
-            fsFolder.setTypeId(folder.getType().getDisplayName());
-            fsFolder.setParentTypeId(folder.getType().getParentTypeId());
+            FSFolder fsFolder = (FSFolder) fsFileDao.convertCmisObjectToFSObject(folder, null);
             files.add(fsFolder);
         }
     }
@@ -432,20 +364,9 @@ public class FSFolderDaoImpl implements FSFolderDao {
         ItemIterable<QueryResult> fileResult = session.query(queryString, false);
         String objectIdQueryName = objectIdPropDef.getQueryName();
         for (QueryResult qResult : fileResult) {
-            FSFile fsFile = new FSFile();
             String objectId = qResult.getPropertyValueByQueryName(objectIdQueryName);
             Document doc = (Document) session.getObject(session.createObjectId(objectId));
-            fsFile.setName(doc.getName());
-            fsFile.setId(doc.getId());
-            fsFile.setVersionable(((DocumentType) (doc.getType())).isVersionable());
-            fsFile.setTypeId(doc.getType().getId());
-            fsFile.setParentTypeId(doc.getType().getParentTypeId());
-            fsFile.setCreatedBy(doc.getCreatedBy());
-            fsFile.setCreationTime(doc.getCreationDate().getTime());
-            fsFile.setLastModifiedBy(doc.getLastModifiedBy());
-            fsFile.setLastModifiedTime(doc.getLastModificationDate().getTime());
-            fsFile.setAbsolutePath(doc.getPaths().get(0));
-            fsFile.setSize(String.valueOf(doc.getContentStreamLength()));
+            FSFile fsFile = (FSFile) fsFileDao.convertCmisObjectToFSObject(doc, null);
             files.add(fsFile);
         }
     }
@@ -519,33 +440,18 @@ public class FSFolderDaoImpl implements FSFolderDao {
 
     private void parseFSFile(List<FSObject> files, String objectIdQueryName, ItemIterable<QueryResult> fileResult) {
         for (QueryResult qResult : fileResult) {
-            FSFile fsFile = new FSFile();
             String objectId = qResult.getPropertyValueByQueryName(objectIdQueryName);
             Document doc = (Document) session.getObject(session.createObjectId(objectId));
-            fsFile.setName(doc.getName());
-            fsFile.setId(doc.getId());
-            fsFile.setTypeId(doc.getType().getId());
-            fsFile.setParentTypeId(doc.getType().getParentTypeId());
-            fsFile.setCreatedBy(doc.getCreatedBy());
-            fsFile.setCreationTime(doc.getCreationDate().getTime());
-            fsFile.setLastModifiedBy(doc.getLastModifiedBy());
-            fsFile.setLastModifiedTime(doc.getLastModificationDate().getTime());
-            fsFile.setAbsolutePath(doc.getPaths().get(0));
-            fsFile.setSize(String.valueOf(doc.getContentStreamLength()));
+            FSFile fsFile = (FSFile) fsFileDao.convertCmisObjectToFSObject(doc, null);
             files.add(fsFile);
         }
     }
 
     private void parseFSFolder(List<FSObject> files, String objectIdQueryName, ItemIterable<QueryResult> folderResults) {
         for (QueryResult qResult : folderResults) {
-            FSFolder fsFolder = new FSFolder();
             String objectId = qResult.getPropertyValueByQueryName(objectIdQueryName);
             Folder folder = (Folder) session.getObject(session.createObjectId(objectId));
-            fsFolder.setPath(folder.getPath());
-            fsFolder.setName(folder.getName());
-            fsFolder.setId(folder.getId());
-            fsFolder.setTypeId(folder.getType().getDisplayName());
-            fsFolder.setParentTypeId(folder.getType().getParentTypeId());
+            FSFolder fsFolder = (FSFolder) fsFileDao.convertCmisObjectToFSObject(folder, null);
             files.add(fsFolder);
         }
     }

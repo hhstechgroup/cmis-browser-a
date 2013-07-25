@@ -24,6 +24,7 @@
     color: #000000;
     font-family: MuseoSans700, sans-serif;
 }
+
 .default:focus{
     outline: none;
 }

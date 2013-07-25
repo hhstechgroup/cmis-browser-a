@@ -36,8 +36,8 @@ public class ConfigBean implements Serializable {
     private final static String lastModifiedDateColumnRender = "lastModifiedDateColumnRender";
 
     private Preferences prefs;
-    private String repoURL;
-    private String repoName;
+    private String repoURL = "";
+    private String repoName = "";
     private Logger logger = Logger.getLogger(ConfigBean.class.getName());
 
     private boolean name = true;

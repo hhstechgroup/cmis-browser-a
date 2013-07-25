@@ -84,7 +84,7 @@ public interface CMISService {
 
     public InputStream getInputStream(FSFile file) throws BaseException;
 
-    public FSFolder move(FSFolder source, FSFolder target) throws BrowserRuntimeException;
+    public void move(FSFolder source, FSFolder target) throws BrowserRuntimeException;
 
     public void copyFolder(FSFolder folder, String name, String targetID) throws FolderAlreadyExistException;
 

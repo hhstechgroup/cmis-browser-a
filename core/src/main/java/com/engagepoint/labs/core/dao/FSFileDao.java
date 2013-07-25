@@ -48,4 +48,5 @@ public interface FSFileDao {
 
     public FSFile getHistory(FSFile file);
 
+    public FSObject convertCmisObjectToFSObject(CmisObject cmisObject, FSFolder parent);
 }

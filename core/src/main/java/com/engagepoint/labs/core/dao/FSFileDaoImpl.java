@@ -2,6 +2,7 @@ package com.engagepoint.labs.core.dao;
 
 import com.engagepoint.labs.core.models.FSFile;
 import com.engagepoint.labs.core.models.FSFolder;
+import com.engagepoint.labs.core.models.FSObject;
 import com.engagepoint.labs.core.models.exceptions.BaseException;
 import com.engagepoint.labs.core.models.exceptions.FileAlreadyExistException;
 import com.engagepoint.labs.core.models.exceptions.FileNotFoundException;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -39,16 +41,10 @@ public class FSFileDaoImpl implements FSFileDao {
         this.session = session;
     }
 
-    public Session getSession() {
-        return session;
-    }
-
     @Override
     public FSFile create(FSFolder parent, String fileName, byte[] content, String mimeType) throws BaseException {
-        FSFile file = null;
+        FSFile file;
         try {
-            String notRootFolder = parent.getPath().equals("/") ? "" : parent.getPath();
-
             ByteArrayInputStream input = new ByteArrayInputStream(content);
 
             ContentStream contentStream = session.getObjectFactory().createContentStream(fileName, content.length, mimeType, input);
@@ -60,20 +56,7 @@ public class FSFileDaoImpl implements FSFileDao {
             Folder cmisParent = (Folder) session.getObjectByPath(parent.getPath());
             Document doc = cmisParent.createDocument(properties, contentStream, VersioningState.NONE);
 
-            file = new FSFile();
-
-            file.setMimetype(mimeType);
-            file.setPath(notRootFolder);
-            file.setAbsolutePath(notRootFolder + "/" + fileName);
-            file.setName(doc.getName());
-            file.setParent(parent);
-            file.setId(doc.getId());
-            file.setTypeId(doc.getType().getId());
-            file.setParentTypeId(doc.getType().getParentTypeId());
-            file.setCreatedBy(doc.getCreatedBy());
-            file.setCreationTime(doc.getCreationDate().getTime());
-            file.setLastModifiedBy(doc.getLastModifiedBy());
-            file.setLastModifiedTime(doc.getLastModificationDate().getTime());
+            file = (FSFile) convertCmisObjectToFSObject(doc, parent);
         } catch (CmisNameConstraintViolationException ex) {
             throw new FileAlreadyExistException(ex.getMessage());
         } catch (CmisBaseException e) {
@@ -132,15 +115,8 @@ public class FSFileDaoImpl implements FSFileDao {
                     throw new BaseException(e.getMessage());
                 }
             }
-            file.setMimetype(mimeType);
-            file.setLastModifiedBy(cmisFile.getLastModifiedBy());
-            file.setLastModifiedTime(cmisFile.getLastModificationDate().getTime());
-            file.setTypeId(cmisFile.getBaseType().getDisplayName());
-            file.setSize(String.valueOf(contentStream.getLength() / 1024));
-            file.setParentTypeId(cmisFile.getType().getParentTypeId());
-            file.setName(cmisFile.getName());
-            file.setAbsolutePath(cmisFile.getPaths().get(0));
         }
+        file = (FSFile) convertCmisObjectToFSObject(cmisFile, file.getParent());
         return file;
     }
 
@@ -153,8 +129,8 @@ public class FSFileDaoImpl implements FSFileDao {
 
     @Override
     public InputStream getInputStream(FSFile file) throws BaseException {
-        Document cmisFile = null;
-        ContentStream contentStream = null;
+        Document cmisFile;
+        ContentStream contentStream;
         try {
             cmisFile = (Document) session.getObject(file.getId());
             contentStream = cmisFile.getContentStream();
@@ -171,7 +147,6 @@ public class FSFileDaoImpl implements FSFileDao {
     public boolean copy(String id, String newName, String targetId) throws BaseException {
         String tempName = "TempCopyName";
         Document document = (Document) session.getObject(id);
-        Folder folder = (Folder) session.getObject(targetId);
         String defaultName = document.getName();
 
         ObjectId targetObjId = new ObjectIdImpl(targetId);
@@ -211,24 +186,43 @@ public class FSFileDaoImpl implements FSFileDao {
             List<Document> versions = cmisFile.getAllVersions();
             List<FSFile> fileVersions = new ArrayList<FSFile>(versions.size());
             for (Document version : versions) {
-                FSFile versionFile = new FSFile();
-                versionFile.setName(version.getName());
+                FSFile versionFile = (FSFile) convertCmisObjectToFSObject(version, file.getParent());
                 versionFile.setVersionLabel(version.getVersionLabel());
-                versionFile.setLastModifiedBy(version.getLastModifiedBy());
-                versionFile.setLastModifiedTime(version.getLastModificationDate().getTime());
-                versionFile.setSize(String.valueOf(version.getContentStreamLength() / 1024));
-                versionFile.setId(version.getId());
-                versionFile.setVersionable(true);
-                versionFile.setMimetype(version.getContentStreamMimeType());
-                versionFile.setTypeId(version.getBaseType().getDisplayName());
-                versionFile.setParentTypeId(version.getType().getParentTypeId());
-                versionFile.setAbsolutePath(version.getPaths().get(0));
                 fileVersions.add(versionFile);
             }
             file.setAllVersions(fileVersions);
             return file;
         }
         return null;
+    }
+
+    public FSObject convertCmisObjectToFSObject(CmisObject cmisObject, FSFolder parent) {
+        FSObject fsObject;
+        if (cmisObject instanceof Folder) {
+            fsObject = new FSFolder();
+            fsObject.setPath(((Folder) cmisObject).getPath());
+        } else {
+            fsObject = new FSFile();
+            fsObject.setMimetype(((Document) cmisObject).getContentStreamMimeType());
+            if (parent != null) {
+                fsObject.setPath(parent.getPath());
+            }
+            ((FSFile) fsObject).setVersionable(((DocumentType) (cmisObject.getType())).isVersionable());
+            fsObject.setSize(String.valueOf(((Document) cmisObject).getContentStreamLength() / 1024));
+            ((FSFile) fsObject).setAbsolutePath(((Document) cmisObject).getPaths().get(0));
+        }
+        fsObject.setParentTypeId(cmisObject.getType().getParentTypeId());
+        fsObject.setCreatedBy(cmisObject.getCreatedBy());
+        fsObject.setCreationTime(cmisObject.getCreationDate().getTime());
+        fsObject.setLastModifiedBy(cmisObject.getLastModifiedBy());
+        fsObject.setLastModifiedTime(cmisObject.getLastModificationDate().getTime());
+        fsObject.setTypeId(cmisObject.getType().getId());
+        fsObject.setName(cmisObject.getName());
+        fsObject.setId(cmisObject.getId());
+        if (parent != null) {
+            fsObject.setParent(parent);
+        }
+        return fsObject;
     }
 
 }

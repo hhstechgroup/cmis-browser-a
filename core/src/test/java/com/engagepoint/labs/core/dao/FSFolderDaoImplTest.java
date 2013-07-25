@@ -1,14 +1,15 @@
-/*
 package com.engagepoint.labs.core.dao;
 
-*/
+import org.junit.Test;
+
 /**
- * Created with IntelliJ IDEA.
- * User: r.reznichenko
- * Date: 6/18/13
- * Time: 12:15 PM
- * To change this template use File | Settings | File Templates.
- *//*
+* Created with IntelliJ IDEA.
+* User: r.reznichenko
+* Date: 6/18/13
+* Time: 12:15 PM
+* To change this template use File | Settings | File Templates.
+*/
+
 
 
 import com.engagepoint.labs.core.models.FSFolder;
@@ -34,7 +35,7 @@ public class FSFolderDaoImplTest {
     @BeforeClass
     public static void setUPclass() throws Exception {
         fsFolderDao = new FSFolderDaoImpl();
-        session = ConnectionFactory.getSession();
+        session = ConnectionFactory.getInstance().getSession();
         fsFolderDao.setSession(session);
     }
 
@@ -68,7 +69,7 @@ public class FSFolderDaoImplTest {
     @Test
     public void testGetChildren() throws Exception {
         FSFolder test = fsFolderDao.create(actual, "test");
-        Folder cmisTest = (Folder) ConnectionFactory.getSession().getObjectByPath(test.getPath());
+        Folder cmisTest = (Folder) ConnectionFactory.getInstance().getSession().getObjectByPath(test.getPath());
         FSFolder expected = new FSFolder();
         expected.setPath("/junit_test_folder/test");
         expected.setId(cmisTest.getId());
@@ -105,4 +106,4 @@ public class FSFolderDaoImplTest {
 //        fsFolderDao.copyFolder(source.getId(),target.getId());
 //        fsFolderDao.delete(actual);
 //    }
-}*/
+}
