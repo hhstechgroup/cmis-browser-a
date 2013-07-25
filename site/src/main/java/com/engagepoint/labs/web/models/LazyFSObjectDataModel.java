@@ -3,10 +3,13 @@ package com.engagepoint.labs.web.models;
 import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
 import com.engagepoint.labs.core.models.exceptions.BaseException;
+import com.engagepoint.labs.core.models.exceptions.FolderNotFoundException;
 import com.engagepoint.labs.core.service.CMISService;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortMeta;
 
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -74,13 +77,27 @@ public class
                 if (dataSize > pageSize) {
                     try {
                         data = cmisService.getPageForLazy(parent, first, pageSize);
+                    } catch (FolderNotFoundException ex) {
+                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Folder !",
+                                ex.getMessage()));
                     } catch (BaseException e) {
+                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Folder !",
+                                e.getMessage()));
                     }
                     return data;
                 } else {
                     try {
                         data = cmisService.getPageForLazy(parent, 0, pageSize);
+                    } catch (FolderNotFoundException ex) {
+                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Folder !",
+                                ex.getMessage()));
                     } catch (BaseException e) {
+                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Folder !",
+                                e.getMessage()));
                     }
                     return data;
                 }

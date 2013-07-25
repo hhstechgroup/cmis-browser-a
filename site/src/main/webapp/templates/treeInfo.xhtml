@@ -14,9 +14,7 @@
     <ui:composition>
         <h:outputStylesheet library="style" name="style.css"/>
         <h:outputScript library="js" name="native_but.js"/>
-
-        <p:messages id="erro" showDetail="true" autoUpdate="true"/>
-
+        <p:messages id="erro" closable="true" redisplay="false" showDetail="true" autoUpdate="true"/>
         <ct:cmisBrowserComponent id="cmisbrowser"
                                  Name="#{config.name}"
                                  TypeId="#{config.typeId}"
@@ -124,7 +122,7 @@
                   showEffect="fade"
                   hideEffect="fade"
                   modal="true"
-                  resizable="false">
+                  resizable="true">
             <ct:cmisBrowserComponent id="cmisbrowserdialog"/>
 
             <p:commandButton value="View as Web Page" type="button" onclick="TreeinDialog.hide()"/>

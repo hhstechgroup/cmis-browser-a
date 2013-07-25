@@ -2,7 +2,9 @@ package com.engagepoint.labs.core.dao;
 
 import com.engagepoint.labs.core.models.FSFile;
 import com.engagepoint.labs.core.models.FSFolder;
+import com.engagepoint.labs.core.models.FSObject;
 import com.engagepoint.labs.core.models.exceptions.BaseException;
+import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.Session;
 
 import java.io.InputStream;

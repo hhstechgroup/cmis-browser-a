@@ -14,3 +14,148 @@
 .ui-widget-overlay {
     background: none repeat scroll 0 0 #c3c3c3;
 }
+
+.ui-menubutton .ui-button {
+    color: #ffffff;
+    background: rgb(40, 153, 183);
+}
+
+@font-face {
+    font-family: MuseoSans_500;
+    src: url("fonts/MuseoSans_500-webfont.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: MuseoSans700;
+    src: url("fonts/museosans_700-webfont.ttf") format("truetype");
+}
+
+.ui-menuitem-text {
+    font-family: MuseoSans700, sans-serif;
+    font-size: 16px;
+    padding: 0px 4px;
+    line-height: 20px;
+    color: white;
+    cursor: pointer;
+}
+
+.ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem a {
+    border: 1px solid rgb(40, 153, 210);
+    background: rgb(40, 153, 183);
+}
+
+.ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem a:hover {
+    /*border: 1px solid rgb(40, 153, 210);*/
+    background: rgb(40, 142, 172);
+}
+
+.ui-buttonset .ui-button {
+    background: -webkit-linear-gradient(top, rgb(105, 105, 104), rgb(53, 53, 53)) rgb(238, 238, 238);
+    color: #ffffff;
+}
+
+.ui-button {
+    background: rgb(40, 153, 183);
+    color: #ffffff;
+}
+
+.ui-tabmenu .ui-tabmenu-nav.ui-widget-header {
+    background: rgb(40, 153, 183);
+}
+
+.ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem.ui-state-default {
+    background: rgb(40, 153, 183);
+}
+
+.ui-widget-header {
+    background: rgb(40, 153, 183);
+}
+
+.ui-menu.ui-widget {
+    background: rgb(40, 153, 183);
+}
+
+.ui-state-hover, .ui-widget-content .ui-state-hover {
+    background: rgb(38, 133, 161);
+    color: #ffffff;
+}
+
+.ui-widget-header .ui-state-default {
+    color: #FFFFFF;
+    font-family: MuseoSans700, sans-serif;
+    background: rgb(40, 153, 183);
+}
+
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
+    background: rgb(40, 153, 183);
+    color: #ffffff;
+    text-shadow: none;
+}
+
+.ui-inputfield {
+    background: #000000;
+}
+
+.ui-state-highlight, .ui-widget-content .ui-state-highlight, .ui-widget-header .ui-state-highlight {
+    background-image: none;
+}
+
+.ui-accordion .ui-accordion-header.ui-state-default a {
+    color: #000000;
+}
+
+.ui-widget-content {
+    background: rgb(238, 238, 238);
+}
+
+.ui-widget-header .ui-inputtext {
+    background: #ffffff;
+    border-radius: 11px;
+    margin-bottom: 5px;
+
+    padding: 2px;
+    color: #000000;
+    font-family: MuseoSans700, sans-serif;
+}
+
+.ui-widget-header .ui-inputfield {
+    background: #ffffff;
+    border-radius: 11px;
+    margin-bottom: 5px;
+    padding: 2px;
+    color: #000000;
+    font-family: MuseoSans700, sans-serif;
+}
+
+.ui-dialog.ui-widget-content {
+    background: rgb(238, 238, 238);
+}
+
+.ui-dialog.ui-widget-content .ui-inputtext {
+    background: #ffffff;
+    border-radius: 11px;
+    margin-bottom: 5px;
+    padding: 2px;
+    color: #000000;
+    font-family: MuseoSans700, sans-serif;
+}
+.ui-dialog.ui-widget-content .ui-inputfield {
+    color: #000000;
+}
+
+.ui-dialog.ui-widget-content .ui-dialog-titlebar {
+    background: rgb(238, 238, 238);
+}
+
+.ui-accordion .ui-inputfield {
+    color: #000000;
+}
+
+.ui-accordion .ui-inputtext {
+    background: #ffffff;
+    color: #000000;
+}
+
+.ui-accordion .ui-widget-header {
+    color: #ffffff;
+}

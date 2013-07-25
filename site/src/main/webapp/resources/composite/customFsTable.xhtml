@@ -32,11 +32,13 @@
 </cc:interface>
 
 <cc:implementation>
+    <h:outputStylesheet library="style" name="text.css"/>
+
     <p:dataTable id="tablecomponent"
                  var="fsObject"
                  scrollable="true"
                  value="#{treeBean.lazyModel}"
-                 scrollHeight="400" style="width: 770px;"
+                 scrollHeight="400" style="width: 900px;"
                  emptyMessage="This folder is empty"
                  rowKey="#{fsObject}"
                  selection="#{treeBean.selectedFSObject}"
@@ -47,24 +49,20 @@
                  rowsPerPageTemplate="3,5,10,15"
                  onRowSelectUpdate="display"
                  currentPageReportTemplate="1"
-
-
             >
 
         <p:ajax event="rowSelect" listener="#{treeBean.onRowSelect}"
                 update="@form :#{cc.parent.clientId}:actiondialogs:#{cc.parent.clientId}edit :historyDialogid :copyDialogId"/>
         <f:facet name="header">
             <h:inputText value="#{treeBean.parent.path}"
-                         style="border-radius: 11px;font-size: 16px; margin-bottom: 5px; color: #000000;" size="90"
+                         styleClass="readonly" size="90"
                          disabled="true"/>
 
-
-            <p:inputText id="finditem" value="#{treeBean.findQuery}"/>
+            <p:inputText id="finditem" value="#{treeBean.findQuery}" styleClass="default" style="margin-right: 5px;"/>
             <p:watermark for="finditem" value="name"/>
-
             <p:splitButton id="selectSearch" value="Search" process="tablecomponent"
                            update=":#{cc.parent.clientId}:treeForm:table:tablecomponent"
-                           action="#{treeBean.findAdvanced}">
+                           actionListener="#{treeBean.findAdvanced}">
                 <p:menuitem value="Simple" actionListener="#{treeBean.disableSearchAdvanced}"
                             update=":#{cc.parent.clientId}:treeForm:table:tablecomponent"
                             icon="ui-icon-arrowrefresh-1-w" process="selectSearch"/>
@@ -76,7 +74,7 @@
 
             </p:splitButton>
 
-            <p:outputPanel id="accordion"  rendered="#{treeBean.ableSearchAdvanced}">
+            <p:accordionPanel id="accordion" rendered="#{treeBean.ableSearchAdvanced}">
                 <p:ajax event="tabChange" listener="#{treeBean.ableSearchAdvanced}"/>
                 <p:tab title="Advanced search">
 
@@ -134,7 +132,7 @@
                     </p:outputPanel>
 
                 </p:tab>
-            </p:outputPanel>
+            </p:accordionPanel>
 
             <p:tabMenu id="actiontabmenu" activeIndex="6" rendered="#{cc.attrs.actionPanel}">
                 <p:menuitem>

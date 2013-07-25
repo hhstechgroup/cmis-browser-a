@@ -231,7 +231,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
                 children.add(fsObject);
             }
         } catch (CmisObjectNotFoundException e) {
-            throw new ConnectionException(e.getMessage());
+            throw new FolderNotFoundException(e.getMessage());
         } catch (CmisBaseException e) {
             throw new BaseException(e.getMessage());
         }
@@ -240,7 +240,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
 
     @Override
     public boolean hasChildFolder(FSFolder folder) throws BaseException {
-        List<FSObject> children = null;
+        List<FSObject> children;
         try {
             children = getChildren(folder);
         } catch (ConnectionException e) {
@@ -350,6 +350,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
     public List<FSObject> find(Map<Integer, Object> query) {
         List<FSObject> files = new LinkedList<FSObject>();
         String myType = (String) query.get(0);
+        logger.log(Level.INFO, "myType: "+myType);
         logger.log(Level.INFO, "=========" + myType);
         ObjectType type = session.getTypeDefinition(myType);
         logger.log(Level.INFO, "====!=====");
@@ -456,7 +457,8 @@ public class FSFolderDaoImpl implements FSFolderDao {
         int counter = 0;
 
         for (int i = 1; i < 6; ++i) {
-            if (!query.get(i).equals("")) {
+            logger.log(Level.INFO, "string null ? - " + (query.get(i) == null));
+            if (query.get(i) != "") {
                 if (counter == 0) {
                     plusQuery += " WHERE ";
                 }
@@ -467,10 +469,13 @@ public class FSFolderDaoImpl implements FSFolderDao {
                 if (counter > 0) {
                     plusQuery += " AND ";
                 }
+                logger.log(Level.INFO, "qs.toQueryString(): "+qs.toQueryString());
                 plusQuery += qs.toQueryString();
                 ++counter;
             }
         }
+
+        logger.log(Level.INFO, "ALARM 1");
 
         for (int i = 6; i < 8; ++i) {
             if (query.get(i) != null) {
@@ -489,9 +494,10 @@ public class FSFolderDaoImpl implements FSFolderDao {
             }
         }
 
+        logger.log(Level.INFO, "ALARM 2");
 
         for (int i = 8; i < 10; ++i) {
-            if (query.get(i) != "") {
+            if (query.get(i) != "" && query.get(i) != null) {
                 if (counter == 0) {
                     plusQuery += " WHERE ";
                 }
