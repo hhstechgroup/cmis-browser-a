@@ -10,10 +10,6 @@ import com.engagepoint.labs.core.models.FSFile;
 import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
 import com.engagepoint.labs.core.models.exceptions.*;
-import com.engagepoint.labs.core.models.exceptions.BaseException;
-import com.engagepoint.labs.core.models.exceptions.BrowserRuntimeException;
-import com.engagepoint.labs.core.models.exceptions.ConnectionException;
-import com.engagepoint.labs.core.models.exceptions.FolderAlreadyExistException;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.client.runtime.ObjectIdImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
@@ -25,15 +21,11 @@ import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundExcept
 import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
 
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class FSFolderDaoImpl implements FSFolderDao {
 
     private Session session;
     private FSFileDao fsFileDao;
-    private static Logger logger = Logger.getLogger(FSFolderDaoImpl.class.getName());
-
     private Map<Integer, String> searchAdvancedParametrs;
 
     public FSFolderDaoImpl() {
@@ -144,7 +136,6 @@ public class FSFolderDaoImpl implements FSFolderDao {
     @Override
     public Map<String, Object> getPageForLazy(FSFolder parent, int first, int pageSize) throws BaseException {
         String notRootFolder = parent.getPath().equals("/") ? "" : parent.getPath();
-        logger.log(Level.INFO, "=========PARENT: "+parent.getPath());
         List<FSObject> children = new ArrayList<FSObject>();
         Folder cmisParent = (Folder) session.getObjectByPath(parent.getPath());
 
@@ -158,39 +149,22 @@ public class FSFolderDaoImpl implements FSFolderDao {
         if (first < dataSize) {
             if (dataSize > pageSize) {
                 if ((first + pageSize) > dataSize) {
-                    logger.log(Level.INFO, "============IN FIND====31==============");
                     pageSizeTroubleproof = dataSize - first;
-//                page.put("page", result.subList(first, dataSize));
-//                return page;
                 }
-
             } else {
                 pageSizeTroubleproof = dataSize - first;
-//            logger.log(Level.INFO, "============IN FIND====4==============");
-//            page.put("page", result.subList(first, dataSize));
-//            return page;
             }
         } else {
-//            logger.log(Level.INFO, "============IN FIND====4==============");
-//            pageSizeTroubleproof = dataSize % pageSize;
-//            firstTroubleproof = dataSize - dataSize % pageSize + 1;
             if (dataSize % pageSize != 0) {
-                logger.log(Level.INFO, "============IN FIND====4==============");
-//                page.put("page", files.subList(dataSize - dataSize % pageSize, dataSize));
                 pageSizeTroubleproof = dataSize % pageSize;
                 firstTroubleproof = dataSize - (dataSize % pageSize + 1);
-//                return page;
             } else {
-                logger.log(Level.INFO, "============IN FIND====4==============");
-//                page.put("page", files.subList(dataSize - pageSize, dataSize));
-                logger.log(Level.INFO, "============IN FIND=================" + dataSize +" asdsadas " + pageSize);
                 pageSizeTroubleproof = dataSize - pageSize;
                 firstTroubleproof = pageSize;
-                if(dataSize == 0 ){
+                if (dataSize == 0) {
                     pageSizeTroubleproof = pageSize;
                     firstTroubleproof = 0;
                 }
-//                return page;
             }
         }
 
@@ -201,27 +175,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
         ItemIterable<CmisObject> cmisChildren = childrenCmis.skipTo(firstTroubleproof).getPage();
         try {
             for (CmisObject o : cmisChildren) {
-                FSObject fsObject;
-                if (o instanceof Folder) {
-                    fsObject = new FSFolder();
-                    fsObject.setPath(((Folder) o).getPath());
-                } else {
-                    fsObject = new FSFile();
-                    fsObject.setMimetype(((Document) o).getContentStreamMimeType());
-                    fsObject.setPath(notRootFolder);
-                    ((FSFile) fsObject).setVersionable(((DocumentType) (o.getType())).isVersionable());
-                    fsObject.setSize(String.valueOf(((Document) o).getContentStreamLength() / 1024));
-                    ((FSFile) fsObject).setAbsolutePath(notRootFolder + "/" + o.getName());
-                }
-                fsObject.setParentTypeId(o.getType().getParentTypeId());
-                fsObject.setCreatedBy(o.getCreatedBy());
-                fsObject.setCreationTime(o.getCreationDate().getTime());
-                fsObject.setLastModifiedBy(o.getLastModifiedBy());
-                fsObject.setLastModifiedTime(o.getLastModificationDate().getTime());
-                fsObject.setTypeId(o.getType().getId());
-                fsObject.setName(o.getName());
-                fsObject.setId(o.getId());
-                fsObject.setParent(parent);
+                FSObject fsObject = fsFileDao.convertCmisObjectToFSObject(o, parent);
                 children.add(fsObject);
             }
         } catch (CmisObjectNotFoundException e) {
@@ -250,26 +204,21 @@ public class FSFolderDaoImpl implements FSFolderDao {
         if (first < dataSize) {
             if (dataSize > pageSize) {
                 if ((first + pageSize) > dataSize) {
-                    logger.log(Level.INFO, "============IN FIND====31==============");
                     page.put("page", files.subList(first, dataSize));
                     return page;
                 } else {
-                    logger.log(Level.INFO, "============IN FIND====32==============");
                     page.put("page", files.subList(first, first + pageSize));
                     return page;
                 }
             } else {
-                logger.log(Level.INFO, "============IN FIND====4==============");
                 page.put("page", files.subList(first, dataSize));
                 return page;
             }
         } else {
             if (dataSize % pageSize != 0) {
-                logger.log(Level.INFO, "============IN FIND====4==============");
                 page.put("page", files.subList(dataSize - dataSize % pageSize, dataSize));
                 return page;
             } else {
-                logger.log(Level.INFO, "============IN FIND====4==============");
                 page.put("page", files.subList(dataSize - pageSize, dataSize));
                 return page;
             }
@@ -280,13 +229,9 @@ public class FSFolderDaoImpl implements FSFolderDao {
     public Map<String, Object> find(int first, int pageSize, Map<Integer, Object> query, FSObject parent) {
         List<FSObject> files = new LinkedList<FSObject>();
         String myType = (String) query.get(0);
-        logger.log(Level.INFO, "=========" + myType);
         ObjectType type = session.getTypeDefinition(myType);
-        logger.log(Level.INFO, "====!=====");
         PropertyDefinition<?> objectIdPropDef = type.getPropertyDefinitions().get(PropertyIds.OBJECT_ID);
-        logger.log(Level.INFO, "====!1=====");
         String objectIdQueryName = objectIdPropDef.getQueryName();
-        logger.log(Level.INFO, "====!11=====");
         String queryString = getQuery(query, parent);
         ItemIterable<QueryResult> Results = session.query(queryString, false);
         if (myType.equals("cmis:document")) {
@@ -306,26 +251,21 @@ public class FSFolderDaoImpl implements FSFolderDao {
         if (first < dataSize) {
             if (dataSize > pageSize) {
                 if ((first + pageSize) > dataSize) {
-                    logger.log(Level.INFO, "============IN FIND====31==============");
                     page.put("page", files.subList(first, dataSize));
                     return page;
                 } else {
-                    logger.log(Level.INFO, "============IN FIND====32==============");
                     page.put("page", files.subList(first, first + pageSize));
                     return page;
                 }
             } else {
-                logger.log(Level.INFO, "============IN FIND====4==============");
                 page.put("page", files.subList(first, dataSize));
                 return page;
             }
         } else {
             if (dataSize % pageSize != 0) {
-                logger.log(Level.INFO, "============IN FIND====4==============");
                 page.put("page", files.subList(dataSize - dataSize % pageSize, dataSize));
                 return page;
             } else {
-                logger.log(Level.INFO, "============IN FIND====4==============");
                 page.put("page", files.subList(dataSize - pageSize, dataSize));
                 return page;
             }
@@ -407,7 +347,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
         newFolderProps.put(PropertyIds.OBJECT_TYPE_ID, "cmis:folder");
         newFolderProps.put(PropertyIds.NAME, name);
 
-        Folder copySourceFolder = null;
+        Folder copySourceFolder;
         try {
             copySourceFolder = cmisFolderTarget.createFolder(newFolderProps);
         } catch (CmisNameConstraintViolationException e) {
@@ -426,21 +366,6 @@ public class FSFolderDaoImpl implements FSFolderDao {
         }
     }
 
-    /**
-     * Return all results from searching in repository by query
-     *
-     * @param query - part of searching word for query
-     * @return List files
-     */
-
-
-    /**
-     * Find all cmis folders from searching in repository by query
-     *
-     * @param query - part of searching word for query
-     * @param files - List for results
-     * @return List files
-     */
     public void parseFSFolder(String query, List<FSObject> files, FSObject parent) {
         ObjectType type = session.getTypeDefinition("cmis:folder");
         PropertyDefinition<?> objectIdPropDef = type.getPropertyDefinitions().get(PropertyIds.OBJECT_ID);
@@ -493,26 +418,19 @@ public class FSFolderDaoImpl implements FSFolderDao {
         int counter = 0;
 
         for (int i = 1; i < 6; ++i) {
-            logger.log(Level.INFO, "string null ? - " + (query.get(i) == null));
             if (query.get(i) != "") {
                 if (counter == 0) {
                     plusQuery += " WHERE ";
                 }
                 qs = session.createQueryStatement(searchAdvancedParametrs.get(i));
-                logger.log(Level.INFO, "===prop____# " + i + "==" + query.get(0) + "====" + query.get(i) + "===");
                 qs.setString(1, (String) query.get(i));
-                logger.log(Level.INFO, "===prop____# " + i + "==" + qs.toQueryString() + "==" + query.get(i) + "===");
                 if (counter > 0) {
                     plusQuery += " AND ";
                 }
-                logger.log(Level.INFO, "qs.toQueryString(): " + qs.toQueryString());
                 plusQuery += qs.toQueryString();
                 ++counter;
             }
         }
-
-        logger.log(Level.INFO, "ALARM 1");
-
         for (int i = 6; i < 8; ++i) {
             if (query.get(i) != null) {
                 if (counter == 0) {
@@ -521,7 +439,6 @@ public class FSFolderDaoImpl implements FSFolderDao {
                 qs = session.createQueryStatement(searchAdvancedParametrs.get(i));
                 qs.setDateTime(1, (Date) query.get(i));
 
-                logger.log(Level.INFO, "===prop____# " + i + "==" + qs.toQueryString() + "==" + query.get(i));
                 if (counter > 0) {
                     plusQuery += " AND ";
                 }
@@ -530,46 +447,26 @@ public class FSFolderDaoImpl implements FSFolderDao {
             }
         }
 
-        logger.log(Level.INFO, "ALARM 2");
-
         for (int i = 8; i < 10; ++i) {
             if (query.get(i) != "" && query.get(i) != null) {
                 if (counter == 0) {
                     plusQuery += " WHERE ";
                 }
-//                logger.log(Level.INFO, "===WOOT ONO11" + searchAdvancedParametrs.get(i));
-//                String k = searchAdvancedParametrs.get(i);
-//                logger.log(Level.INFO, "===WOOT ONO112" + k);
-//                qs = session.createQueryStatement(searchAdvancedParametrs.get(i));
-//                qs.setString(1, (String) query.get(i));
-//                logger.log(Level.INFO, "===prop____# " + i + "==" + qs.toQueryString() + "==");
                 if (counter > 0) {
                     plusQuery += " AND ";
                 }
-                logger.log(Level.INFO, "===WOOT ONO1");
                 plusQuery += searchAdvancedParametrs.get(i) + query.get(i) + "\" ";
-                logger.log(Level.INFO, "===WOOT ONO2");
                 ++counter;
             }
         }
-        logger.log(Level.INFO, "===WOOT ONO3");
         if (counter == 0) {
             plusQuery += " WHERE ";
-            logger.log(Level.INFO, "===WOOT ONO4");
         } else {
             plusQuery += " AND ";
-            logger.log(Level.INFO, "===WOOT ONO5");
         }
         qs = session.createQueryStatement(" IN_TREE(?) ");
-        logger.log(Level.INFO, "===WOOT ONO6");
         qs.setString(1, parent.getId());
-        logger.log(Level.INFO, "===WOOT ONO7");
         plusQuery += qs.toQueryString();
-        logger.log(Level.INFO, "===WOOT ONO8");
-
-
-        logger.log(Level.INFO, "______________________" + plusQuery + "__________________");
-
         return plusQuery;
     }
 

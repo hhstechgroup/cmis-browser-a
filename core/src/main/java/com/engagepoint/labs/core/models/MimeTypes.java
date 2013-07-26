@@ -15,7 +15,8 @@ public class MimeTypes {
 
     private static final Map<String, String> MIME2EXT = new HashMap<String, String>();
 
-    private MimeTypes() {}
+    private MimeTypes() {
+    }
 
     static {
         MIME2EXT.put("application/octet-stream", "");

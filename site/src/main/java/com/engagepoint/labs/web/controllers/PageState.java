@@ -13,18 +13,9 @@ import org.primefaces.model.TreeNode;
  */
 public class PageState {
 
-    private int currentPage;
     private TreeNode selectedNode;
     private FSObject selectedObject;
     private String parentpath;
-
-    public int getCurrentPage() {
-        return currentPage;
-    }
-
-    public void setCurrentPage(int currentPage) {
-        this.currentPage = currentPage;
-    }
 
     public TreeNode getSelectedNode() {
         return selectedNode;
@@ -52,35 +43,23 @@ public class PageState {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof PageState)) {
-            return false;
-        }
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
         PageState pageState = (PageState) o;
 
-        if (currentPage != pageState.currentPage) {
+        if (parentpath != null ? !parentpath.equals(pageState.parentpath) : pageState.parentpath != null) return false;
+        if (selectedNode != null ? !selectedNode.equals(pageState.selectedNode) : pageState.selectedNode != null)
             return false;
-        }
-        if (parentpath != null ? !parentpath.equals(pageState.parentpath) : pageState.parentpath != null) {
+        if (selectedObject != null ? !selectedObject.equals(pageState.selectedObject) : pageState.selectedObject != null)
             return false;
-        }
-        if (selectedNode != null ? !selectedNode.equals(pageState.selectedNode) : pageState.selectedNode != null) {
-            return false;
-        }
-        if (selectedObject != null ? !selectedObject.equals(pageState.selectedObject) : pageState.selectedObject != null) {
-            return false;
-        }
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = currentPage;
-        result = 31 * result + (selectedNode != null ? selectedNode.hashCode() : 0);
+        int result = selectedNode != null ? selectedNode.hashCode() : 0;
         result = 31 * result + (selectedObject != null ? selectedObject.hashCode() : 0);
         result = 31 * result + (parentpath != null ? parentpath.hashCode() : 0);
         return result;

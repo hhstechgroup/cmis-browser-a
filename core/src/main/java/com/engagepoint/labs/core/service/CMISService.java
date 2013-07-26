@@ -18,9 +18,10 @@ import java.util.Map;
 public interface CMISService {
 
 
-
     public Map<String, Object> getPageForLazySearchQuery(int first, int pageSize, Map<Integer, Object> query, FSObject parent);
+
     public Map<String, Object> getPageForLazySearchQuery(int first, int pageSize, String query, FSObject parent);
+
     /**
      * Return a list children of our parent fsFolder folder
      *
@@ -48,11 +49,12 @@ public interface CMISService {
 
     /**
      * Create new folder in repository with folder name folderName
-     * @param parent    parent folder for folderName folder
+     *
+     * @param parent     parent folder for folderName folder
      * @param folderName
-     * @return  created FSFolder object
+     * @return created FSFolder object
      * @throws Exception if folder with this name exist in parent directory
-     * or connection is fail
+     *                   or connection is fail
      */
     public FSFolder createFolder(FSFolder parent, String folderName) throws BaseException;
 

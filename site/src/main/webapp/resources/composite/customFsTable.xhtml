@@ -7,7 +7,6 @@
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:p="http://primefaces.org/ui"
       xmlns:cc="http://java.sun.com/jsf/composite"
-      xmlns:ct="http://java.sun.com/jsf/composite/composite"
       xml:lang="en" lang="en">
 <cc:interface>
     <cc:attribute name="actionPanel" type="java.lang.Boolean" default="true"/>
@@ -74,7 +73,7 @@
 
             </p:splitButton>
 
-            <p:accordionPanel id="accordion"  rendered="#{treeBean.ableSearchAdvanced}">
+            <p:accordionPanel id="accordion" rendered="#{treeBean.ableSearchAdvanced}">
                 <p:tab title="Advanced search">
 
                     <h:outputText value="Type: "/>
@@ -89,7 +88,8 @@
 
                         <!--metadata-->
                         <h:outputText value="Doc type: "/>
-                        <p:inputText id="metaDataType" value="#{treeBean.metaDataType}" disabled="#{treeBean.disableSearchFolderProperties}"/>
+                        <p:inputText id="metaDataType" value="#{treeBean.metaDataType}"
+                                     disabled="#{treeBean.disableSearchFolderProperties}"/>
                         <p:watermark value="typeId" for="metaDataType"/>
                         <br/>
 
@@ -113,19 +113,19 @@
 
                         <!--size -->
 
-                            <h:outputText value="Size:  from "/>
-                            <p:inputText id="sizeFrom" value="#{treeBean.sizeFrom}"
-                                         disabled="#{treeBean.disableSearchFolderProperties}"/>
+                        <h:outputText value="Size:  from "/>
+                        <p:inputText id="sizeFrom" value="#{treeBean.sizeFrom}"
+                                     disabled="#{treeBean.disableSearchFolderProperties}"/>
 
-                            <h:outputText value=" to "/>
-                            <p:inputText id="sizeTo" value="#{treeBean.sizeTo}"
-                                         disabled="#{treeBean.disableSearchFolderProperties}"/>
+                        <h:outputText value=" to "/>
+                        <p:inputText id="sizeTo" value="#{treeBean.sizeTo}"
+                                     disabled="#{treeBean.disableSearchFolderProperties}"/>
 
-                            <p:selectOneMenu value="#{treeBean.sizeMultiplier}">
-                                <f:selectItem itemLabel="Kb" itemValue="1024" />
-                                <f:selectItem itemLabel="Mb" itemValue="1048576" />
-                                <f:selectItem itemLabel="Gb" itemValue="1073741824" />
-                            </p:selectOneMenu>
+                        <p:selectOneMenu value="#{treeBean.sizeMultiplier}">
+                            <f:selectItem itemLabel="Kb" itemValue="1024"/>
+                            <f:selectItem itemLabel="Mb" itemValue="1048576"/>
+                            <f:selectItem itemLabel="Gb" itemValue="1073741824"/>
+                        </p:selectOneMenu>
 
                         <p:watermark value="min size" for="sizeFrom"/>
                         <p:watermark value="max size" for="sizeTo"/>

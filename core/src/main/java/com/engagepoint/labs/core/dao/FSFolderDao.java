@@ -9,9 +9,10 @@ package com.engagepoint.labs.core.dao;
 import com.engagepoint.labs.core.models.FSFile;
 import com.engagepoint.labs.core.models.FSFolder;
 import com.engagepoint.labs.core.models.FSObject;
-import com.engagepoint.labs.core.models.exceptions.*;
 import com.engagepoint.labs.core.models.exceptions.BaseException;
 import com.engagepoint.labs.core.models.exceptions.BrowserRuntimeException;
+import com.engagepoint.labs.core.models.exceptions.FolderAlreadyExistException;
+import com.engagepoint.labs.core.models.exceptions.FolderNotFoundException;
 import org.apache.chemistry.opencmis.client.api.Session;
 
 import java.util.List;
@@ -52,6 +53,7 @@ public interface FSFolderDao {
     public boolean delete(FSFolder folder);
 
     public boolean deleteAllTree(FSFolder folder) throws FolderNotFoundException;
+
     /**
      * Method that will rename folder
      *
@@ -60,6 +62,7 @@ public interface FSFolderDao {
      * @return renamed folder
      */
     public FSFolder rename(FSFolder folder, String newName) throws BaseException;
+
     /**
      * @return root folder
      */

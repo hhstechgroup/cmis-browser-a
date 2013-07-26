@@ -51,7 +51,6 @@ public class ConnectionFactory {
                 parameter.put(SessionParameter.PASSWORD, password);
             }
             parameter.put(SessionParameter.ATOMPUB_URL, url);
-//        parameter.put(SessionParameter.ATOMPUB_URL, "http://repo.opencmis.org/inmemory/atom/");
 
             List<Repository> repositories = sessionFactory.getRepositories(parameter);
             Repository repository = repositories.get(0);

@@ -48,8 +48,10 @@
         </p:treeNode>
     </p:tree>
 
-    <p:droppable for=":#{cc.parent.clientId}:treeForm:tree:treecomponent" tolerance="touch" activeStyleClass="ui-state-highlight" datasource=":#{cc.parent.clientId}:treeForm:table:tablecomponent" onDrop="handleDrop">
-        <p:ajax listener="#{treeBean.onDragFile}" update=":#{cc.parent.clientId}:treeForm:table:tablecomponent" />
+    <p:droppable for=":#{cc.parent.clientId}:treeForm:tree:treecomponent" tolerance="touch"
+                 activeStyleClass="ui-state-highlight" datasource=":#{cc.parent.clientId}:treeForm:table:tablecomponent"
+                 onDrop="handleDrop">
+        <p:ajax listener="#{treeBean.onDragFile}" update=":#{cc.parent.clientId}:treeForm:table:tablecomponent"/>
     </p:droppable>
 
     <p:contextMenu for="treecomponent" rendered="#{cc.attrs.context}">

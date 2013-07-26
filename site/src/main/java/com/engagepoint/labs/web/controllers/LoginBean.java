@@ -13,8 +13,6 @@ import javax.faces.model.SelectItem;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Created with IntelliJ IDEA.
@@ -29,8 +27,6 @@ public class LoginBean implements Serializable {
 
     @ManagedProperty(value = "#{treeBean}")
     private TreeBean treeBean;
-
-    private Logger logger = Logger.getLogger(LoginBean.class.getName());
 
     private String login;
     private String password;

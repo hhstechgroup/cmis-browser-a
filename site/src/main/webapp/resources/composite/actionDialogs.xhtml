@@ -6,7 +6,6 @@
       xmlns:p="http://primefaces.org/ui"
       xmlns:cc="http://java.sun.com/jsf/composite"
       xmlns:f="http://java.sun.com/jsf/core"
-      xmlns:ct="http://java.sun.com/jsf/composite/composite"
       xml:lang="en" lang="en">
 
 <cc:interface>
@@ -77,7 +76,8 @@
         <h:form id="createdDocDialog" enctype="multipart/form-data">
 
             <p:fileUpload value="#{fileActions.file}" mode="simple"/>
-            <p:inputText id="inputTextForDoc" styleClass="default" value="#{action.name}" validatorMessage="Wrong name" label="name">
+            <p:inputText id="inputTextForDoc" styleClass="default" value="#{action.name}" validatorMessage="Wrong name"
+                         label="name">
                 <f:validateRegex pattern="^[_A-Za-z0-9-\+]{0,14}$"/>
             </p:inputText>
             <p:watermark for="inputTextForDoc" value="name"/>
@@ -102,7 +102,8 @@
 
             <p:inputText required="true" styleClass="default" id="newName" value="#{treeBean.selectedFSObject.name}"/>
             <br></br>
-            <p:inputText id="typeOfObject" styleClass="readonly" value="#{treeBean.selectedFSObject.typeId}" disabled="true"/>
+            <p:inputText id="typeOfObject" styleClass="readonly" value="#{treeBean.selectedFSObject.typeId}"
+                         disabled="true"/>
 
             <p:fileUpload rendered="#{fileActions.selectedIsFile}" mode="simple" value="#{fileActions.file}"/>
             <br></br>

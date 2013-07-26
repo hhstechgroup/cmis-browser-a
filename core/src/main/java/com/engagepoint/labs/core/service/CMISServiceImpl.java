@@ -14,8 +14,6 @@ import com.engagepoint.labs.core.models.exceptions.FolderNotFoundException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author volodymyr.kozubal
@@ -24,7 +22,6 @@ import java.util.logging.Logger;
 public class CMISServiceImpl implements CMISService {
 
     private FSFolderDao fsFolderDao;
-    private static Logger logger = Logger.getLogger(CMISServiceImpl.class.getName());
 
     private static CMISServiceImpl service = null;
     private ConnectionFactory connectionFactory;
@@ -118,7 +115,7 @@ public class CMISServiceImpl implements CMISService {
 
     @Override
     public Map<String, Object> getPageForLazySearchQuery(int first, int pageSize, Map<Integer, Object> query, FSObject parent) {
-        return  fsFolderDao.find(first, pageSize, query, parent);
+        return fsFolderDao.find(first, pageSize, query, parent);
     }
 
     @Override

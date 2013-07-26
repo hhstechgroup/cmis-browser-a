@@ -1,4 +1,3 @@
-
 @font-face {
     font-family: MuseoSans700;
     src: url("fonts/museosans_700-webfont.ttf");
@@ -24,6 +23,6 @@
     font-family: MuseoSans700, sans-serif;
 }
 
-.default:focus{
+.default:focus {
     outline: none;
 }

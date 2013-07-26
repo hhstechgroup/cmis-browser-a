@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -38,7 +37,6 @@ public class ConfigBean implements Serializable {
     private Preferences prefs;
     private String repoURL = "";
     private String repoName = "";
-    private Logger logger = Logger.getLogger(ConfigBean.class.getName());
 
     private boolean name = true;
     private boolean typeId = true;

@@ -3,10 +3,10 @@ dojo.back.init();
 
 
 var state = {
-    back: function() {
+    back: function () {
         invokeBack();
     },
-    forward: function() {
+    forward: function () {
         invokeForward();
     }
 };

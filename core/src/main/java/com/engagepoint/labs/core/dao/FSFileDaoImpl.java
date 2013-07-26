@@ -23,8 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * User: r.reznichenko
@@ -34,7 +32,6 @@ import java.util.logging.Logger;
 public class FSFileDaoImpl implements FSFileDao {
 
     private Session session;
-    private static Logger logger = Logger.getLogger(FSFileDaoImpl.class.getName());
 
     @Override
     public void setSession(Session session) {
@@ -173,9 +170,6 @@ public class FSFileDaoImpl implements FSFileDao {
             newDocumentProperties.put(PropertyIds.NAME, defaultName);
             document.updateProperties(newDocumentProperties);
         }
-        System.out.println("Documents ID which we are copy is " + document.getId());
-        System.out.println("Copied document ID is " + copiedDocument.getId());
-        System.out.println("Document is copied successfully");
         return true;
     }
 

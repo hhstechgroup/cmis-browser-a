@@ -17,8 +17,6 @@ import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Created with IntelliJ IDEA.
@@ -33,7 +31,6 @@ import java.util.logging.Logger;
 public class FileActions implements Serializable {
 
     private CMISService cmisService;
-    private static Logger logger;
     private boolean selectedIsFile;
     private String selectedName;
     private boolean versionable;
@@ -51,26 +48,19 @@ public class FileActions implements Serializable {
                     e.getMessage(),
                     ""));
         }
-        logger = Logger.getLogger(FileActions.class.getName());
         selectedIsFile = false;
     }
 
     public StreamedContent download(FSFile file) throws IllegalArgumentException/*, FileNotFoundException*/ {
-        logger.log(Level.INFO, "download: " + file.getName());
         String fileName = file.getName();
         if (file.isVersionable()) {
-            logger.log(Level.INFO, "file is versinable: " + file.getVersionLabel());
             fileName += (file.getVersionLabel() == null) ? "" : file.getVersionLabel();
         }
-        logger.log(Level.INFO, "id: " + file.getId());
         InputStream inputStream = null;
-
         try {
             inputStream = cmisService.getInputStream(file);
-            logger.log(Level.INFO, "inputStream - null? - " + (inputStream == null));
 
         } catch (FileNotFoundException e) {
-            logger.log(Level.INFO, "Is inputStream - null? - " + (inputStream == null));
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     e.getMessage(),
                     "Maybe, file was deleted!"));
@@ -79,9 +69,7 @@ public class FileActions implements Serializable {
                     e.getMessage(),
                     ""));
         }
-        logger.log(Level.INFO, "ggggggggggggggggggggggggggg");
         String extension = MimeTypes.getExtension(file.getMimetype());
-        logger.log(Level.INFO, "wwwwwwwwwwwwwwwwwwwwwwwwwwww");
         DefaultStreamedContent defaultStreamedContent = null;
         try {
             if (inputStream != null)

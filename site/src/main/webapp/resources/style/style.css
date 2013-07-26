@@ -115,7 +115,6 @@ a {
     background: #ffffff !important;
 }
 
-
 .ui-widget-header .ui-inputtext {
     background: #ffffff;
     border-radius: 11px;
@@ -185,7 +184,7 @@ a {
     text-align: left;
 }
 
-.ui-accordion .ui-datepicker .ui-state-hover{
+.ui-accordion .ui-datepicker .ui-state-hover {
     background: #000000;
 }
 

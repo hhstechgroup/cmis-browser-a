@@ -7,7 +7,7 @@ package com.engagepoint.labs.core.models.exceptions;
  * Time: 10:47 AM
  * To change this template use File | Settings | File Templates.
  */
-public class FolderNotFoundException extends BaseException{
+public class FolderNotFoundException extends BaseException {
     public FolderNotFoundException() {
     }
 

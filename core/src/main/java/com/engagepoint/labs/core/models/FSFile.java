@@ -23,7 +23,7 @@ public class FSFile extends FSObject {
     }
 
     @Override
-    public String getIcon(){
+    public String getIcon() {
         return "document.png";
     }
 
