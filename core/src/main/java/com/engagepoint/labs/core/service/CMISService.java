@@ -16,24 +16,11 @@ import java.util.Map;
  * @author volodymyr.kozubal  <volodymyr.kozubal@engagepoint.com>
  */
 public interface CMISService {
-    /**
-     * Return  max value  of page number
-     *
-     * @param parent parent object, pageNumber, numbersOfRows for right pagination
-     * @return List of FSObjects on the page
-     */
-    public int getMaxNumberOfRows(FSFolder parent);
 
-    public int getMaxNumberOfRowsByQuery(String query);
 
-    public int getMaxNumberOfRowsByQuery(Map<Integer, Object> query);
 
-    public List<FSObject> getPageForLazySearchQuery(int first,int pageSize, String query);
-
-    public List<FSObject> getPageForLazySearchQuery(int first,int pageSize, Map<Integer, Object> query);
-
-    public Map<String, Object> getPageForLazySearchQuery2(int first, int pageSize, Map<Integer, Object> query);
-    public Map<String, Object> getPageForLazySearchQuery2(int first, int pageSize, String query);
+    public Map<String, Object> getPageForLazySearchQuery(int first, int pageSize, Map<Integer, Object> query, FSObject parent);
+    public Map<String, Object> getPageForLazySearchQuery(int first, int pageSize, String query, FSObject parent);
     /**
      * Return a list children of our parent fsFolder folder
      *
@@ -49,8 +36,7 @@ public interface CMISService {
      * @param parent parent object, pageNumber, numbersOfRows for right pagination
      * @return List of FSObjects on the page
      */
-    public List<FSObject> getPageForLazy(FSFolder parent, int first, int pageSize) throws BaseException;
-    public Map<String, Object> getPageForLazy2(FSFolder parent, int first, int pageSize) throws BaseException;
+    public Map<String, Object> getPageForLazy(FSFolder parent, int first, int pageSize) throws BaseException;
 
     /**
      * Return a root folder from our repository
@@ -96,7 +82,6 @@ public interface CMISService {
 
     public void move(FSFile source) throws BrowserRuntimeException;
 
-    public List<FSObject> find(String query);
 
     public FSFolder renameFolder(FSFolder folder, String newName) throws BaseException;
 

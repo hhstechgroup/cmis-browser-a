@@ -42,8 +42,8 @@ public class FSFolderDaoImpl implements FSFolderDao {
         searchAdvancedParametrs = new HashMap<Integer, String>();
         searchAdvancedParametrs.put(0, "SELECT * FROM ? WHERE ");
         searchAdvancedParametrs.put(1, " cmis:name LIKE ? ");
-        searchAdvancedParametrs.put(2, "");
-        searchAdvancedParametrs.put(3, " cmis:contentStreamFileName LIKE ? ");
+        searchAdvancedParametrs.put(2, " cmis:objectTypeId LIKE ? ");
+        searchAdvancedParametrs.put(3, " cmis:contentStreamMimeType LIKE ? ");
         searchAdvancedParametrs.put(4, " CONTAINS(?) ");
         searchAdvancedParametrs.put(5, "");
         searchAdvancedParametrs.put(6, " cmis:lastModificationDate >=  TIMESTAMP ? ");
@@ -127,30 +127,6 @@ public class FSFolderDaoImpl implements FSFolderDao {
     }
 
     @Override
-    public int getMaxNumberOfRows(FSFolder parent) {
-        Folder cmisParent = (Folder) session.getObjectByPath(parent.getPath());
-        ItemIterable<CmisObject> cmisChildren = cmisParent.getChildren();
-
-        int total = (int) cmisChildren.getTotalNumItems();
-        return total;
-    }
-
-    @Override
-    public int getMaxNumberOfRowsByQuery(String query) {
-        if (!find(query).isEmpty()) {
-            logger.log(Level.INFO, find(query).get(0).getName());
-        }
-        int total = find(query).size();
-        return total;
-    }
-
-    @Override
-    public List<FSObject> getPageForLazySearchQuery(int first, int pageSize, String query) {
-
-        return find(query).subList(first, first + pageSize);
-    }
-
-    @Override
     public void move(FSFile target) throws BrowserRuntimeException {
         Document doc = (Document) session.getObject(target.getId());
         Folder cmisFolder2 = (Folder) session.getObjectByPath("/");
@@ -164,30 +140,9 @@ public class FSFolderDaoImpl implements FSFolderDao {
         }
     }
 
-    @Override
-    public List<FSObject> getPageForLazy(FSFolder parent, int first, int pageSize) throws BaseException {
-        List<FSObject> children = new ArrayList<FSObject>();
-        Folder cmisParent = (Folder) session.getObjectByPath(parent.getPath());
-
-        OperationContext operationContext = session.createOperationContext();
-        operationContext.setMaxItemsPerPage(pageSize);
-        ItemIterable<CmisObject> childrenCmis = cmisParent.getChildren(operationContext);
-        ItemIterable<CmisObject> cmisChildren = childrenCmis.skipTo(first).getPage();
-        try {
-            for (CmisObject o : cmisChildren) {
-                FSObject fsObject = fsFileDao.convertCmisObjectToFSObject(o, parent);
-                children.add(fsObject);
-            }
-        } catch (CmisObjectNotFoundException e) {
-            throw new FolderNotFoundException(e.getMessage());
-        } catch (CmisBaseException e) {
-            throw new BaseException(e.getMessage());
-        }
-        return children;
-    }
 
     @Override
-    public Map<String, Object> getPageForLazy2(FSFolder parent, int first, int pageSize) throws BaseException {
+    public Map<String, Object> getPageForLazy(FSFolder parent, int first, int pageSize) throws BaseException {
         String notRootFolder = parent.getPath().equals("/") ? "" : parent.getPath();
         List<FSObject> children = new ArrayList<FSObject>();
         Folder cmisParent = (Folder) session.getObjectByPath(parent.getPath());
@@ -260,10 +215,10 @@ public class FSFolderDaoImpl implements FSFolderDao {
     }
 
     @Override
-    public Map<String, Object> find2(int first, int pageSize, String query) {
+    public Map<String, Object> find(int first, int pageSize, String query, FSObject parent) {
         List<FSObject> files = new ArrayList<FSObject>();
-        parseFSFile(query, files);
-        parseFSFolder(query, files);
+        parseFSFile(query, files, parent);
+        parseFSFolder(query, files, parent);
 
         int dataSize = files.size();
         Map<String, Object> page = new HashMap<String, Object>();
@@ -303,7 +258,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
     }
 
     @Override
-    public Map<String, Object> find2(int first, int pageSize, Map<Integer, Object> query) {
+    public Map<String, Object> find(int first, int pageSize, Map<Integer, Object> query, FSObject parent) {
         List<FSObject> files = new LinkedList<FSObject>();
         String myType = (String) query.get(0);
         logger.log(Level.INFO, "=========" + myType);
@@ -313,7 +268,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
         logger.log(Level.INFO, "====!1=====");
         String objectIdQueryName = objectIdPropDef.getQueryName();
         logger.log(Level.INFO, "====!11=====");
-        String queryString = getQuery(query);
+        String queryString = getQuery(query, parent);
         ItemIterable<QueryResult> Results = session.query(queryString, false);
         if (myType.equals("cmis:document")) {
             parseFSFile(files, objectIdQueryName, Results);
@@ -458,38 +413,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
      * @param query - part of searching word for query
      * @return List files
      */
-    @Override
-    public List<FSObject> find(String query) {
-        List<FSObject> files = new ArrayList<FSObject>();
-        parseFSFile(query, files);
-        parseFSFolder(query, files);
-        return files;
-    }
 
-    @Override
-    public List<FSObject> find(Map<Integer, Object> query) {
-        List<FSObject> files = new LinkedList<FSObject>();
-        String myType = (String) query.get(0);
-        logger.log(Level.INFO, "myType: " + myType);
-        logger.log(Level.INFO, "=========" + myType);
-        ObjectType type = session.getTypeDefinition(myType);
-        logger.log(Level.INFO, "====!=====");
-        PropertyDefinition<?> objectIdPropDef = type.getPropertyDefinitions().get(PropertyIds.OBJECT_ID);
-        logger.log(Level.INFO, "====!1=====");
-        String objectIdQueryName = objectIdPropDef.getQueryName();
-        logger.log(Level.INFO, "====!11=====");
-        String queryString = getQuery(query);
-        ItemIterable<QueryResult> Results = session.query(queryString, false);
-        logger.log(Level.INFO, "====I've got result=====");
-        if (myType.equals("cmis:document")) {
-            parseFSFile(files, objectIdQueryName, Results);
-            logger.log(Level.INFO, "====Parse doc=====");
-        } else {
-            parseFSFolder(files, objectIdQueryName, Results);
-            logger.log(Level.INFO, "====Parse folder=====");
-        }
-        return files;
-    }
 
     /**
      * Find all cmis folders from searching in repository by query
@@ -498,11 +422,11 @@ public class FSFolderDaoImpl implements FSFolderDao {
      * @param files - List for results
      * @return List files
      */
-    public void parseFSFolder(String query, List<FSObject> files) {
+    public void parseFSFolder(String query, List<FSObject> files, FSObject parent) {
         ObjectType type = session.getTypeDefinition("cmis:folder");
         PropertyDefinition<?> objectIdPropDef = type.getPropertyDefinitions().get(PropertyIds.OBJECT_ID);
         String objectIdQueryName = objectIdPropDef.getQueryName();
-        String queryString = getFullQuery(query, type);
+        String queryString = getFullQuery(query, type, parent);
         ItemIterable<QueryResult> folderResults = session.query(queryString, false);
         for (QueryResult qResult : folderResults) {
             String objectId = qResult.getPropertyValueByQueryName(objectIdQueryName);
@@ -518,8 +442,8 @@ public class FSFolderDaoImpl implements FSFolderDao {
      * @param query - part of searching word for query
      * @return full query
      */
-    public String getFullQuery(String query, ObjectType type) {
-        return "SELECT " + "*" + " FROM " + type.getQueryName() + " WHERE cmis:name LIKE '%" + query + "%'";
+    public String getFullQuery(String query, ObjectType type, FSObject parent) {
+        return "SELECT " + "*" + " FROM " + type.getQueryName() + " WHERE IN_TREE('" + parent.getId() + "') AND cmis:name LIKE '%" + query + "%'";
     }
 
     /**
@@ -529,10 +453,10 @@ public class FSFolderDaoImpl implements FSFolderDao {
      * @param files - List for results
      * @return List files
      */
-    public void parseFSFile(String query, List<FSObject> files) {
+    public void parseFSFile(String query, List<FSObject> files, FSObject parent) {
         ObjectType type = session.getTypeDefinition("cmis:document");
         PropertyDefinition<?> objectIdPropDef = type.getPropertyDefinitions().get(PropertyIds.OBJECT_ID);
-        String queryString = getFullQuery(query, type);
+        String queryString = getFullQuery(query, type, parent);
         ItemIterable<QueryResult> fileResult = session.query(queryString, false);
         String objectIdQueryName = objectIdPropDef.getQueryName();
         for (QueryResult qResult : fileResult) {
@@ -543,7 +467,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
         }
     }
 
-    private String getQuery(Map<Integer, Object> query) {
+    private String getQuery(Map<Integer, Object> query, FSObject parent) {
 
         QueryStatement qs;
         String plusQuery = "SELECT * FROM " + query.get(0);
@@ -594,16 +518,36 @@ public class FSFolderDaoImpl implements FSFolderDao {
                 if (counter == 0) {
                     plusQuery += " WHERE ";
                 }
-                qs = session.createQueryStatement(searchAdvancedParametrs.get(i));
-                qs.setString(1, (String) query.get(i));
-                logger.log(Level.INFO, "===prop____# " + i + "==" + qs.toQueryString() + "==");
+//                logger.log(Level.INFO, "===WOOT ONO11" + searchAdvancedParametrs.get(i));
+//                String k = searchAdvancedParametrs.get(i);
+//                logger.log(Level.INFO, "===WOOT ONO112" + k);
+//                qs = session.createQueryStatement(searchAdvancedParametrs.get(i));
+//                qs.setString(1, (String) query.get(i));
+//                logger.log(Level.INFO, "===prop____# " + i + "==" + qs.toQueryString() + "==");
                 if (counter > 0) {
                     plusQuery += " AND ";
                 }
+                logger.log(Level.INFO, "===WOOT ONO1");
                 plusQuery += searchAdvancedParametrs.get(i) + query.get(i) + "\" ";
+                logger.log(Level.INFO, "===WOOT ONO2");
                 ++counter;
             }
         }
+        logger.log(Level.INFO, "===WOOT ONO3");
+        if (counter == 0) {
+            plusQuery += " WHERE ";
+            logger.log(Level.INFO, "===WOOT ONO4");
+        } else {
+            plusQuery += " AND ";
+            logger.log(Level.INFO, "===WOOT ONO5");
+        }
+        qs = session.createQueryStatement(" IN_TREE(?) ");
+        logger.log(Level.INFO, "===WOOT ONO6");
+        qs.setString(1, parent.getId());
+        logger.log(Level.INFO, "===WOOT ONO7");
+        plusQuery += qs.toQueryString();
+        logger.log(Level.INFO, "===WOOT ONO8");
+
 
         logger.log(Level.INFO, "______________________" + plusQuery + "__________________");
 

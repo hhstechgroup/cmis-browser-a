@@ -72,7 +72,7 @@ public class
         if (!ableSearchAdvanced) {
             if (searchQuery.equals("")) {
                 try {
-                    page = cmisService.getPageForLazy2(parent, first, pageSize);
+                    page = cmisService.getPageForLazy(parent, first, pageSize);
                     this.setRowCount((Integer)page.get("datasize"));
                     return (List<FSObject>)page.get("page");
                 } catch (BaseException e) {
@@ -80,7 +80,7 @@ public class
                 }
 
             } else {
-                page = cmisService.getPageForLazySearchQuery2(first, pageSize, searchQuery);
+                page = cmisService.getPageForLazySearchQuery(first, pageSize, searchQuery, parent);
                 this.setRowCount((Integer)page.get("datasize"));
                 return (List<FSObject>)page.get("page");
 
@@ -88,7 +88,7 @@ public class
         }
         // for advaced search
         else {
-            page = cmisService.getPageForLazySearchQuery2(first, pageSize, searchQueryAdvanced);
+            page = cmisService.getPageForLazySearchQuery(first, pageSize, searchQueryAdvanced, parent);
             this.setRowCount((Integer)page.get("datasize"));
             return (List<FSObject>)page.get("page");
 

@@ -99,13 +99,10 @@ public class CMISServiceImpl implements CMISService {
         return service;
     }
 
+
     @Override
-    public List<FSObject> getPageForLazy(FSFolder parent, int first, int pageSize) throws BaseException {
+    public Map<String, Object> getPageForLazy(FSFolder parent, int first, int pageSize) throws BaseException {
         return fsFolderDao.getPageForLazy(parent, first, pageSize);
-    }
-    @Override
-    public Map<String, Object> getPageForLazy2(FSFolder parent, int first, int pageSize) throws BaseException {
-        return fsFolderDao.getPageForLazy2(parent, first, pageSize);
     }
 
     @Override
@@ -113,41 +110,15 @@ public class CMISServiceImpl implements CMISService {
         fsFolderDao.move(source);
     }
 
+
     @Override
-    public int getMaxNumberOfRows(FSFolder parent) {
-        return fsFolderDao.getMaxNumberOfRows(parent);
+    public Map<String, Object> getPageForLazySearchQuery(int first, int pageSize, String query, FSObject parent) {
+        return fsFolderDao.find(first, pageSize, query, parent);
     }
 
     @Override
-    public int getMaxNumberOfRowsByQuery(String query) {
-        return fsFolderDao.getMaxNumberOfRowsByQuery(query);
-    }
-
-    @Override
-    public int getMaxNumberOfRowsByQuery(Map<Integer, Object> query) {
-        logger.log(Level.INFO, "============BEFORE FIND======");
-        int total = fsFolderDao.find(query).size();
-        return total;
-    }
-
-    @Override
-    public List<FSObject> getPageForLazySearchQuery(int first, int pageSize, String query) {
-        return fsFolderDao.getPageForLazySearchQuery(first, pageSize, query);
-    }
-
-    @Override
-    public List<FSObject> getPageForLazySearchQuery(int first, int pageSize, Map<Integer, Object> query) {
-
-        return fsFolderDao.find(query).subList(first, first + pageSize);
-    }
-    @Override
-    public Map<String, Object> getPageForLazySearchQuery2(int first, int pageSize, String query) {
-        return fsFolderDao.find2(first, pageSize, query);
-    }
-
-    @Override
-    public Map<String, Object> getPageForLazySearchQuery2(int first, int pageSize, Map<Integer, Object> query) {
-        return  fsFolderDao.find2(first, pageSize, query);
+    public Map<String, Object> getPageForLazySearchQuery(int first, int pageSize, Map<Integer, Object> query, FSObject parent) {
+        return  fsFolderDao.find(first, pageSize, query, parent);
     }
 
     @Override
@@ -178,11 +149,6 @@ public class CMISServiceImpl implements CMISService {
     @Override
     public FSFile getHistory(FSFile file) {
         return fsFolderDao.getFsFileDao().getHistory(file);
-    }
-
-    @Override
-    public List<FSObject> find(String query) {
-        return fsFolderDao.find(query);
     }
 
     @Override

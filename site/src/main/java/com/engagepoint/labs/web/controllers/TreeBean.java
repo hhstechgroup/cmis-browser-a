@@ -75,6 +75,7 @@ public class TreeBean implements Serializable {
     private boolean disableSearchSimple;
     private boolean ableSearchAdvanced;
     private String searchPropertiesVisibility;
+    private int sizeMultiplier;
 
     private boolean rowSelected;
 
@@ -110,6 +111,7 @@ public class TreeBean implements Serializable {
         ableSearchAdvanced = false;
         cmisType = "cmis:document";
         findQuery = "";
+        sizeMultiplier = 1024;
 
         rowSelected = false;
     }
@@ -117,6 +119,7 @@ public class TreeBean implements Serializable {
     public void drawComponent() {
         FSFolder root = cmisService.getRootFolder();
         parent.setPath("/");
+        parent.setId(root.getId());
         main = new DefaultTreeNode("Main", null);
         TreeNode node0 = new DefaultTreeNode(root, main);
         FSFolder fold = new FSFolder();
@@ -266,9 +269,11 @@ public class TreeBean implements Serializable {
             setSelectedFSObject((FSObject) selectedNodes.getData());
             if (selectedFSObject.getPath() == null) {
                 parent.setPath("/");
+                parent.setId("100");
                 selectedFSObject.setPath("/");
             } else {
                 parent.setPath(selectedFSObject.getPath());
+                parent.setId(selectedFSObject.getId());
             }
             if (findQuery.isEmpty()) {
                 changedTableParentFolder();
@@ -397,23 +402,23 @@ public class TreeBean implements Serializable {
         }
     }
 
-    public void findObjects() {
-        logger.log(Level.INFO, "find=" + cmisService.find(findQuery).get(0).getName());
-        // treeBean.updatetablePageList(cmisService.find(findQuery));
-    }
+//    public void findObjects() {
+//        logger.log(Level.INFO, "find=" + cmisService.find(findQuery).get(0).getName());
+//        // treeBean.updatetablePageList(cmisService.find(findQuery));
+//    }
     public void findAdvanced() {
 
         logger.log(Level.INFO, "==___________findAdvanced()____");
 
 
-        if (metaDataType != "" &&  findQuery != null) {
+        if (findQuery != "" &&  findQuery != null) {
             searchQueryAdvanced.put(1, "%" + findQuery + "%");
             logger.log(Level.INFO, "==___________findAdvanced()____" + findQuery);
         } else {
             searchQueryAdvanced.put(1, "");
         }
 
-        if (metaDataType != "" && metaDataType != null ) {
+        if (metaDataType != "" && metaDataType != null && cmisType.equals("cmis:document" )) {
             searchQueryAdvanced.put(2, metaDataType);
             logger.log(Level.INFO, "==___________findAdvanced()____"+metaDataType);
         } else {
@@ -440,16 +445,28 @@ public class TreeBean implements Serializable {
         }
         searchQueryAdvanced.put(6, calendarFrom);
         searchQueryAdvanced.put(7, calendarTo);
-        if ( sizeFrom != null && sizeFrom != "" && cmisType.equals("cmis:document")) {
-            searchQueryAdvanced.put(8, sizeFrom);
-            logger.log(Level.INFO, "==___________findAdvanced()____" +sizeFrom);
-        } else {
+//        if ( sizeFrom != null && sizeFrom != "" && cmisType.equals("cmis:document")) {
+//            searchQueryAdvanced.put(8, sizeFrom);
+//            logger.log(Level.INFO, "==___________findAdvanced()____" +sizeFrom);
+//        } else {
+//            searchQueryAdvanced.put(8, "");
+//        }
+//        if ( sizeTo != null && sizeTo != "" && cmisType.equals("cmis:document")) {
+//            searchQueryAdvanced.put(9, sizeTo);
+//            logger.log(Level.INFO, "==___________findAdvanced()____"+sizeTo);
+//        } else {
+//            searchQueryAdvanced.put(9, "");
+//        }
+        try {
+            Integer.parseInt(sizeFrom);
+            searchQueryAdvanced.put(8, Integer.toString(Integer.parseInt(sizeFrom) * sizeMultiplier));
+        } catch (NumberFormatException e) {
             searchQueryAdvanced.put(8, "");
         }
-        if ( sizeTo != null && sizeTo != "" && cmisType.equals("cmis:document")) {
-            searchQueryAdvanced.put(9, sizeTo);
-            logger.log(Level.INFO, "==___________findAdvanced()____"+sizeTo);
-        } else {
+        try {
+            Integer.parseInt(sizeTo);
+            searchQueryAdvanced.put(9, Integer.toString(Integer.parseInt(sizeTo) * sizeMultiplier));
+        } catch (NumberFormatException e) {
             searchQueryAdvanced.put(9, "");
         }
 
@@ -719,5 +736,13 @@ public class TreeBean implements Serializable {
 
     public void setRowSelected(boolean rowSelected) {
         this.rowSelected = rowSelected;
+    }
+
+    public int getSizeMultiplier() {
+        return sizeMultiplier;
+    }
+
+    public void setSizeMultiplier(int sizeMultiplier) {
+        this.sizeMultiplier = sizeMultiplier;
     }
 }
