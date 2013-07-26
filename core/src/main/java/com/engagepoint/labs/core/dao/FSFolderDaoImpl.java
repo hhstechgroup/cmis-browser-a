@@ -144,6 +144,7 @@ public class FSFolderDaoImpl implements FSFolderDao {
     @Override
     public Map<String, Object> getPageForLazy(FSFolder parent, int first, int pageSize) throws BaseException {
         String notRootFolder = parent.getPath().equals("/") ? "" : parent.getPath();
+        logger.log(Level.INFO, "=========PARENT: "+parent.getPath());
         List<FSObject> children = new ArrayList<FSObject>();
         Folder cmisParent = (Folder) session.getObjectByPath(parent.getPath());
 
@@ -170,9 +171,27 @@ public class FSFolderDaoImpl implements FSFolderDao {
 //            return page;
             }
         } else {
-            logger.log(Level.INFO, "============IN FIND====4==============");
-            pageSizeTroubleproof = dataSize % pageSize;
-            firstTroubleproof = dataSize - dataSize % pageSize;
+//            logger.log(Level.INFO, "============IN FIND====4==============");
+//            pageSizeTroubleproof = dataSize % pageSize;
+//            firstTroubleproof = dataSize - dataSize % pageSize + 1;
+            if (dataSize % pageSize != 0) {
+                logger.log(Level.INFO, "============IN FIND====4==============");
+//                page.put("page", files.subList(dataSize - dataSize % pageSize, dataSize));
+                pageSizeTroubleproof = dataSize % pageSize;
+                firstTroubleproof = dataSize - (dataSize % pageSize + 1);
+//                return page;
+            } else {
+                logger.log(Level.INFO, "============IN FIND====4==============");
+//                page.put("page", files.subList(dataSize - pageSize, dataSize));
+                logger.log(Level.INFO, "============IN FIND=================" + dataSize +" asdsadas " + pageSize);
+                pageSizeTroubleproof = dataSize - pageSize;
+                firstTroubleproof = pageSize;
+                if(dataSize == 0 ){
+                    pageSizeTroubleproof = pageSize;
+                    firstTroubleproof = 0;
+                }
+//                return page;
+            }
         }
 
 

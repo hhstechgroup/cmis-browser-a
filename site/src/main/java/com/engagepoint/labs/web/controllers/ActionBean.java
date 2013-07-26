@@ -49,24 +49,6 @@ public class ActionBean implements Serializable {
 
     private boolean copyItemPressed = false;
 
-    /**
-     * Handling exception and create a message to show user om dialog page  and log the exception
-     * method fail validation and skip all the subsequent phases and go to render response
-     * phase to avoid closing dialog with the client
-     *
-     * @param ex        Exception that is thown from service layer
-     * @param component Component to which error is binding
-     */
-
-    private void catchException(Exception ex, UIComponent component) {
-        RequestContext context = RequestContext.getCurrentInstance();
-        FacesMessage error_msg = new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                "", ex.getMessage());
-        FacesContext.getCurrentInstance().addMessage(component.getClientId(), error_msg);
-        FacesContext.getCurrentInstance().validationFailed();
-        FacesContext.getCurrentInstance().renderResponse();
-        logger.log(Level.SEVERE, "Exception: ", ex);
-    }
 
     public void copyFolder() {
         FSObject target = treeBean.getSelectedFSObject();
@@ -169,12 +151,17 @@ public class ActionBean implements Serializable {
             }
             //TODO enable message when node is not selected       kozubal
             //parent not selected
-        } catch (Exception ex) {
-            catchException(ex, createcomponent);
+        } catch (FolderAlreadyExistException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    ex.getMessage(),
+                    ""));
+        } catch (BaseException e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    e.getMessage(),
+                    "Undefined error!"));
         }
         this.name = "";
         this.type = "";
-        // ====================paging==================treeBean.updatetablePageList();
     }
 
     public void edit(FSObject selected, TreeNode parent) {

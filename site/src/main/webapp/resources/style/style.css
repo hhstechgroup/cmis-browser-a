@@ -22,18 +22,18 @@
 
 @font-face {
     font-family: MuseoSans_500;
-    src: url("fonts/MuseoSans_500-webfont.ttf") format("truetype");
+    src: url("fonts/MuseoSans_500-webfont.ttf");
 }
 
 @font-face {
     font-family: MuseoSans700;
-    src: url("fonts/museosans_700-webfont.ttf") format("truetype");
+    src: url("fonts/museosans_700-webfont.ttf");
 }
 
 .ui-menuitem-text {
-    font-family: MuseoSans700, sans-serif;
-    font-size: 16px;
-    padding: 0px 4px;
+    font-family: MuseoSans700, serif;
+    font-size: 18px;
+    padding: 0 2px;
     line-height: 20px;
     color: white;
     cursor: pointer;
@@ -55,7 +55,6 @@
 }
 
 .ui-button {
-    background: rgb(40, 153, 183);
     color: #ffffff;
 }
 
@@ -82,7 +81,7 @@
 
 .ui-widget-header .ui-state-default {
     color: #FFFFFF;
-    font-family: MuseoSans700, sans-serif;
+    font-family: MuseoSans700, serif;
     background: rgb(40, 153, 183);
 }
 
@@ -104,9 +103,18 @@
     color: #000000;
 }
 
-.ui-widget-content {
-    background: rgb(238, 238, 238);
+a {
+    text-decoration: none
 }
+
+.ui-widget-content {
+    background: #ffffff;
+}
+
+.ui-inputtext {
+    background: #ffffff !important;
+}
+
 
 .ui-widget-header .ui-inputtext {
     background: #ffffff;
@@ -154,6 +162,7 @@
 
 .ui-accordion .ui-inputtext {
     background: #ffffff;
+    margin: 10px;
     color: #000000;
 }
 
@@ -161,9 +170,26 @@
     color: #ffffff;
 }
 
-.ui-accordion .ui-radiobutton {
+.ui-radiobutton {
+    margin: 0 !important;
+
 }
 
 .ui-accordion .ui-accordion-content.ui-widget-content .ui-selectoneradio {
-    border-color: rgb(238, 238, 238);
+    border-color: #ffffff;
+    text-align: center;
+    width: 60%;
 }
+
+.ui-accordion .ui-accordion-content.ui-widget-content {
+    text-align: left;
+}
+
+.ui-accordion .ui-datepicker .ui-state-hover{
+    background: #000000;
+}
+
+.ui-selectonemenu-label {
+    background: rgb(40, 153, 183) !important;
+}
+

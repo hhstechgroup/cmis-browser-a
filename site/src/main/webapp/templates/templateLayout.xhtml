@@ -5,30 +5,34 @@
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:ui="http://java.sun.com/jsf/facelets">
 <h:head>
- <script type="text/javascript"  src="resources/js/dojo/dojo.js"
+    <script type="text/javascript" src="resources/js/dojo/dojo.js"
             djConfig="preventBackButtonFix: false">
     </script>
 </h:head>
-<h:body style="margin: 15px; background: rgb(238, 238, 238);">
-    <h:panelGrid bgcolor="#2899B7" style="height: 80px;border-radius: 15px;" width="100%">
-        <ui:insert name="header">
-            <ui:include src="/templates/header.xhtml"/>
-        </ui:insert>
-    </h:panelGrid>
-    <h:panelGrid>
-        <ui:insert name="login">
-            <ui:include src="/templates/login.xhtml"/>
-        </ui:insert>
-    </h:panelGrid>
-    <h:panelGrid>
-        <ui:insert name="treeInfo">
-            <ui:include src="/templates/treeInfo.xhtml"/>
-        </ui:insert>
-    </h:panelGrid>
-    <h:panelGrid  bgcolor="#2899B7" width="100%" style="border-radius: 11px; margin-top: 15px;">
-        <ui:insert name="footer">
-            <ui:include src="/templates/footer.xhtml"/>
-        </ui:insert>
-    </h:panelGrid>
+<h:body style="margin: 0 15px;  width: 90%; position: relative; left: 50px; background: #d8d8d8;">
+    <div style="background: rgb(238, 238, 238);">
+
+        <h:panelGrid bgcolor="#333333" style="height: 80px;"
+                     width="100%">
+            <ui:insert name="header">
+                <ui:include src="/templates/header.xhtml"/>
+            </ui:insert>
+        </h:panelGrid>
+        <h:panelGrid>
+            <ui:insert name="login">
+                <ui:include src="/templates/login.xhtml"/>
+            </ui:insert>
+        </h:panelGrid>
+        <h:panelGrid>
+            <ui:insert name="treeInfo">
+                <ui:include src="/templates/treeInfo.xhtml"/>
+            </ui:insert>
+        </h:panelGrid>
+        <h:panelGrid bgcolor="#333333" width="100%" style=" margin-top: 15px;">
+            <ui:insert name="footer">
+                <ui:include src="/templates/footer.xhtml"/>
+            </ui:insert>
+        </h:panelGrid>
+    </div>
 </h:body>
 </html>

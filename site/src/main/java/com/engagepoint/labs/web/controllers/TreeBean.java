@@ -419,13 +419,13 @@ public class TreeBean implements Serializable {
         }
 
         if (metaDataType != "" && metaDataType != null && cmisType.equals("cmis:document" )) {
-            searchQueryAdvanced.put(2, metaDataType);
+            searchQueryAdvanced.put(2, "%" +metaDataType + "%");
             logger.log(Level.INFO, "==___________findAdvanced()____"+metaDataType);
         } else {
             searchQueryAdvanced.put(2, "");
         }
         if (docType != "" && docType != null && cmisType.equals("cmis:document")) {
-            searchQueryAdvanced.put(3, "%." + docType);
+            searchQueryAdvanced.put(3,   "%"+docType+ "%");
             logger.log(Level.INFO, "==___________findAdvanced()____"+docType);
         } else {
             searchQueryAdvanced.put(3, "");

@@ -54,7 +54,7 @@ public interface CMISService {
      * @throws Exception if folder with this name exist in parent directory
      * or connection is fail
      */
-    public FSFolder createFolder(FSFolder parent, String folderName) throws Exception;
+    public FSFolder createFolder(FSFolder parent, String folderName) throws BaseException;
 
     public FSFile createFile(FSFolder parent, String fileName, byte[] content, String mimeType) throws BaseException;
 

@@ -38,7 +38,7 @@
                  var="fsObject"
                  scrollable="true"
                  value="#{treeBean.lazyModel}"
-                 scrollHeight="400" style="width: 900px;"
+                 style="width: 810px;"
                  emptyMessage="This folder is empty"
                  rowKey="#{fsObject}"
                  selection="#{treeBean.selectedFSObject}"
@@ -90,7 +90,7 @@
                         <!--metadata-->
                         <h:outputText value="Doc type: "/>
                         <p:inputText id="metaDataType" value="#{treeBean.metaDataType}" disabled="#{treeBean.disableSearchFolderProperties}"/>
-                        <p:watermark value="metaDataType" for="metaDataType"/>
+                        <p:watermark value="typeId" for="metaDataType"/>
                         <br/>
 
                         <!--format-->
@@ -110,11 +110,6 @@
                         <p:watermark value="Second date" for="calendarTo"/>
                         <br/>
 
-                        <!--Metadata-->
-                        <h:outputText value="Content"/>
-                        <p:inputText id="contentType" value="#{treeBean.contentType}" disabled="true"/>
-                        <p:watermark value="type" for="contentType"/>
-                        <br/>
 
                         <!--size -->
 

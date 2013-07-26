@@ -1,15 +1,15 @@
 
 @font-face {
     font-family: MuseoSans700;
-    src: url("fonts/museosans_700-webfont.ttf")
+    src: url("fonts/museosans_700-webfont.ttf");
 }
 
 .readonly {
-    font-family: MuseoSans700, sans-serif;
+    font-family: MuseoSans700, serif !important;
     background: #ffffff;
+    font-size: 18px !important;
     width: 95%;
     border-radius: 11px;
-    font-size: 16px;
     margin-bottom: 5px;
     cursor: no-drop;
     color: #000000;
@@ -19,7 +19,6 @@
     background: #ffffff;
     border-radius: 11px;
     margin-bottom: 5px;
-
     padding: 2px;
     color: #000000;
     font-family: MuseoSans700, sans-serif;
