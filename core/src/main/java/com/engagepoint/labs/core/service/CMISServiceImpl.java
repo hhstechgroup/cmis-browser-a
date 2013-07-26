@@ -103,6 +103,10 @@ public class CMISServiceImpl implements CMISService {
     public List<FSObject> getPageForLazy(FSFolder parent, int first, int pageSize) throws BaseException {
         return fsFolderDao.getPageForLazy(parent, first, pageSize);
     }
+    @Override
+    public Map<String, Object> getPageForLazy2(FSFolder parent, int first, int pageSize) throws BaseException {
+        return fsFolderDao.getPageForLazy2(parent, first, pageSize);
+    }
 
     @Override
     public void move(FSFile source) throws BrowserRuntimeException {
@@ -135,6 +139,15 @@ public class CMISServiceImpl implements CMISService {
     public List<FSObject> getPageForLazySearchQuery(int first, int pageSize, Map<Integer, Object> query) {
 
         return fsFolderDao.find(query).subList(first, first + pageSize);
+    }
+    @Override
+    public Map<String, Object> getPageForLazySearchQuery2(int first, int pageSize, String query) {
+        return fsFolderDao.find2(first, pageSize, query);
+    }
+
+    @Override
+    public Map<String, Object> getPageForLazySearchQuery2(int first, int pageSize, Map<Integer, Object> query) {
+        return  fsFolderDao.find2(first, pageSize, query);
     }
 
     @Override

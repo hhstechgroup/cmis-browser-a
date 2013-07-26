@@ -67,82 +67,30 @@ public class
     @Override
     public List<FSObject> load(int first, int pageSize, String sortField, org.primefaces.model.SortOrder sortOrder, Map<String, String> filters) {
         List<FSObject> data = new ArrayList<FSObject>();
+        Map<String, Object> page;
 
         if (!ableSearchAdvanced) {
             if (searchQuery.equals("")) {
-                int dataSize = cmisService.getMaxNumberOfRows(parent);
-                this.setRowCount(dataSize);
-                logger.log(Level.INFO, "============DATASIZE==========" + dataSize + "========");
-
-                if (dataSize > pageSize) {
-                    try {
-                        data = cmisService.getPageForLazy(parent, first, pageSize);
-                    } catch (FolderNotFoundException ex) {
-                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "Folder !",
-                                ex.getMessage()));
-                    } catch (BaseException e) {
-                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "Folder !",
-                                e.getMessage()));
-                    }
-                    return data;
-                } else {
-                    try {
-                        data = cmisService.getPageForLazy(parent, 0, pageSize);
-                    } catch (FolderNotFoundException ex) {
-                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "Folder !",
-                                ex.getMessage()));
-                    } catch (BaseException e) {
-                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "Folder !",
-                                e.getMessage()));
-                    }
-                    return data;
+                try {
+                    page = cmisService.getPageForLazy2(parent, first, pageSize);
+                    this.setRowCount((Integer)page.get("datasize"));
+                    return (List<FSObject>)page.get("page");
+                } catch (BaseException e) {
+                    return null;
                 }
+
             } else {
-                int dataSize = cmisService.getMaxNumberOfRowsByQuery(searchQuery);
-                this.setRowCount(dataSize);
-                logger.log(Level.INFO, "============DATASIZE_Query==========" + dataSize + "========");
+                page = cmisService.getPageForLazySearchQuery2(first, pageSize, searchQuery);
+                this.setRowCount((Integer)page.get("datasize"));
+                return (List<FSObject>)page.get("page");
 
-                if (dataSize > pageSize) {
-                    if ((first + pageSize) > dataSize) {
-                        logger.log(Level.INFO, "============if((first + pageSize) > dataSize)==========" + dataSize + "========");
-                        data = cmisService.getPageForLazySearchQuery(first, dataSize - first, searchQuery);
-                        return data;
-                    } else {
-                        data = cmisService.getPageForLazySearchQuery(first, pageSize, searchQuery);
-                        return data;
-                    }
-                } else {
-                    logger.log(Level.INFO, "============DATASIZE_Query from==========" + pageSize + "========");
-                    data = cmisService.find(searchQuery);
-                    logger.log(Level.INFO, "============DATASIZE_Query to==========" + pageSize + "========");
-                    return data;
-                }
             }
         }
         // for advaced search
         else {
-            int dataSize = cmisService.getMaxNumberOfRowsByQuery(searchQueryAdvanced);
-            this.setRowCount(dataSize);
-
-            if (dataSize > pageSize) {
-                if ((first + pageSize) > dataSize) {
-                    logger.log(Level.INFO, "============IN FIND====31==============");
-                    data = cmisService.getPageForLazySearchQuery(first, dataSize - first, searchQueryAdvanced);
-                    return data;
-                } else {
-                    logger.log(Level.INFO, "============IN FIND====32==============");
-                    data = cmisService.getPageForLazySearchQuery(first, pageSize, searchQueryAdvanced);
-                    return data;
-                }
-            } else {
-                logger.log(Level.INFO, "============IN FIND====4==============");
-                data = cmisService.getPageForLazySearchQuery(first, dataSize, searchQueryAdvanced);
-                return data;
-            }
+            page = cmisService.getPageForLazySearchQuery2(first, pageSize, searchQueryAdvanced);
+            this.setRowCount((Integer)page.get("datasize"));
+            return (List<FSObject>)page.get("page");
 
         }
     }
